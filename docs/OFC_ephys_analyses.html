@@ -1,0 +1,1652 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>OFC recordings - Analyses</title>
+
+<script src="site_libs/header-attrs-2.27/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">My Website</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="OFC_ephys_analyses.html">OFC ephys - Analyses (Figs 2, 3, S1-3)</a>
+</li>
+<li>
+  <a href="ACx_ephys_analyses.html">OFC muscimol + ACx ephys - Analyses (Figs 5, S5-6)</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">OFC recordings - Analyses</h1>
+
+</div>
+
+
+<div id="load-libraries-and-data-from-preprocessing-pipeline"
+class="section level1">
+<h1>Load libraries and data from preprocessing pipeline</h1>
+<div id="load-previously-exported-environment." class="section level2">
+<h2>Load previously exported environment.</h2>
+<p>Uncomment chunk below if the second block of code has been run
+previously and does not need modifications</p>
+<pre class="r"><code># 
+# load(&#39;./Data/OFC_ephys_analyses_env.RData&#39;)
+# 
+# library(ggplot2)
+# library(dplyr)
+# library(tidyr)
+# # install.packages(c(&#39;remotes&#39;, &#39;TMB&#39;))
+# # remotes::install_github(&quot;glmmTMB/glmmTMB/glmmTMB&quot;, build_vignettes=FALSE)
+# library(glmmTMB)
+# library(DHARMa)
+# library(car)
+# library(reshape2)
+# library(emmeans)
+# library(rcompanion)
+# # Create the notin operator
+# `%notin%` &lt;- Negate(`%in%`)
+# 
+# # Some global plot parameters if modification is needed.
+# source(&#39;./r_theme.r&#39;, echo=F)
+# theme_set(theme_mml(base_size = 20))
+# LINE_THICKNESS = 1
+# ERRORBAR_THICKNESS = LINE_THICKNESS/2
+# INDIVIDUAL_DATAPOINT_LINE = LINE_THICKNESS/1.5
+# SMALL_PLOTS_LINE_THICKNESS = LINE_THICKNESS/3
+# ACTIVEBASELINE_MODULATION_COLORS = c(&#39;#E39D51&#39;,&#39;#356B83&#39;, &#39;gray&#39;)  # task-suppressed, -enhanced, -unchanged
+# 
+# TRIALTYPE_MODULATION_COLORS = c(&#39;#46BDD7&#39;, &#39;#9E4770&#39;, &#39;#EB172C&#39;, &#39;black&#39;)  # Hit, FA, miss, passive</code></pre>
+</div>
+<div id="process" class="section level2">
+<h2>Process</h2>
+<pre class="r"><code>library(ggplot2)
+library(dplyr)
+library(tidyr)
+# install.packages(c(&#39;remotes&#39;, &#39;TMB&#39;))
+# remotes::install_github(&quot;glmmTMB/glmmTMB/glmmTMB&quot;, build_vignettes=FALSE)
+library(glmmTMB)
+library(DHARMa)
+library(car)
+library(reshape2)
+library(emmeans)
+library(rcompanion)
+# Create the notin operator
+`%notin%` &lt;- Negate(`%in%`)
+
+# Some global plot parameters if modification is needed.
+source(&#39;./r_theme.r&#39;, echo=F)
+theme_set(theme_mml(base_size = 20))
+LINE_THICKNESS = 1
+ERRORBAR_THICKNESS = LINE_THICKNESS/2
+INDIVIDUAL_DATAPOINT_LINE = LINE_THICKNESS/1.5
+SMALL_PLOTS_LINE_THICKNESS = LINE_THICKNESS/3
+ACTIVEBASELINE_MODULATION_COLORS = c(&#39;#E39D51&#39;,&#39;#356B83&#39;, &#39;gray&#39;)  # task-suppressed, -enhanced, -unchanged
+
+TRIALTYPE_MODULATION_COLORS = c(&#39;#46BDD7&#39;, &#39;#9E4770&#39;, &#39;#EB172C&#39;, &#39;black&#39;)  # Hit, FA, miss, passive
+
+boxplot_whiskers &lt;- function(x) {
+  r &lt;- quantile(x, probs = c(0.10, 0.25, 0.5, 0.75, 0.90))
+  names(r) &lt;- c(&quot;ymin&quot;, &quot;lower&quot;, &quot;middle&quot;, &quot;upper&quot;, &quot;ymax&quot;)
+  r
+}
+
+# Custom functions
+z_score = function(response_df, baseline_df) {
+  
+  # If variables have equal length, assume covariates, else don&#39;t use cov()
+  if(length(response_df) == length(baseline_df)) {
+    return(
+      (mean(response_df) - mean(baseline_df)) / 
+        (sqrt(var(response_df) + var(baseline_df) - 
+        2*cov(response_df, baseline_df)))
+    )
+  } else {
+    return(
+      (mean(response_df) - mean(baseline_df)) / 
+        (sqrt(var(response_df) + var(baseline_df)))
+    )
+  }
+}
+
+zeromin = function(x) {
+  return( (x + 2*abs(min(x))) )
+}
+
+# Load data from preprocessing pipeline
+df = read.csv(&#39;./Data/OFCPL_allTrial_df.csv&#39;)
+
+# Remove eventual NA rows
+df[df == &quot;NaN&quot;]&lt;-NA
+df = df[!is.na(df$Subject),]
+
+
+# Factorize some columns
+df$Session = factor(df$Session, levels=c(&#39;Pre&#39;, &#39;Active&#39;, &#39;Post&#39;, &#39;Post1h&#39;))
+cols_to_factorize = c(&#39;Unit&#39;, &#39;Subject&#39;, &#39;Date&#39;, &#39;TrialID&#39;, &#39;AMdepth&#39;, &#39;Period&#39;, &#39;Subject_date&#39;, &#39;Cluster_quality_MML&#39;, &#39;Cluster_quality_Allen&#39;, &#39;First_am_above_threshold_flag&#39;, &#39;AM_above_threshold_flag&#39;, &#39;AMThreshold_modulated&#39;, &#39;AMThreshold_modulation_direction&#39;)
+df[cols_to_factorize] &lt;- lapply(df[cols_to_factorize], factor) 
+
+# Separate SU and MU activity
+# Call &#39;good&#39; the intersection between MML and Allen classification
+df$Cluster_quality = &#39;mua&#39;
+df[df$Cluster_quality_MML == &#39;good&#39; &amp; df$Cluster_quality_Allen == &#39;good&#39;,]$Cluster_quality = &#39;good&#39;
+
+# Simplify trial outcome labels
+df$Trial_type = &#39;Miss (no shock)&#39;
+df[df$Hit == 1,]$Trial_type = &#39;Hit&#39;
+df[df$Miss == 1 &amp; df$ShockFlag == 1,]$Trial_type = &#39;Miss (shock)&#39;
+df[df$FA == 1,]$Trial_type = &#39;False alarm&#39;
+
+df$Trial_type = factor(df$Trial_type, levels=c(&#39;Miss (shock)&#39;, &#39;Hit&#39;, &#39;False alarm&#39;, &#39;Miss (no shock)&#39;))
+
+# Load behavioral files
+threshold_df = read.csv(&#39;./Data/OFCPL_behavior_df.csv&#39;)
+
+# Elliminate eventual subjects not in behavioral threshold_df
+df = df[df$Subject %in% unique(threshold_df$Subject),]
+
+df$Cluster_quality_Allen = &#39;mua&#39;
+df[(df$ISI_FPRate &lt; 0.5) &amp; (df$Fraction_missing &lt; 0.1) &amp; (df$Presence_ratio &gt; 0.9) &amp; (df$ISI_ViolationRate &lt; 2),]$Cluster_quality_Allen = &#39;good&#39;
+
+# Call &#39;good&#39; the intersection between MML and Allen 
+df$Cluster_quality = &#39;mua&#39;
+df[df$Cluster_quality_MML == &#39;good&#39; &amp; df$Cluster_quality_Allen == &#39;good&#39;,]$Cluster_quality = &#39;good&#39;
+
+# ---------------------------------------------------------------------------
+# Data curation
+# Ensure  subjects 232 and 270 are not here (insufficient training days and units, respectively)
+# Also SUBJ-ID-197 anatomy was off; probably only in OFC towards the end of training
+subjects_to_exclude = c(&#39;SUBJ-ID-232&#39;, &#39;SUBJ-ID-270&#39;, &#39;SUBJ-ID-197&#39;)
+df = df[df$Subject %notin% subjects_to_exclude,]
+
+# SUBJ-ID-390_2022-06-24_16-37-06_PassivePost 
+# eliminate trials between 108.5 and 171.1 s when animal unplugged SPI cable; these translate to trials 77 through 119
+df = df[!(df$Key_file == &#39;SUBJ-ID-390_SUBJ-ID-390_2022-06-24_16-37-06_PassivePost_trialInfo&#39; &amp; df$TrialID %in% 77:119),]
+
+# Something strange happened on SUBJ-ID-390 6/27/22 Active where DACs become out of sync with ePsych by a variable offset starting when the animal regressed in AM depth difficulty after AM trial 7 (TrialID 178 on); remove trials after that here
+# This did not happen in any other session
+df = df[!(df$Key_file == &#39;SUBJ-ID-390_SUBJ-ID-390_2022-06-27_18-11-15_Active_trialInfo&#39; &amp; as.numeric(as.character(df$TrialID)) &gt; 177),]
+
+# Remove units without Pre recording
+pre_units = unique(df[df$Session == &#39;Pre&#39;,]$Unit)
+df = df[df$Unit %in% pre_units,]
+df = droplevels(df)
+# ---------------------------------------------------------------------------
+
+# Save image for faster loading
+save.image(&#39;./Data/OFC_ephys_analyses_env.RData&#39;)
+
+# Some garbage collection
+gc()</code></pre>
+<pre><code>##            used  (Mb) gc trigger  (Mb)  max used   (Mb)
+## Ncells  3090522 165.1    9849321 526.1   8962634  478.7
+## Vcells 36125409 275.7  118875496 907.0 141093357 1076.5</code></pre>
+</div>
+</div>
+<div id="get-some-descriptives" class="section level1">
+<h1>Get some descriptives</h1>
+<pre class="r"><code># Training days per subject
+df %&gt;% group_by(Subject) %&gt;%
+  summarise(
+    Max_day = max(Day_of_training)
+  )</code></pre>
+<pre><code>## # A tibble: 5 × 2
+##   Subject     Max_day
+##   &lt;fct&gt;         &lt;int&gt;
+## 1 SUBJ-ID-151      10
+## 2 SUBJ-ID-154      13
+## 3 SUBJ-ID-231       9
+## 4 SUBJ-ID-389       9
+## 5 SUBJ-ID-390      10</code></pre>
+<pre class="r"><code># How many trials per session?
+df_info = df[df$AMdepth_db != -40 &amp; df$Period == &#39;Baseline&#39;,] %&gt;% group_by(Subject, Session, Subject_date) %&gt;%
+  summarise(
+    Trial_count = length(unique(TrialID))
+  )</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;Subject&#39;, &#39;Session&#39;. You can override
+## using the `.groups` argument.</code></pre>
+<pre class="r"><code>df_info %&gt;% group_by(Session) %&gt;%
+  summarise(
+    Trial_count_mean = mean(Trial_count),
+    Trial_count_ste = sd(Trial_count)/sqrt(n() - 1)
+  )</code></pre>
+<pre><code>## # A tibble: 4 × 3
+##   Session Trial_count_mean Trial_count_ste
+##   &lt;fct&gt;              &lt;dbl&gt;           &lt;dbl&gt;
+## 1 Pre                 101.          0.117 
+## 2 Active              110.          3.16  
+## 3 Post                101.          0.236 
+## 4 Post1h              101.          0.0645</code></pre>
+<pre class="r"><code># How many single units?
+df_info = df[df$AMdepth_db != -40 &amp; df$Period == &#39;Baseline&#39;,] %&gt;% group_by(Subject, Unit, Subject_date, Cluster_quality, ActiveTrial_modulation_direction) %&gt;%
+  summarise(
+    Trial_count = length(unique(TrialID)),
+    ISI_FPRate = mean(ISI_FPRate),
+    ISI_ViolationRate = mean(ISI_ViolationRate),
+    Fraction_missing = mean(Fraction_missing)
+  )</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;Subject&#39;, &#39;Unit&#39;, &#39;Subject_date&#39;, &#39;Cluster_quality&#39;. You can override
+## using the `.groups` argument.</code></pre>
+<pre class="r"><code>table(df_info$Cluster_quality)</code></pre>
+<pre><code>## 
+## good  mua 
+##  313  234</code></pre>
+</div>
+<div id="figure-2e-g-task-dependent-tonic-modulation"
+class="section level1">
+<h1>Figure 2E-G: Task-dependent tonic modulation</h1>
+<div id="fig-2e-modulation-strength-distribution"
+class="section level2">
+<h2>Fig 2E: Modulation strength distribution</h2>
+<pre class="r"><code># Prepare data using relevant variables
+df_grouped = df[df$Trial_type != &#39;False alarm&#39; &amp; df$Period == &#39;Baseline&#39;,] %&gt;% group_by(Unit, Subject, Date, Day_of_training, ActiveBaseline_modulation_direction) %&gt;%
+  summarise( 
+    FR_Hz_baseline = mean(FR_Hz),
+    Zscore_taskPassive = z_score(FR_Hz[Session==&#39;Active&#39;], FR_Hz[Session==&#39;Pre&#39;])
+  )</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;Unit&#39;, &#39;Subject&#39;, &#39;Date&#39;, &#39;Day_of_training&#39;. You can override using
+## the `.groups` argument.</code></pre>
+<pre class="r"><code>df_grouped$ActiveBaseline_modulation_direction = factor(df_grouped$ActiveBaseline_modulation_direction, levels=c(&#39;decrease&#39;, &#39;increase&#39;, &#39;none&#39;))
+
+# Plot
+graph_data = df_grouped[!is.nan(df_grouped$Zscore_taskPassive),]
+graph_data = graph_data[order(graph_data$Zscore_taskPassive),]
+graph_data$Plot_order = seq(1, nrow(graph_data))
+
+y_axis = seq(-2, 6, 2)
+p = ggplot(data=graph_data, aes(x = Plot_order, y = Zscore_taskPassive, fill=ActiveBaseline_modulation_direction)) + 
+  geom_bar(stat=&#39;identity&#39;, width=1) +
+  scale_fill_manual(values=ACTIVEBASELINE_MODULATION_COLORS, name=&#39;&#39;,
+                    labels=c(&#39;Task-\nsuppressed&#39;, &#39;Task-\nenhanced&#39;, &#39;Task-\nunchanged&#39;)) +
+  geom_hline(yintercept = 0, color=&#39;black&#39;, linetype=&quot;dashed&quot;) +
+
+  ylab(&#39;Context modulation (z-score)&#39;) +
+  
+  scale_y_continuous(breaks=y_axis, expand=c(0, 0)) +
+  coord_cartesian(ylim = c(min(y_axis), max(y_axis))) +
+  
+  theme(
+    strip.background = element_blank(),
+    strip.text.y = element_blank(),
+    legend.position = c(0.2, 0.85),
+    axis.title.x=element_blank(),
+    axis.text.x=element_blank(),
+    axis.ticks.x=element_blank()
+  ) +
+  guides(x = &quot;none&quot;)
+p</code></pre>
+<p><img src="OFC_ephys_analyses_files/figure-html/unnamed-chunk-4-1.png" width="1152" /></p>
+</div>
+<div id="fig-2f-modulation-strength-comparison-among-groups"
+class="section level2">
+<h2>Fig 2F: Modulation strength comparison among groups</h2>
+<pre class="r"><code># Prepare data using relevant variables
+df_grouped = df[df$Trial_type != &#39;False alarm&#39; &amp; df$Period == &#39;Baseline&#39;,] %&gt;% group_by(Unit, Subject, Date, Day_of_training, ActiveBaseline_modulation_direction) %&gt;%
+  summarise( 
+    FR_Hz_baseline = mean(FR_Hz),
+    Zscore_taskPassive = z_score(FR_Hz[Session==&#39;Active&#39;], FR_Hz[Session==&#39;Pre&#39;])
+  )</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;Unit&#39;, &#39;Subject&#39;, &#39;Date&#39;, &#39;Day_of_training&#39;. You can override using
+## the `.groups` argument.</code></pre>
+<pre class="r"><code>df_grouped$ActiveBaseline_modulation_direction = factor(df_grouped$ActiveBaseline_modulation_direction, levels=c(&#39;decrease&#39;, &#39;increase&#39;, &#39;none&#39;))
+
+# Plot
+graph_data = df_grouped[!is.nan(df_grouped$Zscore_taskPassive),]
+# reversed_colors = rev(ACTIVEBASELINE_MODULATION_COLORS[1:2])
+y_axis = seq(0, 1.5, 0.5)
+p = ggplot(data=graph_data, aes(x = ActiveBaseline_modulation_direction, y = abs(Zscore_taskPassive), fill=ActiveBaseline_modulation_direction, color=ActiveBaseline_modulation_direction)) + 
+  stat_summary(fun.data=boxplot_whiskers, geom=&quot;boxplot&quot;, na.rm = T, alpha=0.3, lwd=LINE_THICKNESS/2, fatten=1, width=0.75)+
+  
+  ylab(expression(&#39;|Context modulation|&#39;)) +
+  
+  scale_fill_manual(values=ACTIVEBASELINE_MODULATION_COLORS, name=&#39;&#39;,
+                    guide=&#39;none&#39;) +
+  
+  scale_color_manual(values=ACTIVEBASELINE_MODULATION_COLORS, 
+                     labels=c(&#39;Task-\nsuppressed&#39;, &#39;Task-\nenhanced&#39;, &#39;Task-\nunchanged&#39;), name=&#39;&#39;) +
+  
+  scale_y_continuous(breaks=y_axis, expand=c(0, 0)) +
+  coord_cartesian(ylim = c(min(y_axis), max(y_axis))) +
+
+  theme(
+    legend.position = c(0.2, 0.85),
+    axis.title.x=element_blank(),
+    axis.line.x = element_blank(),
+    axis.text.x=element_blank(),
+    axis.ticks.x=element_blank()
+  )
+p</code></pre>
+<p><img src="OFC_ephys_analyses_files/figure-html/unnamed-chunk-5-1.png" width="1152" />
+### Stats</p>
+<pre class="r"><code>lme_data = graph_data
+lme_bin &lt;- glmmTMB(sqrt(sqrt(abs(Zscore_taskPassive))) ~ ActiveBaseline_modulation_direction + (1 | Subject/Unit),  data=lme_data, family=gaussian)
+simulationOutput &lt;- simulateResiduals(fittedModel = lme_bin, plot = T, re.form=NULL)  # pass</code></pre>
+<p><img src="OFC_ephys_analyses_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<pre class="r"><code>Anova(lme_bin)</code></pre>
+<pre><code>## Analysis of Deviance Table (Type II Wald chisquare tests)
+## 
+## Response: sqrt(sqrt(abs(Zscore_taskPassive)))
+##                                      Chisq Df Pr(&gt;Chisq)    
+## ActiveBaseline_modulation_direction 431.99  2  &lt; 2.2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>pairs(regrid(emmeans(lme_bin,  ~ActiveBaseline_modulation_direction)),  adjust=&#39;Bonferroni&#39;)</code></pre>
+<pre><code>## Warning in (function (object, at, cov.reduce = mean, cov.keep = get_emm_option(&quot;cov.keep&quot;), : There are unevaluated constants in the response formula
+## Auto-detection of the response transformation may be incorrect</code></pre>
+<pre><code>##  contrast            estimate     SE  df t.ratio p.value
+##  decrease - increase  -0.0181 0.0152 541  -1.194  0.6991
+##  decrease - none       0.3023 0.0165 541  18.319  &lt;.0001
+##  increase - none       0.3204 0.0171 541  18.754  &lt;.0001
+## 
+## P value adjustment: bonferroni method for 3 tests</code></pre>
+</div>
+<div id="fig-2g-task-dependent-firing-rate-change"
+class="section level2">
+<h2>Fig 2G: Task-dependent firing rate change</h2>
+<pre class="r"><code># Group data using relevant columns
+df_grouped = df[df$Trial_type != &#39;False alarm&#39;,] %&gt;% group_by(Unit, Subject, Subject_date, Session, Period, ActiveBaseline_modulated, ActiveBaseline_modulation_direction, Cluster_quality) %&gt;%
+  summarise( 
+    FR_Hz = mean(FR_Hz, na.rm=T),
+    Spike_count = round(mean(Spike_count, na.rm=T)),
+    Threshold_improvement = mean(Threshold_improvement, na.rm=T),
+    Threshold_improvement_linear = mean(Threshold_improvement_linear, na.rm=T),
+    Threshold_linear = mean(Threshold_linear, na.rm=T),
+    Threshold = mean(Threshold, na.rm=T)
+  )</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;Unit&#39;, &#39;Subject&#39;, &#39;Subject_date&#39;, &#39;Session&#39;, &#39;Period&#39;,
+## &#39;ActiveBaseline_modulated&#39;, &#39;ActiveBaseline_modulation_direction&#39;. You can override using the `.groups`
+## argument.</code></pre>
+<pre class="r"><code>df_grouped$ActiveBaseline_modulation_direction = factor(df_grouped$ActiveBaseline_modulation_direction, levels=c(&#39;decrease&#39;, &#39;increase&#39;, &#39;none&#39;))
+df_grouped$Session = factor(df_grouped$Session, levels=c(&#39;Pre&#39;, &#39;Active&#39;, &#39;Post&#39;))
+df_grouped = df_grouped[!is.na(df_grouped$Session),]
+
+# Plot
+graph_data =  df_grouped[df_grouped$Period==&#39;Baseline&#39;,]
+
+graph_data$ActiveBaseline_modulation_direction = factor(graph_data$ActiveBaseline_modulation_direction, levels=c(&#39;decrease&#39;, &#39;increase&#39;, &#39;none&#39;))
+y_axis = seq(0, 30, 10)
+p =ggplot(data=graph_data, aes(x=Session, y=(FR_Hz), fill=ActiveBaseline_modulation_direction, color=ActiveBaseline_modulation_direction)) + 
+  facet_grid(.~ActiveBaseline_modulation_direction) +
+
+  stat_summary(fun.data=boxplot_whiskers, geom=&quot;boxplot&quot;, na.rm = T, alpha=0.3, lwd=LINE_THICKNESS/2, fatten=1, width=0.75)+
+  
+  ylab(&#39;Firing rate (Hz)&#39;) +
+    scale_x_discrete(labels=c(&quot;Pre&quot; = &quot;Pre&quot;, &quot;Active&quot; = &quot;Task&quot;,
+                                &quot;Post&quot; = &quot;Post&quot;)) +
+  scale_fill_manual(values=ACTIVEBASELINE_MODULATION_COLORS, name=&#39;&#39;,
+                    guide=&#39;none&#39;) +
+  
+  scale_color_manual(values=ACTIVEBASELINE_MODULATION_COLORS, 
+                     labels=c(&#39;Task-\nsuppressed&#39;, &#39;Task-\nenhanced&#39;, &#39;Task-\nunchanged&#39;), name=&#39;&#39;) +
+  
+  scale_y_continuous(breaks=y_axis, expand=c(0, 0)) +
+  coord_cartesian(ylim = c(min(y_axis), max(y_axis))) +
+
+  theme(
+    strip.background = element_blank(),
+    strip.text.y = element_blank(),
+    strip.text.x = element_blank(),
+    axis.title.x = element_blank(),
+    axis.line.x = element_blank(),
+    axis.ticks.x=element_blank(),
+    legend.position = c(0.2, 0.85),
+    axis.text.x = element_text(angle = 270, vjust = 0.5, hjust=0)
+  ) 
+p</code></pre>
+<p><img src="OFC_ephys_analyses_files/figure-html/unnamed-chunk-7-1.png" width="1440" /></p>
+<div id="stats" class="section level3">
+<h3>Stats</h3>
+<pre class="r"><code>lme_data = graph_data[graph_data$ActiveBaseline_modulation_direction == &#39;decrease&#39;,]
+lme_bin &lt;- glmmTMB(sqrt(FR_Hz)~Session + (1 | Subject/Unit/Session), data=lme_data, family=gaussian)
+simulationOutput &lt;- simulateResiduals(fittedModel = lme_bin, plot = T, re.form=NULL)  # pass</code></pre>
+<p><img src="OFC_ephys_analyses_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<pre class="r"><code>Anova(lme_bin)</code></pre>
+<pre><code>## Analysis of Deviance Table (Type II Wald chisquare tests)
+## 
+## Response: sqrt(FR_Hz)
+##          Chisq Df Pr(&gt;Chisq)    
+## Session 352.41  2  &lt; 2.2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>pairs(regrid(emmeans(lme_bin,  ~Session)),  adjust=&#39;Bonferroni&#39;)</code></pre>
+<pre><code>##  contrast      estimate    SE  df t.ratio p.value
+##  Pre - Active      3.51 0.458 644   7.666  &lt;.0001
+##  Pre - Post        1.66 0.275 644   6.051  &lt;.0001
+##  Active - Post    -1.85 0.296 644  -6.244  &lt;.0001
+## 
+## P value adjustment: bonferroni method for 3 tests</code></pre>
+<pre class="r"><code>lme_data = graph_data[graph_data$ActiveBaseline_modulation_direction == &#39;increase&#39;,]
+lme_bin &lt;- glmmTMB(sqrt((FR_Hz))/100~Session + (1 | Subject/Unit/Session), data=lme_data, family=gaussian)</code></pre>
+<pre><code>## Warning in finalizeTMB(TMBStruc, obj, fit, h, data.tmb.old): Model convergence
+## problem; non-positive-definite Hessian matrix. See vignette(&#39;troubleshooting&#39;)</code></pre>
+<pre class="r"><code>simulationOutput &lt;- simulateResiduals(fittedModel = lme_bin, plot = T, re.form=NULL)  # pass</code></pre>
+<p><img src="OFC_ephys_analyses_files/figure-html/unnamed-chunk-8-2.png" width="672" /></p>
+<pre class="r"><code>Anova(lme_bin)</code></pre>
+<pre><code>## Analysis of Deviance Table (Type II Wald chisquare tests)
+## 
+## Response: sqrt((FR_Hz))/100
+##          Chisq Df Pr(&gt;Chisq)    
+## Session 368.83  2  &lt; 2.2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>pairs(regrid(emmeans(lme_bin,  ~Session)),  adjust=&#39;Bonferroni&#39;)</code></pre>
+<pre><code>## Warning in (function (object, at, cov.reduce = mean, cov.keep = get_emm_option(&quot;cov.keep&quot;), : There are unevaluated constants in the response formula
+## Auto-detection of the response transformation may be incorrect</code></pre>
+<pre><code>##  contrast      estimate       SE  df t.ratio p.value
+##  Pre - Active  -0.01013 0.000579 575 -17.511  &lt;.0001
+##  Pre - Post    -0.00111 0.000579 575  -1.926  0.1638
+##  Active - Post  0.00902 0.000579 575  15.585  &lt;.0001
+## 
+## P value adjustment: bonferroni method for 3 tests</code></pre>
+<pre class="r"><code>lme_data = graph_data[graph_data$ActiveBaseline_modulation_direction == &#39;none&#39;,]
+lme_bin &lt;- glmmTMB((sqrt(FR_Hz))~Session + (1 | Subject/Unit/Session), data=lme_data, family=gaussian)
+simulationOutput &lt;- simulateResiduals(fittedModel = lme_bin, plot = T, re.form=NULL)  # pass</code></pre>
+<p><img src="OFC_ephys_analyses_files/figure-html/unnamed-chunk-8-3.png" width="672" /></p>
+<pre class="r"><code>Anova(lme_bin)</code></pre>
+<pre><code>## Analysis of Deviance Table (Type II Wald chisquare tests)
+## 
+## Response: (sqrt(FR_Hz))
+##          Chisq Df Pr(&gt;Chisq)  
+## Session 5.3515  2    0.06886 .
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+</div>
+</div>
+</div>
+<div id="fig-3b-c-pre-spout-withdrawal" class="section level1">
+<h1>Fig 3B-C: Pre-spout withdrawal</h1>
+<p>Analyze auROC data extracted from the Python pipeline ## Fig 3B</p>
+<pre class="r"><code>auroc_df = read.csv(&#39;./Data/TrialType_preSpoutOffset_allUnitsauROC_plotData.csv&#39;)
+auroc_df = separate(data = auroc_df, col = Unit,  sep = &quot;_&quot;, into=c(&quot;Subject&quot;, &quot;Date&quot;, &quot;temp1&quot;), remove=F)
+# Remove temp columns
+auroc_df = auroc_df[, -grep(&quot;temp&quot;, colnames(auroc_df))]
+
+time_slice = c(-0.5, 0)  # 0-0.1 s is not included
+
+auroc_cutoffs = c(0.45, 0.55)
+
+df_grouped = auroc_df[auroc_df$TrialType != &#39;SpoutOff_misses_auroc&#39;,] %&gt;% group_by(Unit, Subject, TrialType, ActiveBaseline_modulation_direction) %&gt;%
+  summarise( 
+    auroc_timeSlice_mean = mean(auROC[(Time_s &gt;= time_slice[1]) &amp; (Time_s &lt; time_slice[2])], na.rm=T),
+    auroc_timeSlice_abs = mean(abs(auROC[(Time_s &gt;= time_slice[1]) &amp; (Time_s &lt; time_slice[2])] - 0.5), na.rm=T),
+    auroc_timeSlice_all = all( abs(auROC[(Time_s &gt;= time_slice[1]) &amp; (Time_s &lt; time_slice[2])] - 0.5) &gt; 0.1)
+  )</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;Unit&#39;, &#39;Subject&#39;, &#39;TrialType&#39;. You can override using the `.groups`
+## argument.</code></pre>
+<pre class="r"><code>df_grouped = df_grouped[!is.na(df_grouped$auroc_timeSlice_mean),]
+df_grouped$TrialType = factor(df_grouped$TrialType, levels=c(&#39;SpoutOff_hits_auroc&#39;, &#39;SpoutOff_FAs_auroc&#39;))
+levels(df_grouped$TrialType) = c(&#39;Hit&#39;, &#39;False alarm&#39;)
+
+
+# Cutoff based on auROC
+df_grouped$PreHit_modulated = &#39;unmodulated&#39;
+df_grouped$PreFA_modulated = &#39;unmodulated&#39;
+df_grouped$PreMiss_modulated = &#39;unmodulated&#39;
+df_grouped$PreHitOrFA_modulated = &#39;unmodulated&#39;
+
+df_grouped$PreHit_modulation_direction = &#39;none&#39;
+df_grouped$PreFA_modulation_direction = &#39;none&#39;
+df_grouped$PreMiss_modulation_direction = &#39;none&#39;
+
+# Hit-modulated
+temp_df = df_grouped[df_grouped$TrialType == &#39;Hit&#39;,]
+temp_increase_units = temp_df[(temp_df$auroc_timeSlice_mean &gt; auroc_cutoffs[2]),]$Unit
+temp_decrease_units = temp_df[(temp_df$auroc_timeSlice_mean &lt; auroc_cutoffs[1]),]$Unit
+df_grouped[df_grouped$Unit %in% temp_increase_units,]$PreHit_modulation_direction = &#39;increase&#39;
+df_grouped[df_grouped$Unit %in% temp_decrease_units,]$PreHit_modulation_direction = &#39;decrease&#39;
+df_grouped[df_grouped$PreHit_modulation_direction != &#39;none&#39;,]$PreHit_modulated = &#39;modulated&#39;
+
+# FA-modulated
+temp_df = df_grouped[df_grouped$TrialType == &#39;False alarm&#39;,]
+temp_increase_units = temp_df[(temp_df$auroc_timeSlice_mean &gt; auroc_cutoffs[2]),]$Unit
+temp_decrease_units = temp_df[(temp_df$auroc_timeSlice_mean &lt; auroc_cutoffs[1]),]$Unit
+df_grouped[df_grouped$Unit %in% temp_increase_units,]$PreFA_modulation_direction = &#39;increase&#39;
+df_grouped[df_grouped$Unit %in% temp_decrease_units,]$PreFA_modulation_direction = &#39;decrease&#39;
+df_grouped[df_grouped$PreFA_modulation_direction != &#39;none&#39;,]$PreFA_modulated = &#39;modulated&#39;
+
+# Either hit or FA modulated
+df_grouped[(df_grouped$PreHit_modulated == &#39;modulated&#39;) | (df_grouped$PreFA_modulated == &#39;modulated&#39;),]$PreHitOrFA_modulated = &#39;modulated&#39; 
+
+# Get proportions
+graph_data =  df_grouped[df_grouped$TrialType==&#39;Hit&#39;,]
+
+cur_table = table(graph_data$PreHit_modulation_direction)
+cur_table</code></pre>
+<pre><code>## 
+## decrease increase     none 
+##      103      192      238</code></pre>
+<pre class="r"><code>cur_table/sum(cur_table)</code></pre>
+<pre><code>## 
+##  decrease  increase      none 
+## 0.1932458 0.3602251 0.4465291</code></pre>
+<pre class="r"><code>hit_values = cur_table[1:2]/sum(cur_table)*100
+
+cur_table = table(graph_data$PreFA_modulation_direction)
+cur_table</code></pre>
+<pre><code>## 
+## decrease increase     none 
+##       77      172      284</code></pre>
+<pre class="r"><code>cur_table/sum(cur_table)</code></pre>
+<pre><code>## 
+##  decrease  increase      none 
+## 0.1444653 0.3227017 0.5328330</code></pre>
+<pre class="r"><code>fa_values = cur_table[1:2]/sum(cur_table)*100
+
+cur_table = table(graph_data$PreHitOrFA_modulated)
+cur_table</code></pre>
+<pre><code>## 
+##   modulated unmodulated 
+##         383         150</code></pre>
+<pre class="r"><code>cur_table/sum(cur_table)</code></pre>
+<pre><code>## 
+##   modulated unmodulated 
+##   0.7185741   0.2814259</code></pre>
+<pre class="r"><code># Plot distributions
+graph_data = df_grouped
+
+y_axis = seq(0, 40, 20)
+x_axis = c(0, 0.45, 0.55, 1)
+p = ggplot(df_grouped, aes(x=auroc_timeSlice_mean, fill=TrialType)) + 
+
+  geom_histogram(alpha=0.5, position=&quot;identity&quot;, binwidth=0.01, color=&#39;NA&#39;, boundary=0) +
+  
+  geom_vline(xintercept=0.55, size=LINE_THICKNESS/4) +
+  
+  geom_vline(xintercept=0.45, size=LINE_THICKNESS/4) +
+  
+  scale_y_continuous(breaks=y_axis, expand=c(0, 0)) +
+  
+  scale_x_continuous(breaks=x_axis, expand=c(0, 0)) +
+  
+  coord_cartesian(ylim = c(min(y_axis), max(y_axis)), 
+                  xlim = c(min(x_axis), max(x_axis))) +
+  
+  scale_color_manual(values = TRIALTYPE_MODULATION_COLORS, name=&#39;&#39;) +
+  scale_fill_manual(values = TRIALTYPE_MODULATION_COLORS, name=&#39;&#39;) +
+  
+  ylab(&#39;Number of units&#39;) +
+  xlab(&#39;Phasic modulation&#39;) +
+  
+  # Add percentage values
+  annotate(&quot;text&quot;, x=c(0.2, 0.8), y=c(20, 20), label=paste(round(hit_values, 0), &#39;%&#39;, sep=&#39;&#39;), color=TRIALTYPE_MODULATION_COLORS[1]) + 
+  annotate(&quot;text&quot;, x=c(0.2, 0.8), y=c(18, 18), label=paste(round(fa_values, 0), &#39;%&#39;, sep=&#39;&#39;), color=TRIALTYPE_MODULATION_COLORS[2]) + 
+  
+  theme(
+    legend.position=c(0.85, 0.85)
+  )
+p</code></pre>
+<p><img src="OFC_ephys_analyses_files/figure-html/unnamed-chunk-9-1.png" width="1440" /></p>
+<div id="fig-3c" class="section level2">
+<h2>Fig 3C</h2>
+<pre class="r"><code>graph_data = auroc_df[(auroc_df$Time_s &gt;= -1) &amp; (auroc_df$Time_s &lt; 0) &amp; auroc_df$TrialType != &#39;SpoutOff_misses_auroc&#39;,]
+graph_data = graph_data[!is.na(graph_data$auROC),]
+graph_data$TrialType = factor(graph_data$TrialType, levels=c(&#39;SpoutOff_hits_auroc&#39;, &#39;SpoutOff_FAs_auroc&#39;))
+levels(graph_data$TrialType) = c(&#39;Hit&#39;, &#39;False alarm&#39;)
+
+y_axis = seq(0.07, 0.17, 0.05)
+x_axis = seq(-1, 0, 0.5)
+p =ggplot(data=graph_data, aes(x=Time_s, y=abs(auROC-0.5), fill=TrialType, color=TrialType)) + 
+  stat_summary(fun.data = mean_se, geom = &quot;ribbon&quot;, na.rm = T, size=ERRORBAR_THICKNESS/2, width=ERRORBAR_THICKNESS/2, alpha=0.3, color=NA) +
+  stat_summary(fun=&quot;mean&quot;, geom=&quot;line&quot;, na.rm = T, alpha = 1, size=LINE_THICKNESS/4) +
+  
+  ylab(&#39;Phasic modulation&#39;) +
+  xlab(&#39;Time re: spout withdrawal (s)&#39;) +
+  
+  scale_y_continuous(breaks=y_axis, expand=c(0, 0)) +
+  
+  scale_x_continuous(breaks=x_axis, expand=c(0, 0)) +
+  
+  coord_cartesian(ylim = c(min(y_axis), max(y_axis)), 
+                  xlim = c(min(x_axis), max(x_axis))) +
+
+  scale_color_manual(values = TRIALTYPE_MODULATION_COLORS, name=&#39;&#39;) +
+  scale_fill_manual(values = TRIALTYPE_MODULATION_COLORS, name=&#39;&#39;) +
+  
+  theme(
+    strip.background = element_blank(),
+    strip.text.y = element_blank(),
+    strip.text.x = element_blank(),
+    legend.position = c(0.25, 0.85),
+    panel.spacing = unit(1, &quot;lines&quot;)
+  )
+
+p</code></pre>
+<p><img src="OFC_ephys_analyses_files/figure-html/unnamed-chunk-10-1.png" width="1440" /></p>
+<div id="stats-1" class="section level3">
+<h3>Stats</h3>
+<pre class="r"><code>lme_data = df_grouped
+lme_bin &lt;- glmmTMB((blom(auroc_timeSlice_abs, method=&#39;rankit&#39;))~ TrialType + (1 | Subject/Unit/TrialType),  data=lme_data, family=gaussian)
+simulationOutput &lt;- simulateResiduals(fittedModel = lme_bin, plot = T, re.form=NULL)  # pass</code></pre>
+<p><img src="OFC_ephys_analyses_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+<pre class="r"><code>Anova(lme_bin)</code></pre>
+<pre><code>## Analysis of Deviance Table (Type II Wald chisquare tests)
+## 
+## Response: (blom(auroc_timeSlice_abs, method = &quot;rankit&quot;))
+##            Chisq Df Pr(&gt;Chisq)    
+## TrialType 49.281  1  2.218e-12 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+</div>
+</div>
+</div>
+<div id="fig-s2-post-spout-withdrawal" class="section level1">
+<h1>Fig S2: Post-spout withdrawal</h1>
+<div id="fig-s2b" class="section level2">
+<h2>Fig S2B</h2>
+<pre class="r"><code>auroc_df = read.csv(&#39;./Data/TrialType_postSpoutOffset_allUnitsauROC_plotData.csv&#39;)
+auroc_df = separate(data = auroc_df, col = Unit,  sep = &quot;_&quot;, into=c(&quot;Subject&quot;, &quot;Date&quot;, &quot;temp1&quot;), remove=F)
+auroc_df = auroc_df[, -grep(&quot;temp&quot;, colnames(auroc_df))]  # Remove temp columns
+
+time_slice = c(0.3, 0.8) # 0.8-0.9 s is not included
+
+auroc_cutoffs = c(0.45, 0.55)
+
+df_grouped = auroc_df[auroc_df$TrialType %in% c(&#39;SpoutOff_hits_auroc&#39;, &#39;SpoutOff_FAs_auroc&#39;, &#39;SpoutOff_misses_auroc&#39;),] %&gt;% group_by(Unit, Subject, TrialType, ActiveBaseline_modulation_direction) %&gt;%
+  summarise( 
+    auroc_timeSlice_mean = mean(auROC[(Time_s &gt;= time_slice[1]) &amp; (Time_s &lt; time_slice[2])], na.rm=T),
+    auroc_timeSlice_abs = mean(abs(auROC[(Time_s &gt;= time_slice[1]) &amp; (Time_s &lt; time_slice[2])] - 0.5), na.rm=T),
+    auroc_timeSlice_all = all( abs(auROC[(Time_s &gt;= time_slice[1]) &amp; (Time_s &lt; time_slice[2])] - 0.5) &gt;= 0.1)
+  )</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;Unit&#39;, &#39;Subject&#39;, &#39;TrialType&#39;. You can override using the `.groups`
+## argument.</code></pre>
+<pre class="r"><code>df_grouped = df_grouped[!is.na(df_grouped$auroc_timeSlice_mean),]
+df_grouped$TrialType = factor(df_grouped$TrialType, levels=c(&#39;SpoutOff_hits_auroc&#39;, &#39;SpoutOff_FAs_auroc&#39;, &#39;SpoutOff_misses_auroc&#39;))
+levels(df_grouped$TrialType) = c(&#39;Hit&#39;, &#39;False alarm&#39;, &#39;Miss&#39;)
+
+
+# Cutoff based on auROC
+df_grouped$PostHit_modulated = &#39;unmodulated&#39;
+df_grouped$PostFA_modulated = &#39;unmodulated&#39;
+df_grouped$PostMiss_modulated = &#39;unmodulated&#39;
+df_grouped$PostHitOrFAOrMiss_modulated = &#39;unmodulated&#39;
+
+df_grouped$PostHit_modulation_direction = &#39;none&#39;
+df_grouped$PostFA_modulation_direction = &#39;none&#39;
+df_grouped$PostMiss_modulation_direction = &#39;none&#39;
+
+# Hit modulation
+temp_df = df_grouped[df_grouped$TrialType == &#39;Hit&#39;,]
+temp_increase_units = temp_df[(temp_df$auroc_timeSlice_mean &gt; auroc_cutoffs[2]),]$Unit
+temp_decrease_units = temp_df[(temp_df$auroc_timeSlice_mean &lt; auroc_cutoffs[1]),]$Unit
+df_grouped[df_grouped$Unit %in% temp_increase_units,]$PostHit_modulation_direction = &#39;increase&#39;
+df_grouped[df_grouped$Unit %in% temp_decrease_units,]$PostHit_modulation_direction = &#39;decrease&#39;
+df_grouped[df_grouped$PostHit_modulation_direction != &#39;none&#39;,]$PostHit_modulated = &#39;modulated&#39;
+
+# FA modulation
+temp_df = df_grouped[df_grouped$TrialType == &#39;False alarm&#39;,]
+temp_increase_units = temp_df[(temp_df$auroc_timeSlice_mean &gt; auroc_cutoffs[2]),]$Unit
+temp_decrease_units = temp_df[(temp_df$auroc_timeSlice_mean &lt; auroc_cutoffs[1]),]$Unit
+df_grouped[df_grouped$Unit %in% temp_increase_units,]$PostFA_modulation_direction = &#39;increase&#39;
+df_grouped[df_grouped$Unit %in% temp_decrease_units,]$PostFA_modulation_direction = &#39;decrease&#39;
+df_grouped[df_grouped$PostFA_modulation_direction != &#39;none&#39;,]$PostFA_modulated = &#39;modulated&#39;
+
+# Miss modulation
+temp_df = df_grouped[df_grouped$TrialType == &#39;Miss&#39;,]
+temp_increase_units = temp_df[(temp_df$auroc_timeSlice_mean &gt; auroc_cutoffs[2]),]$Unit
+temp_decrease_units = temp_df[(temp_df$auroc_timeSlice_mean &lt; auroc_cutoffs[1]),]$Unit
+df_grouped[df_grouped$Unit %in% temp_increase_units,]$PostMiss_modulation_direction = &#39;increase&#39;
+df_grouped[df_grouped$Unit %in% temp_decrease_units,]$PostMiss_modulation_direction = &#39;decrease&#39;
+df_grouped[df_grouped$PostMiss_modulation_direction != &#39;none&#39;,]$PostMiss_modulated = &#39;modulated&#39;
+
+# Either hit, FA or miss modulated
+df_grouped[(df_grouped$PostHit_modulated == &#39;modulated&#39;) | (df_grouped$PostFA_modulated == &#39;modulated&#39;),]$PostHitOrFAOrMiss_modulated = &#39;modulated&#39; 
+
+
+# Get proportions
+graph_data =  df_grouped[df_grouped$TrialType==&#39;Hit&#39;,]
+
+cur_table = table(graph_data$PostHit_modulation_direction)
+cur_table</code></pre>
+<pre><code>## 
+## decrease increase     none 
+##      113      331       89</code></pre>
+<pre class="r"><code>cur_table/sum(cur_table)</code></pre>
+<pre><code>## 
+##  decrease  increase      none 
+## 0.2120075 0.6210131 0.1669794</code></pre>
+<pre class="r"><code>hit_values = cur_table[1:2]/sum(cur_table)*100
+
+cur_table = table(graph_data$PostFA_modulation_direction)
+cur_table</code></pre>
+<pre><code>## 
+## decrease increase     none 
+##       85      297      151</code></pre>
+<pre class="r"><code>cur_table/sum(cur_table)</code></pre>
+<pre><code>## 
+##  decrease  increase      none 
+## 0.1594747 0.5572233 0.2833021</code></pre>
+<pre class="r"><code>fa_values = cur_table[1:2]/sum(cur_table)*100
+
+cur_table = table(graph_data$PostMiss_modulation_direction)
+cur_table</code></pre>
+<pre><code>## 
+## decrease increase     none 
+##      112      273      148</code></pre>
+<pre class="r"><code>cur_table/sum(cur_table)</code></pre>
+<pre><code>## 
+##  decrease  increase      none 
+## 0.2101313 0.5121951 0.2776735</code></pre>
+<pre class="r"><code>miss_values = cur_table[1:2]/sum(cur_table)*100
+
+cur_table = table(graph_data$PostHitOrFAOrMiss_modulated)
+cur_table</code></pre>
+<pre><code>## 
+##   modulated unmodulated 
+##         481          52</code></pre>
+<pre class="r"><code>cur_table/sum(cur_table)</code></pre>
+<pre><code>## 
+##   modulated unmodulated 
+##  0.90243902  0.09756098</code></pre>
+<pre class="r"><code># Plot distributions
+graph_data = df_grouped
+
+y_axis = seq(0, 40, 20)
+x_axis = c(0, 0.45, 0.55, 1)
+p = ggplot(df_grouped, aes(x=auroc_timeSlice_mean, fill=TrialType)) + 
+  # facet_grid(.~TrialType) +
+    # geom_density(alpha=0.2, fill=&#39;NA&#39;, adjust=1, size=LINE_THICKNESS/2) +
+
+  
+
+  geom_histogram(alpha=0.5, position=&quot;identity&quot;, binwidth=0.01, color=&#39;NA&#39;, boundary=0) +
+  
+  geom_vline(xintercept=0.55, size=LINE_THICKNESS/4) +
+  
+  geom_vline(xintercept=0.45, size=LINE_THICKNESS/4) +
+  
+  scale_y_continuous(breaks=y_axis, expand=c(0, 0)) +
+  
+  scale_x_continuous(breaks=x_axis, expand=c(0, 0)) +
+  
+  coord_cartesian(ylim = c(min(y_axis), max(y_axis)), 
+                  xlim = c(min(x_axis), max(x_axis))) +
+
+  # scale_linetype_manual(values = plot_linetypes) +
+  scale_color_manual(values = TRIALTYPE_MODULATION_COLORS, name=&#39;&#39;) +
+  scale_fill_manual(values = TRIALTYPE_MODULATION_COLORS, name=&#39;&#39;) +
+  
+  ylab(&#39;Number of units&#39;) +
+  xlab(&#39;Phasic modulation&#39;) +
+  
+  # Add percentage values
+  annotate(&quot;text&quot;, x=c(0.2, 0.8), y=c(20, 20), label=paste(round(hit_values, 0), &#39;%&#39;, sep=&#39;&#39;), color=TRIALTYPE_MODULATION_COLORS[1]) + 
+  annotate(&quot;text&quot;, x=c(0.2, 0.8), y=c(18, 18), label=paste(round(fa_values, 0), &#39;%&#39;, sep=&#39;&#39;), color=TRIALTYPE_MODULATION_COLORS[2]) + 
+  annotate(&quot;text&quot;, x=c(0.2, 0.8), y=c(16, 16), label=paste(round(miss_values, 0), &#39;%&#39;, sep=&#39;&#39;), color=TRIALTYPE_MODULATION_COLORS[3]) + 
+  
+  theme(
+    legend.position = c(0.85, 0.85)
+  )
+p</code></pre>
+<p><img src="OFC_ephys_analyses_files/figure-html/unnamed-chunk-12-1.png" width="1440" /></p>
+</div>
+<div id="fig-s2c" class="section level2">
+<h2>Fig S2C</h2>
+<pre class="r"><code>graph_data =  df_grouped
+# Plot the curves
+graph_data = auroc_df[(auroc_df$Time_s &gt;= 0.3) &amp; (auroc_df$Time_s &lt; 2),]
+graph_data = graph_data[!is.na(graph_data$auROC),]
+graph_data$TrialType = factor(graph_data$TrialType, levels=c(&#39;SpoutOff_hits_auroc&#39;, &#39;SpoutOff_FAs_auroc&#39;, &#39;SpoutOff_misses_auroc&#39;))
+levels(graph_data$TrialType) = c(&#39;Hit&#39;, &#39;False alarm&#39;, &#39;Miss&#39;)
+
+y_axis = seq(0, 0.3, 0.1)
+x_axis = c(0.3, 0.8, 1.5, 2)
+p =ggplot(data=graph_data, aes(x=Time_s, y=abs(auROC-0.5), color=TrialType, fill=TrialType)) + 
+  # facet_grid(.~PostHitOrFAOrMiss_modulated) +
+  stat_summary(fun.data = mean_se, geom = &quot;ribbon&quot;, na.rm = T, size=ERRORBAR_THICKNESS/2,  alpha=0.3, color=NA) +
+  stat_summary(fun=&quot;mean&quot;, geom=&quot;line&quot;, na.rm = T, alpha = 1, size=LINE_THICKNESS/4) +
+  
+  ylab(&#39;Phasic modulation&#39;) +
+  xlab(&#39;Time re: spout withdrawal (s)&#39;) +
+  
+  scale_y_continuous(breaks=y_axis, expand=c(0, 0)) +
+  
+  scale_x_continuous(breaks=x_axis, expand=c(0, 0)) +
+  
+  coord_cartesian(ylim = c(min(y_axis), max(y_axis)), 
+                  xlim = c(min(x_axis), max(x_axis))) +
+  
+  scale_color_manual(values = TRIALTYPE_MODULATION_COLORS, name=&#39;&#39;) +
+  scale_fill_manual(values = TRIALTYPE_MODULATION_COLORS, name=&#39;&#39;) +
+  
+  theme(
+    strip.background = element_blank(),
+    strip.text.y = element_blank(),
+    strip.text.x = element_blank(),
+    legend.position = c(0.85, 0.85),
+    panel.spacing = unit(1, &quot;lines&quot;)
+  )
+
+p</code></pre>
+<p><img src="OFC_ephys_analyses_files/figure-html/unnamed-chunk-13-1.png" width="1440" /></p>
+<div id="stats-2" class="section level3">
+<h3>Stats</h3>
+<pre class="r"><code>lme_data = df_grouped
+lme_bin &lt;- glmmTMB(blom(auroc_timeSlice_abs, method=&#39;rankit&#39;)*10~ TrialType + (1 | Subject/Unit/TrialType),  data=lme_data, family=gaussian)
+simulationOutput &lt;- simulateResiduals(fittedModel = lme_bin, plot = T, re.form=NULL)  # pass</code></pre>
+<p><img src="OFC_ephys_analyses_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
+<pre class="r"><code>Anova(lme_bin)</code></pre>
+<pre><code>## Analysis of Deviance Table (Type II Wald chisquare tests)
+## 
+## Response: blom(auroc_timeSlice_abs, method = &quot;rankit&quot;) * 10
+##            Chisq Df Pr(&gt;Chisq)    
+## TrialType 203.98  2  &lt; 2.2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>pairs(regrid(emmeans(lme_bin,  ~TrialType)),  adjust=&#39;Bonferroni&#39;)</code></pre>
+<pre><code>## Warning in (function (object, at, cov.reduce = mean, cov.keep = get_emm_option(&quot;cov.keep&quot;), : There are unevaluated constants in the response formula
+## Auto-detection of the response transformation may be incorrect</code></pre>
+<pre><code>##  contrast           estimate    SE   df t.ratio p.value
+##  Hit - False alarm     4.779 0.395 1576  12.091  &lt;.0001
+##  Hit - Miss            4.925 0.391 1576  12.589  &lt;.0001
+##  False alarm - Miss    0.145 0.395 1576   0.367  1.0000
+## 
+## P value adjustment: bonferroni method for 3 tests</code></pre>
+</div>
+</div>
+</div>
+<div id="fig-s3-phasic-firing-by-tonic-modulation"
+class="section level1">
+<h1>Fig S3: Phasic firing by tonic modulation</h1>
+<div id="fig-s3b" class="section level2">
+<h2>Fig S3B</h2>
+<pre class="r"><code>auroc_df = read.csv(&#39;./Data/TrialType_postSpoutOffset_allUnitsauROC_plotData.csv&#39;)
+auroc_df = separate(data = auroc_df, col = Unit,  sep = &quot;_&quot;, into=c(&quot;Subject&quot;, &quot;Date&quot;, &quot;temp1&quot;), remove=F)
+# Remove temp columns
+auroc_df = auroc_df[, -grep(&quot;temp&quot;, colnames(auroc_df))]
+
+# Plot the curves
+graph_data = auroc_df[(auroc_df$Time_s &gt;= 0.3) &amp; (auroc_df$Time_s &lt; 2),]
+graph_data = graph_data[!is.na(graph_data$auROC),]
+graph_data$TrialType = factor(graph_data$TrialType, levels=c(&#39;SpoutOff_hits_auroc&#39;, &#39;SpoutOff_FAs_auroc&#39;, &#39;SpoutOff_misses_auroc&#39;))
+levels(graph_data$TrialType) = c(&#39;Hit&#39;, &#39;False alarm&#39;, &#39;Miss&#39;)
+
+graph_data$ActiveBaseline_modulation_direction = factor(graph_data$ActiveBaseline_modulation_direction, levels=c(&#39;decrease&#39;, &#39;increase&#39;, &#39;none&#39;))
+levels(graph_data$ActiveBaseline_modulation_direction) = c(&#39;Task-suppressed&#39;, &#39;Task-enhanced&#39;, &#39;Task-unchanged&#39;)
+
+y_axis = c(0, 0.1, 0.2, 0.3)
+x_axis = c(0.3, 0.8, 1.5, 2)
+p =ggplot(data=graph_data, aes(x=Time_s, y=abs(auROC-0.5), color=TrialType, fill=TrialType)) + 
+  facet_grid(.~ActiveBaseline_modulation_direction) +
+  stat_summary(fun.data = mean_se, geom = &quot;ribbon&quot;, na.rm = T, size=ERRORBAR_THICKNESS/2, width=ERRORBAR_THICKNESS/2, alpha=0.3, color=NA) +
+  stat_summary(fun=&quot;mean&quot;, geom=&quot;line&quot;, na.rm = T, alpha = 1, size=LINE_THICKNESS/4) +
+  
+  ylab(&#39;Phasic modulation&#39;) +
+  xlab(&#39;Time re: spout withdrawal (s)&#39;) +
+  
+  scale_y_continuous(breaks=y_axis, expand=c(0, 0)) +
+  
+  scale_x_continuous(breaks=x_axis, expand=c(0, 0)) +
+  
+  coord_cartesian(ylim = c(min(y_axis), max(y_axis)), 
+                  xlim = c(min(x_axis), max(x_axis))) +
+
+  scale_color_manual(values = TRIALTYPE_MODULATION_COLORS) +
+  scale_fill_manual(values = TRIALTYPE_MODULATION_COLORS)
+
+  theme(
+    strip.background = element_blank(),
+    legend.position = &#39;none&#39;,
+    panel.spacing = unit(2.5, &quot;lines&quot;)
+  ) +
+
+p</code></pre>
+<pre><code>## List of 14
+##  $ legend.position : chr &quot;none&quot;
+##  $ panel.spacing   : &#39;simpleUnit&#39; num 2.5lines
+##   ..- attr(*, &quot;unit&quot;)= int 3
+##  $ strip.background: list()
+##   ..- attr(*, &quot;class&quot;)= chr [1:2] &quot;element_blank&quot; &quot;element&quot;
+##  $ data            :&#39;data.frame&#39;:    26911 obs. of  7 variables:
+##   ..$ Unit                               : chr [1:26911] &quot;SUBJ-ID-151_210507_concat_cluster2492&quot; &quot;SUBJ-ID-151_210507_concat_cluster2492&quot; &quot;SUBJ-ID-151_210507_concat_cluster2492&quot; &quot;SUBJ-ID-151_210507_concat_cluster2492&quot; ...
+##   ..$ Subject                            : chr [1:26911] &quot;SUBJ-ID-151&quot; &quot;SUBJ-ID-151&quot; &quot;SUBJ-ID-151&quot; &quot;SUBJ-ID-151&quot; ...
+##   ..$ Date                               : chr [1:26911] &quot;210507&quot; &quot;210507&quot; &quot;210507&quot; &quot;210507&quot; ...
+##   ..$ Time_s                             : num [1:26911] 0.3 0.4 0.5 0.6 0.7 ...
+##   ..$ auROC                              : num [1:26911] 0.485 0.485 0.485 0.485 0.585 ...
+##   ..$ TrialType                          : Factor w/ 3 levels &quot;Hit&quot;,&quot;False alarm&quot;,..: 1 1 1 1 1 1 1 1 1 1 ...
+##   ..$ ActiveBaseline_modulation_direction: Factor w/ 3 levels &quot;Task-suppressed&quot;,..: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ layers          :List of 2
+##   ..$ :Classes &#39;LayerInstance&#39;, &#39;Layer&#39;, &#39;ggproto&#39;, &#39;gg&#39; &lt;ggproto object: Class LayerInstance, Layer, gg&gt;
+##     aes_params: list
+##     compute_aesthetics: function
+##     compute_geom_1: function
+##     compute_geom_2: function
+##     compute_position: function
+##     compute_statistic: function
+##     computed_geom_params: NULL
+##     computed_mapping: NULL
+##     computed_stat_params: NULL
+##     constructor: call
+##     data: waiver
+##     draw_geom: function
+##     finish_statistics: function
+##     geom: &lt;ggproto object: Class GeomRibbon, Geom, gg&gt;
+##         aesthetics: function
+##         default_aes: uneval
+##         draw_group: function
+##         draw_key: function
+##         draw_layer: function
+##         draw_panel: function
+##         extra_params: na.rm orientation
+##         handle_na: function
+##         non_missing_aes: 
+##         optional_aes: 
+##         parameters: function
+##         rename_size: TRUE
+##         required_aes: x|y ymin|xmin ymax|xmax
+##         setup_data: function
+##         setup_params: function
+##         use_defaults: function
+##         super:  &lt;ggproto object: Class Geom, gg&gt;
+##     geom_params: list
+##     inherit.aes: TRUE
+##     layer_data: function
+##     map_statistic: function
+##     mapping: NULL
+##     position: &lt;ggproto object: Class PositionIdentity, Position, gg&gt;
+##         compute_layer: function
+##         compute_panel: function
+##         required_aes: 
+##         setup_data: function
+##         setup_params: function
+##         super:  &lt;ggproto object: Class Position, gg&gt;
+##     print: function
+##     setup_layer: function
+##     show.legend: NA
+##     stat: &lt;ggproto object: Class StatSummary, Stat, gg&gt;
+##         aesthetics: function
+##         compute_group: function
+##         compute_layer: function
+##         compute_panel: function
+##         default_aes: uneval
+##         dropped_aes: 
+##         extra_params: na.rm orientation
+##         finish_layer: function
+##         non_missing_aes: 
+##         optional_aes: 
+##         parameters: function
+##         required_aes: x y
+##         retransform: TRUE
+##         setup_data: function
+##         setup_params: function
+##         super:  &lt;ggproto object: Class Stat, gg&gt;
+##     stat_params: list
+##     super:  &lt;ggproto object: Class Layer, gg&gt; 
+##   ..$ :Classes &#39;LayerInstance&#39;, &#39;Layer&#39;, &#39;ggproto&#39;, &#39;gg&#39; &lt;ggproto object: Class LayerInstance, Layer, gg&gt;
+##     aes_params: list
+##     compute_aesthetics: function
+##     compute_geom_1: function
+##     compute_geom_2: function
+##     compute_position: function
+##     compute_statistic: function
+##     computed_geom_params: NULL
+##     computed_mapping: NULL
+##     computed_stat_params: NULL
+##     constructor: call
+##     data: waiver
+##     draw_geom: function
+##     finish_statistics: function
+##     geom: &lt;ggproto object: Class GeomLine, GeomPath, Geom, gg&gt;
+##         aesthetics: function
+##         default_aes: uneval
+##         draw_group: function
+##         draw_key: function
+##         draw_layer: function
+##         draw_panel: function
+##         extra_params: na.rm orientation
+##         handle_na: function
+##         non_missing_aes: linewidth colour linetype
+##         optional_aes: 
+##         parameters: function
+##         rename_size: TRUE
+##         required_aes: x y
+##         setup_data: function
+##         setup_params: function
+##         use_defaults: function
+##         super:  &lt;ggproto object: Class GeomPath, Geom, gg&gt;
+##     geom_params: list
+##     inherit.aes: TRUE
+##     layer_data: function
+##     map_statistic: function
+##     mapping: NULL
+##     position: &lt;ggproto object: Class PositionIdentity, Position, gg&gt;
+##         compute_layer: function
+##         compute_panel: function
+##         required_aes: 
+##         setup_data: function
+##         setup_params: function
+##         super:  &lt;ggproto object: Class Position, gg&gt;
+##     print: function
+##     setup_layer: function
+##     show.legend: NA
+##     stat: &lt;ggproto object: Class StatSummary, Stat, gg&gt;
+##         aesthetics: function
+##         compute_group: function
+##         compute_layer: function
+##         compute_panel: function
+##         default_aes: uneval
+##         dropped_aes: 
+##         extra_params: na.rm orientation
+##         finish_layer: function
+##         non_missing_aes: 
+##         optional_aes: 
+##         parameters: function
+##         required_aes: x y
+##         retransform: TRUE
+##         setup_data: function
+##         setup_params: function
+##         super:  &lt;ggproto object: Class Stat, gg&gt;
+##     stat_params: list
+##     super:  &lt;ggproto object: Class Layer, gg&gt; 
+##  $ scales          :Classes &#39;ScalesList&#39;, &#39;ggproto&#39;, &#39;gg&#39; &lt;ggproto object: Class ScalesList, gg&gt;
+##     add: function
+##     add_defaults: function
+##     add_missing: function
+##     backtransform_df: function
+##     clone: function
+##     find: function
+##     get_scales: function
+##     has_scale: function
+##     input: function
+##     map_df: function
+##     n: function
+##     non_position_scales: function
+##     scales: list
+##     train_df: function
+##     transform_df: function
+##     super:  &lt;ggproto object: Class ScalesList, gg&gt; 
+##  $ guides          :Classes &#39;Guides&#39;, &#39;ggproto&#39;, &#39;gg&#39; &lt;ggproto object: Class Guides, gg&gt;
+##     add: function
+##     assemble: function
+##     build: function
+##     draw: function
+##     get_custom: function
+##     get_guide: function
+##     get_params: function
+##     get_position: function
+##     guides: NULL
+##     merge: function
+##     missing: &lt;ggproto object: Class GuideNone, Guide, gg&gt;
+##         add_title: function
+##         arrange_layout: function
+##         assemble_drawing: function
+##         available_aes: any
+##         build_decor: function
+##         build_labels: function
+##         build_ticks: function
+##         build_title: function
+##         draw: function
+##         draw_early_exit: function
+##         elements: list
+##         extract_decor: function
+##         extract_key: function
+##         extract_params: function
+##         get_layer_key: function
+##         hashables: list
+##         measure_grobs: function
+##         merge: function
+##         override_elements: function
+##         params: list
+##         process_layers: function
+##         setup_elements: function
+##         setup_params: function
+##         train: function
+##         transform: function
+##         super:  &lt;ggproto object: Class GuideNone, Guide, gg&gt;
+##     package_box: function
+##     print: function
+##     process_layers: function
+##     setup: function
+##     subset_guides: function
+##     train: function
+##     update_params: function
+##     super:  &lt;ggproto object: Class Guides, gg&gt; 
+##  $ mapping         :List of 4
+##   ..$ x     : language ~Time_s
+##   .. ..- attr(*, &quot;.Environment&quot;)=&lt;environment: R_GlobalEnv&gt; 
+##   ..$ y     : language ~abs(auROC - 0.5)
+##   .. ..- attr(*, &quot;.Environment&quot;)=&lt;environment: R_GlobalEnv&gt; 
+##   ..$ colour: language ~TrialType
+##   .. ..- attr(*, &quot;.Environment&quot;)=&lt;environment: R_GlobalEnv&gt; 
+##   ..$ fill  : language ~TrialType
+##   .. ..- attr(*, &quot;.Environment&quot;)=&lt;environment: R_GlobalEnv&gt; 
+##   ..- attr(*, &quot;class&quot;)= chr &quot;uneval&quot;
+##  $ theme           : list()
+##  $ coordinates     :Classes &#39;CoordCartesian&#39;, &#39;Coord&#39;, &#39;ggproto&#39;, &#39;gg&#39; &lt;ggproto object: Class CoordCartesian, Coord, gg&gt;
+##     aspect: function
+##     backtransform_range: function
+##     clip: on
+##     default: FALSE
+##     distance: function
+##     expand: TRUE
+##     is_free: function
+##     is_linear: function
+##     labels: function
+##     limits: list
+##     modify_scales: function
+##     range: function
+##     render_axis_h: function
+##     render_axis_v: function
+##     render_bg: function
+##     render_fg: function
+##     setup_data: function
+##     setup_layout: function
+##     setup_panel_guides: function
+##     setup_panel_params: function
+##     setup_params: function
+##     train_panel_guides: function
+##     transform: function
+##     super:  &lt;ggproto object: Class CoordCartesian, Coord, gg&gt; 
+##  $ facet           :Classes &#39;FacetGrid&#39;, &#39;Facet&#39;, &#39;ggproto&#39;, &#39;gg&#39; &lt;ggproto object: Class FacetGrid, Facet, gg&gt;
+##     compute_layout: function
+##     draw_back: function
+##     draw_front: function
+##     draw_labels: function
+##     draw_panels: function
+##     finish_data: function
+##     init_scales: function
+##     map_data: function
+##     params: list
+##     setup_data: function
+##     setup_params: function
+##     shrink: TRUE
+##     train_scales: function
+##     vars: function
+##     super:  &lt;ggproto object: Class FacetGrid, Facet, gg&gt; 
+##  $ plot_env        :&lt;environment: R_GlobalEnv&gt; 
+##  $ layout          :Classes &#39;Layout&#39;, &#39;ggproto&#39;, &#39;gg&#39; &lt;ggproto object: Class Layout, gg&gt;
+##     coord: NULL
+##     coord_params: list
+##     facet: NULL
+##     facet_params: list
+##     finish_data: function
+##     get_scales: function
+##     layout: NULL
+##     map_position: function
+##     panel_params: NULL
+##     panel_scales_x: NULL
+##     panel_scales_y: NULL
+##     render: function
+##     render_labels: function
+##     reset_scales: function
+##     resolve_label: function
+##     setup: function
+##     setup_panel_guides: function
+##     setup_panel_params: function
+##     train_position: function
+##     super:  &lt;ggproto object: Class Layout, gg&gt; 
+##  $ labels          :List of 4
+##   ..$ x     : chr &quot;Time re: spout withdrawal (s)&quot;
+##   ..$ y     : chr &quot;Phasic modulation&quot;
+##   ..$ colour: chr &quot;TrialType&quot;
+##   ..$ fill  : chr &quot;TrialType&quot;
+##  - attr(*, &quot;class&quot;)= chr [1:2] &quot;theme&quot; &quot;gg&quot;
+##  - attr(*, &quot;complete&quot;)= logi FALSE
+##  - attr(*, &quot;validate&quot;)= logi TRUE</code></pre>
+<div id="stats-3" class="section level3">
+<h3>Stats</h3>
+<pre class="r"><code>time_slice = c(0.3, 0.8)
+df_grouped = auroc_df %&gt;% group_by(Unit, Subject, TrialType, ActiveBaseline_modulation_direction) %&gt;%
+  summarise( 
+    auroc_timeSlice_abs = mean(abs(auROC[(Time_s &gt;= time_slice[1]) &amp; (Time_s &lt; time_slice[2])] - 0.5), na.rm=T)
+  )</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;Unit&#39;, &#39;Subject&#39;, &#39;TrialType&#39;. You can override using the `.groups`
+## argument.</code></pre>
+<pre class="r"><code>df_grouped$TrialType = factor(df_grouped$TrialType, levels=c(&#39;SpoutOff_hits_auroc&#39;, &#39;SpoutOff_FAs_auroc&#39;, &#39;SpoutOff_misses_auroc&#39;))
+levels(df_grouped$TrialType) = c(&#39;Hit&#39;, &#39;False alarm&#39;, &#39;Miss&#39;)
+df_grouped$ActiveBaseline_modulation_direction = factor(df_grouped$ActiveBaseline_modulation_direction, levels=c(&#39;decrease&#39;, &#39;increase&#39;, &#39;none&#39;))
+levels(df_grouped$ActiveBaseline_modulation_direction) = c(&#39;Task-suppressed&#39;, &#39;Task-enhanced&#39;, &#39;Task-unchanged&#39;)
+
+lme_data = df_grouped[df_grouped$ActiveBaseline_modulation_direction==&#39;Task-suppressed&#39;,]
+lme_bin &lt;- glmmTMB((sqrt(auroc_timeSlice_abs))~ TrialType + (1 | Subject/Unit/TrialType),  data=lme_data, family=gaussian)
+simulationOutput &lt;- simulateResiduals(fittedModel = lme_bin, plot = T, re.form=NULL)  # pass</code></pre>
+<p><img src="OFC_ephys_analyses_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
+<pre class="r"><code>Anova(lme_bin)</code></pre>
+<pre><code>## Analysis of Deviance Table (Type II Wald chisquare tests)
+## 
+## Response: (sqrt(auroc_timeSlice_abs))
+##            Chisq Df Pr(&gt;Chisq)    
+## TrialType 89.686  2  &lt; 2.2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>pairs(regrid(emmeans(lme_bin,  ~TrialType)),  adjust=&#39;Bonferroni&#39;)</code></pre>
+<pre><code>## Warning in (function (object, at, cov.reduce = mean, cov.keep = get_emm_option(&quot;cov.keep&quot;), : There are unevaluated constants in the response formula
+## Auto-detection of the response transformation may be incorrect</code></pre>
+<pre><code>##  contrast            estimate      SE  df t.ratio p.value
+##  Hit - False alarm   0.071697 0.00876 622   8.188  &lt;.0001
+##  Hit - Miss          0.070785 0.00865 622   8.182  &lt;.0001
+##  False alarm - Miss -0.000912 0.00876 622  -0.104  1.0000
+## 
+## P value adjustment: bonferroni method for 3 tests</code></pre>
+<pre class="r"><code>lme_data = df_grouped[df_grouped$ActiveBaseline_modulation_direction==&#39;Task-enhanced&#39;,]
+lme_bin &lt;- glmmTMB((sqrt(auroc_timeSlice_abs))~ TrialType + (1 | Subject/Unit/TrialType),  data=lme_data, family=gaussian)</code></pre>
+<pre><code>## Warning in finalizeTMB(TMBStruc, obj, fit, h, data.tmb.old): Model convergence
+## problem; non-positive-definite Hessian matrix. See vignette(&#39;troubleshooting&#39;)</code></pre>
+<pre class="r"><code>simulationOutput &lt;- simulateResiduals(fittedModel = lme_bin, plot = T, re.form=NULL)  # pass</code></pre>
+<p><img src="OFC_ephys_analyses_files/figure-html/unnamed-chunk-16-2.png" width="672" /></p>
+<pre class="r"><code>Anova(lme_bin)</code></pre>
+<pre><code>## Analysis of Deviance Table (Type II Wald chisquare tests)
+## 
+## Response: (sqrt(auroc_timeSlice_abs))
+##            Chisq Df Pr(&gt;Chisq)    
+## TrialType 104.72  2  &lt; 2.2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>pairs(regrid(emmeans(lme_bin,  ~TrialType)),  adjust=&#39;Bonferroni&#39;)</code></pre>
+<pre><code>## Warning in (function (object, at, cov.reduce = mean, cov.keep = get_emm_option(&quot;cov.keep&quot;), : There are unevaluated constants in the response formula
+## Auto-detection of the response transformation may be incorrect</code></pre>
+<pre><code>##  contrast           estimate     SE  df t.ratio p.value
+##  Hit - False alarm   0.09385 0.0104 570   8.984  &lt;.0001
+##  Hit - Miss          0.09023 0.0104 570   8.709  &lt;.0001
+##  False alarm - Miss -0.00362 0.0104 570  -0.347  1.0000
+## 
+## P value adjustment: bonferroni method for 3 tests</code></pre>
+<pre class="r"><code>lme_data = df_grouped[df_grouped$ActiveBaseline_modulation_direction==&#39;Task-unchanged&#39;,]
+lme_bin &lt;- glmmTMB((log(auroc_timeSlice_abs+0.1))*100~ TrialType + (1 | Subject/Unit/TrialType),  data=lme_data, family=gaussian)
+simulationOutput &lt;- simulateResiduals(fittedModel = lme_bin, plot = T, re.form=NULL)  # pass</code></pre>
+<p><img src="OFC_ephys_analyses_files/figure-html/unnamed-chunk-16-3.png" width="672" /></p>
+<pre class="r"><code>Anova(lme_bin)</code></pre>
+<pre><code>## Analysis of Deviance Table (Type II Wald chisquare tests)
+## 
+## Response: (log(auroc_timeSlice_abs + 0.1)) * 100
+##            Chisq Df Pr(&gt;Chisq)    
+## TrialType 21.378  2  2.279e-05 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>pairs(regrid(emmeans(lme_bin,  ~TrialType)),  adjust=&#39;Bonferroni&#39;)</code></pre>
+<pre><code>## Warning in (function (object, at, cov.reduce = mean, cov.keep = get_emm_option(&quot;cov.keep&quot;), : There are unevaluated constants in the response formula
+## Auto-detection of the response transformation may be incorrect</code></pre>
+<pre><code>##  contrast           estimate   SE  df t.ratio p.value
+##  Hit - False alarm     11.99 3.45 370   3.472  0.0017
+##  Hit - Miss            14.93 3.41 370   4.371  &lt;.0001
+##  False alarm - Miss     2.94 3.45 370   0.852  1.0000
+## 
+## P value adjustment: bonferroni method for 3 tests</code></pre>
+</div>
+</div>
+<div id="fig-s3c" class="section level2">
+<h2>Fig S3C</h2>
+<pre class="r"><code># Plot the curves
+graph_data = auroc_df[(auroc_df$Time_s &gt;= -1) &amp; (auroc_df$Time_s &lt; 0) &amp; auroc_df$TrialType != &#39;SpoutOff_misses_auroc&#39;,]
+graph_data = graph_data[!is.na(graph_data$auROC),]
+graph_data$TrialType = factor(graph_data$TrialType, levels=c(&#39;SpoutOff_hits_auroc&#39;, &#39;SpoutOff_FAs_auroc&#39;))
+levels(graph_data$TrialType) = c(&#39;Hit&#39;, &#39;False alarm&#39;)
+
+graph_data$ActiveBaseline_modulation_direction = factor(graph_data$ActiveBaseline_modulation_direction, levels=c(&#39;decrease&#39;, &#39;increase&#39;, &#39;none&#39;))
+levels(graph_data$ActiveBaseline_modulation_direction) = c(&#39;Task-suppressed&#39;, &#39;Task-enhanced&#39;, &#39;Task-unchanged&#39;)
+
+y_axis = seq(0.0, 0.25, 0.05)
+x_axis = seq(-1, 0, 0.5)
+p =ggplot(data=graph_data, aes(x=Time_s, y=abs(auROC-0.5), color=TrialType, fill=TrialType)) + 
+  facet_grid(.~ActiveBaseline_modulation_direction) +
+  stat_summary(fun.data = mean_se, geom = &quot;ribbon&quot;, na.rm = T, size=ERRORBAR_THICKNESS/2, alpha=0.3, color=NA) +
+  stat_summary(fun=&quot;mean&quot;, geom=&quot;line&quot;, na.rm = T, alpha = 1, size=LINE_THICKNESS/4) +
+  
+  ylab(&#39;Phasic modulation&#39;) +
+  xlab(&#39;Time re: spout withdrawal (s)&#39;) +
+  
+  scale_y_continuous(breaks=y_axis, expand=c(0, 0)) +
+  
+  scale_x_continuous(breaks=x_axis, expand=c(0, 0)) +
+  
+  coord_cartesian(ylim = c(min(y_axis), max(y_axis)), 
+                  xlim = c(min(x_axis), max(x_axis))) +
+
+  scale_color_manual(values = TRIALTYPE_MODULATION_COLORS, name=&#39;&#39;) +
+  scale_fill_manual(values = TRIALTYPE_MODULATION_COLORS, name=&#39;&#39;) +
+    theme(
+    strip.background = element_blank(),
+    # strip.text.y = element_blank(),
+    # strip.text.x = element_blank(),
+    # axis.text.x.bottom = element_blank(),
+    legend.position = c(0.85, 0.85),
+    panel.spacing = unit(2.5, &quot;lines&quot;)
+  ) 
+p</code></pre>
+<p><img src="OFC_ephys_analyses_files/figure-html/unnamed-chunk-17-1.png" width="1440" /></p>
+<div id="stats-4" class="section level3">
+<h3>Stats</h3>
+<pre class="r"><code>time_slice = c(-0.5, 0)
+df_grouped = auroc_df[auroc_df$TrialType %in% c(&#39;SpoutOff_hits_auroc&#39;, &#39;SpoutOff_FAs_auroc&#39;),] %&gt;% group_by(Unit, Subject, TrialType, ActiveBaseline_modulation_direction) %&gt;%
+  summarise( 
+    auroc_timeSlice_abs = mean(abs(auROC[(Time_s &gt;= time_slice[1]) &amp; (Time_s &lt; time_slice[2])] - 0.5), na.rm=T)
+  )</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;Unit&#39;, &#39;Subject&#39;, &#39;TrialType&#39;. You can override using the `.groups`
+## argument.</code></pre>
+<pre class="r"><code>df_grouped$TrialType = factor(df_grouped$TrialType, levels=c(&#39;SpoutOff_hits_auroc&#39;, &#39;SpoutOff_FAs_auroc&#39;))
+levels(df_grouped$TrialType) = c(&#39;Hit&#39;, &#39;False alarm&#39;)
+df_grouped$ActiveBaseline_modulation_direction = factor(df_grouped$ActiveBaseline_modulation_direction, levels=c(&#39;decrease&#39;, &#39;increase&#39;, &#39;none&#39;))
+levels(df_grouped$ActiveBaseline_modulation_direction) = c(&#39;Task-suppressed&#39;, &#39;Task-enhanced&#39;, &#39;Task-unchanged&#39;)
+
+lme_data = df_grouped[df_grouped$ActiveBaseline_modulation_direction==&#39;Task-suppressed&#39;,]
+lme_bin &lt;- glmmTMB((log(auroc_timeSlice_abs+0.1))~ TrialType + (1 | Subject/Unit/TrialType),  data=lme_data, family=gaussian)
+simulationOutput &lt;- simulateResiduals(fittedModel = lme_bin, plot = T, re.form=NULL)  # pass</code></pre>
+<p><img src="OFC_ephys_analyses_files/figure-html/unnamed-chunk-18-1.png" width="672" /></p>
+<pre class="r"><code>Anova(lme_bin)</code></pre>
+<pre><code>## Analysis of Deviance Table (Type II Wald chisquare tests)
+## 
+## Response: (log(auroc_timeSlice_abs + 0.1))
+##            Chisq Df Pr(&gt;Chisq)    
+## TrialType 20.842  1  4.989e-06 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>lme_data = df_grouped[df_grouped$ActiveBaseline_modulation_direction==&#39;Task-enhanced&#39;,]
+lme_bin &lt;- glmmTMB((log(auroc_timeSlice_abs+0.1))~ TrialType + (1 | Subject/Unit/TrialType),  data=lme_data, family=gaussian)
+simulationOutput &lt;- simulateResiduals(fittedModel = lme_bin, plot = T, re.form=NULL)  # pass</code></pre>
+<p><img src="OFC_ephys_analyses_files/figure-html/unnamed-chunk-18-2.png" width="672" /></p>
+<pre class="r"><code>Anova(lme_bin)</code></pre>
+<pre><code>## Analysis of Deviance Table (Type II Wald chisquare tests)
+## 
+## Response: (log(auroc_timeSlice_abs + 0.1))
+##            Chisq Df Pr(&gt;Chisq)    
+## TrialType 31.561  1  1.933e-08 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>lme_data = df_grouped[df_grouped$ActiveBaseline_modulation_direction==&#39;Task-unchanged&#39;,]
+lme_bin &lt;- glmmTMB((log(auroc_timeSlice_abs+0.1))~ TrialType + (1 | Subject/Unit/TrialType),  data=lme_data, family=gaussian)
+simulationOutput &lt;- simulateResiduals(fittedModel = lme_bin, plot = T, re.form=NULL)  # pass</code></pre>
+<p><img src="OFC_ephys_analyses_files/figure-html/unnamed-chunk-18-3.png" width="672" /></p>
+<pre class="r"><code>Anova(lme_bin)</code></pre>
+<pre><code>## Analysis of Deviance Table (Type II Wald chisquare tests)
+## 
+## Response: (log(auroc_timeSlice_abs + 0.1))
+##            Chisq Df Pr(&gt;Chisq)
+## TrialType 2.4882  1     0.1147</code></pre>
+</div>
+</div>
+</div>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

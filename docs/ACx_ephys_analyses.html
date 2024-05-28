@@ -1,0 +1,1509 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>ACx recordings with OFC inactivation - Analyses</title>
+
+<script src="site_libs/header-attrs-2.27/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">My Website</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="OFC_ephys_analyses.html">OFC ephys - Analyses (Figs 2, 3, S1-3)</a>
+</li>
+<li>
+  <a href="ACx_ephys_analyses.html">OFC muscimol + ACx ephys - Analyses (Figs 5, S5-6)</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">ACx recordings with OFC inactivation -
+Analyses</h1>
+
+</div>
+
+
+<div id="load-libraries-and-data-from-preprocessing-pipeline"
+class="section level1">
+<h1>Load libraries and data from preprocessing pipeline</h1>
+<div id="load-previously-exported-environment." class="section level2">
+<h2>Load previously exported environment.</h2>
+<p>Uncomment chunk below if the second block of code has been run
+previously and does not need modifications</p>
+<pre class="r"><code># load(&#39;./Data/ACx_ephys_analyses_env.RData&#39;)
+# 
+# library(ggplot2)
+# library(dplyr)
+# library(tidyr)
+# # install.packages(c(&#39;remotes&#39;, &#39;TMB&#39;))
+# # remotes::install_github(&quot;glmmTMB/glmmTMB/glmmTMB&quot;, build_vignettes=FALSE)
+# library(glmmTMB)
+# library(DHARMa)
+# library(car)
+# library(reshape2)
+# library(emmeans)
+# library(rcompanion)
+# # Create the notin operator
+# `%notin%` &lt;- Negate(`%in%`)
+# 
+# # Some global plot parameters if modification is needed.
+# source(&#39;./r_theme.r&#39;, echo=F)
+# theme_set(theme_mml(base_size = 20))
+# LINE_THICKNESS = 1
+# ERRORBAR_THICKNESS = LINE_THICKNESS/2
+# INDIVIDUAL_DATAPOINT_LINE = LINE_THICKNESS/1.5
+# SMALL_PLOTS_LINE_THICKNESS = LINE_THICKNESS/3
+# cbPalette = c(&quot;#999999&quot;, &quot;#E69F00&quot;, &quot;#56B4E9&quot;, &quot;#009E73&quot;, &quot;#F0E442&quot;, &quot;#0072B2&quot;, &quot;#D55E00&quot;, &quot;#CC79A7&quot;, &quot;#d55e00&quot;)
+# treatment_colors = c(&#39;#0072B2&#39;, &#39;#B9519E&#39;)</code></pre>
+</div>
+<div id="process" class="section level2">
+<h2>Process</h2>
+<pre class="r"><code>library(ggplot2)
+library(dplyr)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;dplyr&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:stats&#39;:
+## 
+##     filter, lag</code></pre>
+<pre><code>## The following objects are masked from &#39;package:base&#39;:
+## 
+##     intersect, setdiff, setequal, union</code></pre>
+<pre class="r"><code>library(tidyr)
+# install.packages(c(&#39;remotes&#39;, &#39;TMB&#39;))
+# remotes::install_github(&quot;glmmTMB/glmmTMB/glmmTMB&quot;, build_vignettes=FALSE)
+library(glmmTMB)
+library(DHARMa)</code></pre>
+<pre><code>## This is DHARMa 0.4.6. For overview type &#39;?DHARMa&#39;. For recent changes, type news(package = &#39;DHARMa&#39;)</code></pre>
+<pre class="r"><code>library(car)</code></pre>
+<pre><code>## Loading required package: carData</code></pre>
+<pre><code>## 
+## Attaching package: &#39;car&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:dplyr&#39;:
+## 
+##     recode</code></pre>
+<pre class="r"><code>library(reshape2)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;reshape2&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:tidyr&#39;:
+## 
+##     smiths</code></pre>
+<pre class="r"><code>library(emmeans)</code></pre>
+<pre><code>## Welcome to emmeans.
+## Caution: You lose important information if you filter this package&#39;s results.
+## See &#39;? untidy&#39;</code></pre>
+<pre class="r"><code>library(rcompanion)
+# Create the notin operator
+`%notin%` &lt;- Negate(`%in%`)
+
+# Some global plot parameters if modification is needed.
+source(&#39;./r_theme.r&#39;, echo=F)
+theme_set(theme_mml(base_size = 20))
+LINE_THICKNESS = 1
+ERRORBAR_THICKNESS = LINE_THICKNESS/2
+INDIVIDUAL_DATAPOINT_LINE = LINE_THICKNESS/1.5
+SMALL_PLOTS_LINE_THICKNESS = LINE_THICKNESS/3
+
+cbPalette = c(&quot;#999999&quot;, &quot;#E69F00&quot;, &quot;#56B4E9&quot;, &quot;#009E73&quot;, &quot;#F0E442&quot;, &quot;#0072B2&quot;, &quot;#D55E00&quot;, &quot;#CC79A7&quot;, &quot;#d55e00&quot;)
+treatment_colors = c(&#39;#0072B2&#39;, &#39;#B9519E&#39;)
+
+boxplot_whiskers &lt;- function(x) {
+  r &lt;- quantile(x, probs = c(0.10, 0.25, 0.5, 0.75, 0.90))
+  names(r) &lt;- c(&quot;ymin&quot;, &quot;lower&quot;, &quot;middle&quot;, &quot;upper&quot;, &quot;ymax&quot;)
+  r
+}
+
+# Custom functions
+z_score = function(response_df, baseline_df) {
+  
+  # If variables have equal length, assume covariates, else don&#39;t use cov()
+  if(length(response_df) == length(baseline_df)) {
+    return(
+      (mean(response_df) - mean(baseline_df)) / 
+        (sqrt(var(response_df) + var(baseline_df) - 
+        2*cov(response_df, baseline_df)))
+    )
+  } else {
+    return(
+      (mean(response_df) - mean(baseline_df)) / 
+        (sqrt(var(response_df) + var(baseline_df)))
+    )
+  }
+}
+
+
+d_prime = function(response_df, baseline_df) {
+  # Remove NaNs and NAs
+  response_df = response_df[!(is.na(response_df) | is.nan(response_df))]
+  baseline_df = baseline_df[!(is.na(baseline_df) | is.nan(baseline_df))]
+  
+  if( all(response_df == 0) &amp; (all(baseline_df == 0))) {
+    return(0)
+  } else {
+    d_numerator = 2 * (mean(response_df) - mean(baseline_df))
+    d_denominator =  sd(response_df) + sd(baseline_df)
+    return(d_numerator / d_denominator)
+  }
+}
+
+cv = function(response_df) {
+  return( 
+      sd(response_df) / mean(response_df)
+  )
+}
+
+zeromin = function(x) {
+  return( (x + 2*abs(min(x))) )
+}
+
+# Create the notin operator
+`%notin%` &lt;- Negate(`%in%`)
+
+### Load previously saved dataframe
+df = read.csv(&#39;./Data/OFC-cannula_ACx-recording_allTrial_df.csv&#39;)
+behavior_df = read.csv(&#39;./Data/OFC-cannula_ACx-recording_behavior_df.csv&#39;)
+
+df[df == &quot;NaN&quot;]&lt;-NA
+
+# eliminate NA rows if they exist
+df = df[!is.na(df$Subject),]
+
+df$Session = factor(df$Session, levels=c(&#39;Pre&#39;, &#39;Active&#39;))
+
+
+df$Cluster_quality_Allen = &#39;mua&#39;
+df[(df$ISI_FPRate &lt; 0.5) &amp; (df$Fraction_missing &lt; 0.1) &amp; (df$Presence_ratio &gt; 0.9) &amp; (df$ISI_ViolationRate &lt; 2),]$Cluster_quality_Allen = &#39;good&#39;
+df$Cluster_quality_Allen = factor(df$Cluster_quality_Allen, levels=c(&#39;good&#39;, &#39;mua&#39;))
+# Call &#39;good&#39; the intersection between MML and Allen 
+df$Cluster_quality = &#39;mua&#39;
+df[df$Cluster_quality_MML == &#39;good&#39; &amp; df$Cluster_quality_Allen == &#39;good&#39;,]$Cluster_quality = &#39;good&#39;
+
+
+# Rename trial type during passive session
+df[df$Session != &#39;Active&#39;,]$Trial_type = &#39;Passive&#39;
+
+# Unit quality
+df$Cluster_quality_Allen = &#39;mua&#39;
+df[(df$ISI_FPRate &lt; 0.5) &amp; (df$Fraction_missing &lt; 0.1) &amp; (df$Presence_ratio &gt; 0.9) &amp; (df$ISI_ViolationRate &lt; 2),]$Cluster_quality_Allen = &#39;good&#39;
+df$Cluster_quality_Allen = factor(df$Cluster_quality_Allen, levels=c(&#39;good&#39;, &#39;mua&#39;))
+# Call &#39;good&#39; the intersection between MML and Allen 
+df$Cluster_quality = &#39;mua&#39;
+df[df$Cluster_quality_MML == &#39;good&#39; &amp; df$Cluster_quality_Allen == &#39;good&#39;,]$Cluster_quality = &#39;good&#39;
+
+
+# ---------------------------------------------------------------------------
+# Data curation
+# Exclude -9 dB days (different project)
+df = df[df$Subject_date %notin% c(&#39;SUBJ-ID-448_230110&#39;, &#39;SUBJ-ID-448_230112&#39;),]
+behavior_df = behavior_df[!grepl(&#39;230110|230112&#39;, behavior_df$Session),]
+
+# Did some passive playback during an active session for 448. Exclude here
+df = df[!(df$Subject_date == &#39;SUBJ-ID-448_221213&#39; &amp; df$Trial_type == &#39;Miss (no shock)&#39;),]
+
+# In subject 174 Eliminate trials 75:end from PRE on the 11/16.
+# Headstage battery died
+df = df[!(df$Subject_date == &#39;SUBJ-ID-174_201116&#39; &amp; df$Session==&#39;Pre&#39; &amp; df$TrialID &gt;= 75 ),]
+
+
+# SessionID 221210 was a shock training day (no treatment)  
+# It accidentally made it into the behavioral dataset. Remove it here
+behavior_df = behavior_df[!grepl(&#39;221210&#39;, behavior_df$Session),]
+
+# Same for SUBJ-ID-575_230821
+df = df[df$Subject_date != &#39;SUBJ-ID-575_230821&#39;,]
+behavior_df = behavior_df[behavior_df$Subject_date != &#39;SUBJ-ID-575_230821&#39;,]
+
+# Include only the first day of saline and muscimol for 448 and 575, which had repeated treatments
+# SUBJ-ID-174 only had two days
+df_all = df # Save all data here for repeated muscimol treatment analyses
+behavior_df_all = behavior_df
+good_subj_date = c(&#39;SUBJ-ID-448_221211&#39;, &#39;SUBJ-ID-448_221213&#39;)
+good_subj_date = c(good_subj_date, &#39;SUBJ-ID-575_230826&#39;, &#39;SUBJ-ID-575_230827&#39;)
+df = df[df$Subject == &#39;SUBJ-ID-174&#39; | df$Subject_date %in% good_subj_date,]
+behavior_df = behavior_df[behavior_df$Subject == &#39;SUBJ-ID-174&#39; | behavior_df$Subject_date %in% good_subj_date,]
+# ---------------------------------------------------------------------------
+
+
+
+
+# Treatment days
+df$Treatment = &#39;Saline&#39;
+muscimol_sessions = c(&#39;SUBJ-ID-174_201116&#39;)
+muscimol_sessions = c(muscimol_sessions, &#39;SUBJ-ID-448_221213&#39;, &#39;SUBJ-ID-448_221215&#39;, &#39;SUBJ-ID-448_221217&#39;, &#39;SUBJ-ID-448_221219&#39;, &#39;SUBJ-ID-448_221220&#39;, &#39;SUBJ-ID-448_221222&#39;)
+muscimol_sessions = c(muscimol_sessions, &#39;SUBJ-ID-575_230827&#39;, &#39;SUBJ-ID-575_230829&#39;, &#39;SUBJ-ID-575_230831&#39;, &#39;SUBJ-ID-575_230902&#39;)
+df[df$Subject_date %in% muscimol_sessions,]$Treatment = &#39;Muscimol&#39;
+df$Treatment = factor(df$Treatment, levels=c(&#39;Saline&#39;, &#39;Muscimol&#39;))
+
+behavior_df$Treatment = &#39;Saline&#39;
+behavior_df[behavior_df$Subject_date %in% muscimol_sessions,]$Treatment = &#39;Muscimol&#39;
+behavior_df$Treatment = factor(behavior_df$Treatment, levels=c(&#39;Saline&#39;, &#39;Muscimol&#39;))
+
+
+save.image(&#39;./Data/ACx_ephys_analyses_env.RData&#39;)
+
+# Some garbage collection
+gc()</code></pre>
+<pre><code>##            used  (Mb) gc trigger  (Mb) max used  (Mb)
+## Ncells  2455222 131.2    4601572 245.8  3601804 192.4
+## Vcells 12760602  97.4   34878729 266.2 34877231 266.1</code></pre>
+</div>
+</div>
+<div id="get-some-descriptives" class="section level1">
+<h1>Get some descriptives</h1>
+<pre class="r"><code># Training days per subject
+df %&gt;% group_by(Subject) %&gt;%
+  summarise(
+    Max_day = length(unique(Day_of_training))
+  )</code></pre>
+<pre><code>## # A tibble: 3 × 2
+##   Subject     Max_day
+##   &lt;chr&gt;         &lt;int&gt;
+## 1 SUBJ-ID-174       2
+## 2 SUBJ-ID-448       2
+## 3 SUBJ-ID-575       2</code></pre>
+<pre class="r"><code># How many trials per session?
+df_info = df[df$AMdepth_db != -40 &amp; df$Period == &#39;Baseline&#39;,] %&gt;% group_by(Subject, Session, Subject_date) %&gt;%
+  summarise(
+    Trial_count = length(unique(TrialID))
+  )</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;Subject&#39;, &#39;Session&#39;. You can override
+## using the `.groups` argument.</code></pre>
+<pre class="r"><code>df_info %&gt;% group_by(Session) %&gt;%
+  summarise(
+    Trial_count_mean = mean(Trial_count),
+    Trial_count_ste = sd(Trial_count)/sqrt(n() - 1)
+  )</code></pre>
+<pre><code>## # A tibble: 2 × 3
+##   Session Trial_count_mean Trial_count_ste
+##   &lt;fct&gt;              &lt;dbl&gt;           &lt;dbl&gt;
+## 1 Pre                 38.3            8.08
+## 2 Active              55.5           12.5</code></pre>
+<pre class="r"><code># How many single units?
+df_info = df[df$AMdepth_db != -40 &amp; df$Period == &#39;Baseline&#39;,] %&gt;% group_by(Subject, Unit, Subject_date, Cluster_quality, ActiveTrial_modulation_direction) %&gt;%
+  summarise(
+    Trial_count = length(unique(TrialID)),
+    ISI_FPRate = mean(ISI_FPRate),
+    ISI_ViolationRate = mean(ISI_ViolationRate),
+    Fraction_missing = mean(Fraction_missing)
+  )</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;Subject&#39;, &#39;Unit&#39;, &#39;Subject_date&#39;, &#39;Cluster_quality&#39;. You can override
+## using the `.groups` argument.</code></pre>
+<pre class="r"><code>table(df_info$Cluster_quality)</code></pre>
+<pre><code>## 
+## good  mua 
+##   22   45</code></pre>
+<pre class="r"><code># How many units per treatment?
+df_info = df[df$AMdepth_db != -40 &amp; df$Period == &#39;Baseline&#39;,] %&gt;% group_by(Subject, Unit, Subject_date, Cluster_quality, ActiveTrial_modulation_direction, Treatment) %&gt;%
+  summarise(
+    Trial_count = length(unique(TrialID)),
+    ISI_FPRate = mean(ISI_FPRate),
+    ISI_ViolationRate = mean(ISI_ViolationRate),
+    Fraction_missing = mean(Fraction_missing)
+  )</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;Subject&#39;, &#39;Unit&#39;, &#39;Subject_date&#39;, &#39;Cluster_quality&#39;,
+## &#39;ActiveTrial_modulation_direction&#39;. You can override using the `.groups` argument.</code></pre>
+<pre class="r"><code>table(df_info$Cluster_quality, df_info$Treatment)</code></pre>
+<pre><code>##       
+##        Saline Muscimol
+##   good     12       10
+##   mua      16       29</code></pre>
+</div>
+<div
+id="figure-5c-and-s5-ofc-muscimols-effect-on-behavior-during-acx-recordings"
+class="section level1">
+<h1>Figure 5C and S5: OFC muscimol’s effect on behavior during ACx
+recordings</h1>
+<div id="fig-5c-behavioral-d" class="section level2">
+<h2>Fig 5C: Behavioral d’</h2>
+<pre class="r"><code># Includes water consumption information
+behavior_df$Treatment = factor(behavior_df$Treatment, levels=c(&#39;Saline&#39;, &#39;Muscimol&#39;))
+
+graph_data = behavior_df
+
+y_axis = seq(0.5, 3, 0.5)
+p = ggplot(data=graph_data, aes(x=Treatment, y=D_prime, color=Treatment, fill=Treatment)) + 
+  stat_summary(fun.data=boxplot_whiskers, geom=&quot;boxplot&quot;, na.rm = T, alpha=0.25, lwd=LINE_THICKNESS/2, fatten=1, width=0.5)+
+
+  geom_line(aes(group = Subject), color=&#39;black&#39;,  alpha=0.1, size=LINE_THICKNESS/4, width=0.1) +
+  
+  ylab(&#39;Behavioral d\&#39;&#39;) +
+  xlab(&#39;&#39;) +
+  
+  scale_fill_manual(name = &quot;Treatment&quot;,
+                   values = treatment_colors, guide=&#39;none&#39;) +
+  scale_color_manual(name = &quot;Treatment&quot;,
+                   values = treatment_colors, guide=&#39;none&#39;) +
+  
+  scale_y_continuous(breaks=y_axis, expand=c(0, 0)) +
+  coord_cartesian(ylim = c(min(y_axis), max(y_axis))) +
+  
+  theme(
+    legend.position = &#39;none&#39;,
+    axis.title.x=element_blank(),
+    axis.line.x = element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank())
+p</code></pre>
+<p><img src="ACx_ephys_analyses_files/figure-html/unnamed-chunk-4-1.png" width="288" /></p>
+<pre class="r"><code># ggsave(plot=p, &#39;OFC-cannula_ACx-recording_behaviorDprime_lines.pdf&#39;, width=0.75, height=1.5,dpi=600, useDingbats=FALSE)</code></pre>
+<div id="stats" class="section level3">
+<h3>Stats</h3>
+<pre class="r"><code>lme_data = graph_data
+lme_bin &lt;- glmmTMB(D_prime~ Treatment +  (1|Subject) , data=lme_data, family=gaussian)
+simulationOutput &lt;- simulateResiduals(fittedModel = lme_bin, plot = T, re.form=NULL)  # pass</code></pre>
+<pre><code>## Warning in smooth.construct.tp.smooth.spec(object, dk$data, dk$knots): basis dimension, k, increased to minimum possible</code></pre>
+<pre><code>## Unable to calculate quantile regression for quantile 0.25. Possibly to few (unique) data points / predictions. Will be ommited in plots and significance calculations.</code></pre>
+<pre><code>## Warning in smooth.construct.tp.smooth.spec(object, dk$data, dk$knots): basis dimension, k, increased to minimum possible</code></pre>
+<pre><code>## Unable to calculate quantile regression for quantile 0.5. Possibly to few (unique) data points / predictions. Will be ommited in plots and significance calculations.</code></pre>
+<pre><code>## Warning in smooth.construct.tp.smooth.spec(object, dk$data, dk$knots): basis dimension, k, increased to minimum possible</code></pre>
+<pre><code>## Unable to calculate quantile regression for quantile 0.75. Possibly to few (unique) data points / predictions. Will be ommited in plots and significance calculations.</code></pre>
+<p><img src="ACx_ephys_analyses_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<pre class="r"><code>Anova(lme_bin)</code></pre>
+<pre><code>## Analysis of Deviance Table (Type II Wald chisquare tests)
+## 
+## Response: D_prime
+##            Chisq Df Pr(&gt;Chisq)    
+## Treatment 238.96  1  &lt; 2.2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+</div>
+</div>
+<div id="fig-s5a-hit-rate" class="section level2">
+<h2>Fig S5A: Hit rate</h2>
+<pre class="r"><code>y_axis = seq(0, 100, 25)
+p = ggplot(data=graph_data, aes(x=Treatment, y=Hit_rate, color=Treatment, fill=Treatment)) + 
+  stat_summary(fun.data=boxplot_whiskers, geom=&quot;boxplot&quot;, na.rm = T, alpha=0.25, lwd=LINE_THICKNESS/2, fatten=1, width=0.5)+
+
+  geom_line(aes(group = Subject), color=&#39;black&#39;,  alpha=0.1, size=LINE_THICKNESS/4, width=0.1) +
+  
+  ylab(&#39;Hit rate (%)&#39;) +
+  xlab(&#39;&#39;) +
+  
+  scale_fill_manual(name = &quot;Treatment&quot;,
+                   values = treatment_colors, guide=&#39;none&#39;) +
+  scale_color_manual(name = &quot;Treatment&quot;,
+                   values = treatment_colors, guide=&#39;none&#39;) +
+  
+  scale_y_continuous(breaks=y_axis, expand=c(0, 0)) +
+  coord_cartesian(ylim = c(min(y_axis), max(y_axis))) +
+  
+  theme(
+    legend.position = &#39;none&#39;,
+    axis.title.x=element_blank(),
+    axis.line.x = element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank())
+p</code></pre>
+<p><img src="ACx_ephys_analyses_files/figure-html/unnamed-chunk-6-1.png" width="288" />
+### Stats</p>
+<pre class="r"><code>lme_data = graph_data
+lme_bin &lt;- glmmTMB(Hit_rate~ Treatment +  (1|Subject) , data=lme_data, family=gaussian)
+simulationOutput &lt;- simulateResiduals(fittedModel = lme_bin, plot = T, re.form=NULL)  # pass</code></pre>
+<pre><code>## Warning in smooth.construct.tp.smooth.spec(object, dk$data, dk$knots): basis dimension, k, increased to minimum possible</code></pre>
+<pre><code>## Unable to calculate quantile regression for quantile 0.25. Possibly to few (unique) data points / predictions. Will be ommited in plots and significance calculations.</code></pre>
+<pre><code>## Warning in smooth.construct.tp.smooth.spec(object, dk$data, dk$knots): basis dimension, k, increased to minimum possible</code></pre>
+<pre><code>## Unable to calculate quantile regression for quantile 0.5. Possibly to few (unique) data points / predictions. Will be ommited in plots and significance calculations.</code></pre>
+<pre><code>## Warning in smooth.construct.tp.smooth.spec(object, dk$data, dk$knots): basis dimension, k, increased to minimum possible</code></pre>
+<pre><code>## Unable to calculate quantile regression for quantile 0.75. Possibly to few (unique) data points / predictions. Will be ommited in plots and significance calculations.</code></pre>
+<p><img src="ACx_ephys_analyses_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<pre class="r"><code>Anova(lme_bin)</code></pre>
+<pre><code>## Analysis of Deviance Table (Type II Wald chisquare tests)
+## 
+## Response: Hit_rate
+##            Chisq Df Pr(&gt;Chisq)   
+## Treatment 8.2715  1   0.004027 **
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+</div>
+<div id="fig-s5b-false-alarm-rate" class="section level2">
+<h2>Fig S5B: False alarm rate</h2>
+<pre class="r"><code>y_axis = seq(0, 100, 25)
+p = ggplot(data=graph_data, aes(x=Treatment, y=FA_rate, color=Treatment, fill=Treatment)) + 
+  stat_summary(fun.data=boxplot_whiskers, geom=&quot;boxplot&quot;, na.rm = T, alpha=0.25, lwd=LINE_THICKNESS/2, fatten=1, width=0.5)+
+
+  geom_line(aes(group = Subject), color=&#39;black&#39;,  alpha=0.1, size=LINE_THICKNESS/4, width=0.1) +
+  
+  ylab(&#39;False alarm rate (%)&#39;) +
+  xlab(&#39;&#39;) +
+  
+  scale_fill_manual(name = &quot;Treatment&quot;,
+                   values = treatment_colors, guide=&#39;none&#39;) +
+  scale_color_manual(name = &quot;Treatment&quot;,
+                   values = treatment_colors, guide=&#39;none&#39;) +
+  
+  scale_y_continuous(breaks=y_axis, expand=c(0, 0)) +
+  coord_cartesian(ylim = c(min(y_axis), max(y_axis))) +
+  
+  theme(
+    legend.position = &#39;none&#39;,
+    axis.title.x=element_blank(),
+    axis.line.x = element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank())
+p</code></pre>
+<p><img src="ACx_ephys_analyses_files/figure-html/unnamed-chunk-8-1.png" width="288" />
+### Stats</p>
+<pre class="r"><code>lme_data = graph_data
+lme_bin &lt;- glmmTMB(FA_rate~ Treatment +  (1|Subject) , data=lme_data, family=gaussian)
+simulationOutput &lt;- simulateResiduals(fittedModel = lme_bin, plot = T, re.form=NULL)  # pass</code></pre>
+<pre><code>## Warning in smooth.construct.tp.smooth.spec(object, dk$data, dk$knots): basis dimension, k, increased to minimum possible</code></pre>
+<pre><code>## Unable to calculate quantile regression for quantile 0.25. Possibly to few (unique) data points / predictions. Will be ommited in plots and significance calculations.</code></pre>
+<pre><code>## Warning in smooth.construct.tp.smooth.spec(object, dk$data, dk$knots): basis dimension, k, increased to minimum possible</code></pre>
+<pre><code>## Unable to calculate quantile regression for quantile 0.5. Possibly to few (unique) data points / predictions. Will be ommited in plots and significance calculations.</code></pre>
+<pre><code>## Warning in smooth.construct.tp.smooth.spec(object, dk$data, dk$knots): basis dimension, k, increased to minimum possible</code></pre>
+<pre><code>## Unable to calculate quantile regression for quantile 0.75. Possibly to few (unique) data points / predictions. Will be ommited in plots and significance calculations.</code></pre>
+<p><img src="ACx_ephys_analyses_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<pre class="r"><code>Anova(lme_bin)</code></pre>
+<pre><code>## Analysis of Deviance Table (Type II Wald chisquare tests)
+## 
+## Response: FA_rate
+##            Chisq Df Pr(&gt;Chisq)  
+## Treatment 2.7146  1    0.09944 .
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+</div>
+<div id="fig-s5c-water-consumed" class="section level2">
+<h2>Fig S5C: Water consumed</h2>
+<pre class="r"><code>y_axis = seq(0.5, 1.1, 0.1)
+p = ggplot(data=graph_data, aes(x=Treatment, y=WaterConsumed, color=Treatment, fill=Treatment)) + 
+  stat_summary(fun.data=boxplot_whiskers, geom=&quot;boxplot&quot;, na.rm = T, alpha=0.25, lwd=LINE_THICKNESS/2, fatten=1, width=0.5)+
+
+  geom_line(aes(group = Subject), color=&#39;black&#39;,  alpha=0.1, size=LINE_THICKNESS/4, width=0.1) +
+  
+  ylab(&#39;Water consumed (mL)&#39;) +
+  xlab(&#39;&#39;) +
+  
+  scale_fill_manual(name = &quot;Treatment&quot;,
+                   values = treatment_colors, guide=&#39;none&#39;) +
+  scale_color_manual(name = &quot;Treatment&quot;,
+                   values = treatment_colors, guide=&#39;none&#39;) +
+  
+  scale_y_continuous(breaks=y_axis, expand=c(0, 0)) +
+  coord_cartesian(ylim = c(min(y_axis), max(y_axis))) +
+  
+  theme(
+    legend.position = &#39;none&#39;,
+    axis.title.x=element_blank(),
+    axis.line.x = element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank())
+p</code></pre>
+<p><img src="ACx_ephys_analyses_files/figure-html/unnamed-chunk-10-1.png" width="288" />
+### Stats</p>
+<pre class="r"><code>lme_data = graph_data
+lme_bin &lt;- glmmTMB(WaterConsumed~ Treatment +  (1|Subject) , data=lme_data, family=gaussian)
+simulationOutput &lt;- simulateResiduals(fittedModel = lme_bin, plot = T, re.form=NULL)  # pass</code></pre>
+<pre><code>## Warning in smooth.construct.tp.smooth.spec(object, dk$data, dk$knots): basis dimension, k, increased to minimum possible</code></pre>
+<pre><code>## Unable to calculate quantile regression for quantile 0.25. Possibly to few (unique) data points / predictions. Will be ommited in plots and significance calculations.</code></pre>
+<pre><code>## Warning in smooth.construct.tp.smooth.spec(object, dk$data, dk$knots): basis dimension, k, increased to minimum possible</code></pre>
+<pre><code>## Unable to calculate quantile regression for quantile 0.5. Possibly to few (unique) data points / predictions. Will be ommited in plots and significance calculations.</code></pre>
+<pre><code>## Warning in smooth.construct.tp.smooth.spec(object, dk$data, dk$knots): basis dimension, k, increased to minimum possible</code></pre>
+<pre><code>## Unable to calculate quantile regression for quantile 0.75. Possibly to few (unique) data points / predictions. Will be ommited in plots and significance calculations.</code></pre>
+<p><img src="ACx_ephys_analyses_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+<pre class="r"><code>Anova(lme_bin)</code></pre>
+<pre><code>## Analysis of Deviance Table (Type II Wald chisquare tests)
+## 
+## Response: WaterConsumed
+##            Chisq Df Pr(&gt;Chisq)
+## Treatment 2.3234  1     0.1274</code></pre>
+</div>
+</div>
+<div
+id="figure-5e-f-and-s6-ofc-muscimols-effect-on-behavior-during-acx-recordings"
+class="section level1">
+<h1>Figure 5E-F and S6: OFC muscimol’s effect on behavior during ACx
+recordings</h1>
+<div id="fig-5e-neural-d" class="section level2">
+<h2>Fig 5E: Neural d’</h2>
+<pre class="r"><code>df_grouped = df[df$Trial_type %notin% c(&#39;False alarm&#39;),] %&gt;% group_by(Unit, Subject, Subject_date, Session, Treatment, AMdprime) %&gt;%
+  summarise( 
+    FR_Hz_baseline = mean(FR_Hz[Period == &#39;Baseline&#39;]),
+    FR_Hz_trial = mean(FR_Hz[Period == &#39;Trial&#39;]),
+    absNeural_d_trial = abs(d_prime(FR_Hz[Period == &#39;Trial&#39;], FR_Hz[Period == &#39;Baseline&#39;])),
+  )</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;Unit&#39;, &#39;Subject&#39;, &#39;Subject_date&#39;, &#39;Session&#39;, &#39;Treatment&#39;. You can
+## override using the `.groups` argument.</code></pre>
+<pre class="r"><code>df_grouped$Session = factor(df_grouped$Session, levels=c(&#39;Pre&#39;, &#39;Active&#39;))
+levels(df_grouped$Session) = c(&#39;Passive&#39;, &#39;Task&#39;)
+
+df_grouped = df_grouped[!is.na(df_grouped$absNeural_d_trial),]
+complete_case_units = Reduce(intersect, list(df_grouped[df_grouped$Session == &#39;Passive&#39;,]$Unit, df_grouped[df_grouped$Session == &#39;Task&#39;,]$Unit))
+df_grouped = df_grouped[df_grouped$Unit %in% complete_case_units,]
+
+graph_data = df_grouped
+
+# Create Session.Treatment intersection for color scheme
+graph_data$Session.Treatment = as.character(interaction(graph_data$Session, graph_data$Treatment))
+graph_data[grepl(&#39;Passive&#39;, graph_data$Session.Treatment),]$Session.Treatment = &#39;Passive&#39;
+graph_data$Session.Treatment = factor(graph_data$Session.Treatment, levels=c(&#39;Passive&#39;, &#39;Task.Saline&#39;, &#39;Task.Muscimol&#39;))
+session.treatment_colors = c(&#39;black&#39;, treatment_colors)
+
+y_axis = seq(0, 1.5, 0.5)
+p =ggplot(data=graph_data, aes(x=Session, y=(absNeural_d_trial), fill=Session.Treatment, color=Session.Treatment)) + 
+  facet_grid(.~Treatment) +
+
+    stat_summary(fun.data=boxplot_whiskers, geom=&quot;boxplot&quot;, na.rm = T, alpha=0.25, lwd=LINE_THICKNESS/2, fatten=1, width=0.5)+
+  ylab(&#39;|Neural d\&#39;|&#39;) + xlab(&#39;Trial type&#39;) +
+  
+  scale_fill_manual(name = &quot;Treatment&quot;,
+                   values = session.treatment_colors) +
+  scale_color_manual(name = &quot;Treatment&quot;,
+                   values = session.treatment_colors) +
+  
+  scale_y_continuous(breaks=y_axis, expand=c(0, 0)) +
+  coord_cartesian(ylim = c(min(y_axis), max(y_axis))) +
+  
+  theme(legend.position = &quot;none&quot;, 
+      strip.text.x = element_blank(),
+      axis.line.x = element_blank(),
+      axis.ticks.x = element_blank(),
+      axis.title.x = element_blank(),
+      panel.spacing.x = unit(1.5, &quot;lines&quot;))
+p</code></pre>
+<p><img src="ACx_ephys_analyses_files/figure-html/unnamed-chunk-12-1.png" width="480" />
+### Stats</p>
+<pre class="r"><code>lme_data = graph_data[graph_data$Treatment == &#39;Saline&#39;,]
+lme_bin &lt;- glmmTMB(sqrt(absNeural_d_trial)~ Session +  (1|Subject/Unit/Session) , data=lme_data, family=gaussian)
+simulationOutput &lt;- simulateResiduals(fittedModel = lme_bin, plot = T, re.form=NULL)  # pass</code></pre>
+<p><img src="ACx_ephys_analyses_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
+<pre class="r"><code>Anova(lme_bin)</code></pre>
+<pre><code>## Analysis of Deviance Table (Type II Wald chisquare tests)
+## 
+## Response: sqrt(absNeural_d_trial)
+##          Chisq Df Pr(&gt;Chisq)   
+## Session 7.2933  1   0.006921 **
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>lme_data = graph_data[graph_data$Treatment == &#39;Muscimol&#39;,]
+lme_bin &lt;- glmmTMB((sqrt(absNeural_d_trial))~ Session +  (1|Subject/Unit/Session) , data=lme_data, family=gaussian)
+simulationOutput &lt;- simulateResiduals(fittedModel = lme_bin, plot = T, re.form=NULL)  # pass</code></pre>
+<p><img src="ACx_ephys_analyses_files/figure-html/unnamed-chunk-13-2.png" width="672" /></p>
+<pre class="r"><code>Anova(lme_bin)</code></pre>
+<pre><code>## Analysis of Deviance Table (Type II Wald chisquare tests)
+## 
+## Response: (sqrt(absNeural_d_trial))
+##          Chisq Df Pr(&gt;Chisq)
+## Session 1.9521  1     0.1624</code></pre>
+</div>
+<div id="fig-s6a-non-am-firing-rate" class="section level2">
+<h2>Fig S6A: Non-AM firing rate</h2>
+<pre class="r"><code>df_grouped = df[df$Period %in% c(&#39;Baseline&#39;,&#39;Trial&#39;) &amp; df$Trial_type %notin% c(&#39;False alarm&#39;),] %&gt;% group_by(Unit, Subject, Session, Subject_date, Period, Cluster_quality, Treatment) %&gt;%
+  summarise( 
+    FR_Hz = mean(FR_Hz)
+  )</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;Unit&#39;, &#39;Subject&#39;, &#39;Session&#39;, &#39;Subject_date&#39;, &#39;Period&#39;,
+## &#39;Cluster_quality&#39;. You can override using the `.groups` argument.</code></pre>
+<pre class="r"><code>df_grouped$Period = factor(df_grouped$Period, levels=c(&#39;Baseline&#39;,&#39;Trial&#39;))
+df_grouped$Period = droplevels(df_grouped$Period)
+levels(df_grouped$Period) = c(&#39;non-AM&#39;, &#39;AM&#39;)
+
+df_grouped$Session = factor(df_grouped$Session, levels=c(&#39;Pre&#39;, &#39;Active&#39;))
+levels(df_grouped$Session) = c(&#39;Passive&#39;, &#39;Task&#39;)
+
+graph_data = df_grouped[df_grouped$Period == &#39;non-AM&#39;,]
+graph_data$Session.Treatment = as.character(interaction(graph_data$Session, graph_data$Treatment))
+graph_data[grepl(&#39;Passive&#39;, graph_data$Session.Treatment),]$Session.Treatment = &#39;Passive&#39;
+graph_data$Session.Treatment = factor(graph_data$Session.Treatment, levels=c(&#39;Passive&#39;, &#39;Task.Saline&#39;, &#39;Task.Muscimol&#39;))
+session.treatment_colors = c(&#39;black&#39;, treatment_colors)
+
+y_axis = seq(0, 15, 5)
+p =ggplot(data=graph_data, aes(x=Session, y=FR_Hz, fill=Session.Treatment, color=Session.Treatment)) + 
+  facet_grid(.~Treatment) +
+
+    stat_summary(fun.data=boxplot_whiskers, geom=&quot;boxplot&quot;, na.rm = T, alpha=0.25, lwd=LINE_THICKNESS/2, fatten=1, width=0.5)+
+  ylab(&#39;Firing rate (Hz)&#39;) + xlab(&#39;Trial type&#39;) +
+  
+  scale_fill_manual(name = &quot;Treatment&quot;,
+                   values = session.treatment_colors) +
+  scale_color_manual(name = &quot;Treatment&quot;,
+                   values = session.treatment_colors) +
+  
+  scale_y_continuous(breaks=y_axis, expand=c(0, 0)) +
+  coord_cartesian(ylim = c(min(y_axis), max(y_axis))) +
+  
+  theme(legend.position = &quot;none&quot;, 
+      strip.text.x = element_blank(),
+      axis.line.x = element_blank(),
+      axis.ticks.x = element_blank(),
+      axis.title.x = element_blank(),
+      panel.spacing.x = unit(1.5, &quot;lines&quot;))
+p</code></pre>
+<p><img src="ACx_ephys_analyses_files/figure-html/unnamed-chunk-14-1.png" width="480" />
+### Stats</p>
+<pre class="r"><code>lme_data = graph_data[graph_data$Treatment == &#39;Saline&#39;,]
+lme_bin &lt;- glmmTMB(sqrt(FR_Hz)~ Session +  (1|Subject/Unit/Session) , data=lme_data, family=gaussian)
+simulationOutput &lt;- simulateResiduals(fittedModel = lme_bin, plot = T, re.form=NULL)  # passAnova(lme_bin)</code></pre>
+<p><img src="ACx_ephys_analyses_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
+<pre class="r"><code>Anova(lme_bin)</code></pre>
+<pre><code>## Analysis of Deviance Table (Type II Wald chisquare tests)
+## 
+## Response: sqrt(FR_Hz)
+##          Chisq Df Pr(&gt;Chisq)
+## Session 0.6783  1     0.4102</code></pre>
+<pre class="r"><code>lme_data = graph_data[graph_data$Treatment == &#39;Muscimol&#39;,]
+lme_bin &lt;- glmmTMB(sqrt(FR_Hz)~ Session +  (1|Subject/Unit/Session) , data=lme_data, family=gaussian)
+simulationOutput &lt;- simulateResiduals(fittedModel = lme_bin, plot = T, re.form=NULL)  # passAnova(lme_bin)</code></pre>
+<p><img src="ACx_ephys_analyses_files/figure-html/unnamed-chunk-15-2.png" width="672" /></p>
+<pre class="r"><code>Anova(lme_bin)</code></pre>
+<pre><code>## Analysis of Deviance Table (Type II Wald chisquare tests)
+## 
+## Response: sqrt(FR_Hz)
+##          Chisq Df Pr(&gt;Chisq)
+## Session 1.9001  1     0.1681</code></pre>
+</div>
+<div id="fig-s6b-am-firing-rate" class="section level2">
+<h2>Fig S6B: AM firing rate</h2>
+<pre class="r"><code>graph_data = df_grouped[df_grouped$Period == &#39;AM&#39;,]
+graph_data$Session.Treatment = as.character(interaction(graph_data$Session, graph_data$Treatment))
+graph_data[grepl(&#39;Passive&#39;, graph_data$Session.Treatment),]$Session.Treatment = &#39;Passive&#39;
+graph_data$Session.Treatment = factor(graph_data$Session.Treatment, levels=c(&#39;Passive&#39;, &#39;Task.Saline&#39;, &#39;Task.Muscimol&#39;))
+session.treatment_colors = c(&#39;black&#39;, treatment_colors)
+
+y_axis = seq(0, 15, 5)
+p =ggplot(data=graph_data, aes(x=Session, y=FR_Hz, fill=Session.Treatment, color=Session.Treatment)) + 
+  facet_grid(.~Treatment) +
+
+    stat_summary(fun.data=boxplot_whiskers, geom=&quot;boxplot&quot;, na.rm = T, alpha=0.25, lwd=LINE_THICKNESS/2, fatten=1, width=0.5)+
+  ylab(&#39;Firing rate (Hz)&#39;) + xlab(&#39;Trial type&#39;) +
+  
+  scale_fill_manual(name = &quot;Treatment&quot;,
+                   values = session.treatment_colors) +
+  scale_color_manual(name = &quot;Treatment&quot;,
+                   values = session.treatment_colors) +
+  
+  scale_y_continuous(breaks=y_axis, expand=c(0, 0)) +
+  coord_cartesian(ylim = c(min(y_axis), max(y_axis))) +
+  
+  theme(legend.position = &quot;none&quot;, 
+      strip.text.x = element_blank(),
+      axis.line.x = element_blank(),
+      axis.ticks.x = element_blank(),
+      axis.title.x = element_blank(),
+      panel.spacing.x = unit(1.5, &quot;lines&quot;))
+p</code></pre>
+<p><img src="ACx_ephys_analyses_files/figure-html/unnamed-chunk-16-1.png" width="480" />
+### Stats</p>
+<pre class="r"><code>lme_data = graph_data[graph_data$Treatment == &#39;Saline&#39;,]
+lme_bin &lt;- glmmTMB(sqrt(FR_Hz)~ Session +  (1|Subject/Unit/Session) , data=lme_data, family=gaussian)
+simulationOutput &lt;- simulateResiduals(fittedModel = lme_bin, plot = T, re.form=NULL)  # passAnova(lme_bin)</code></pre>
+<p><img src="ACx_ephys_analyses_files/figure-html/unnamed-chunk-17-1.png" width="672" /></p>
+<pre class="r"><code>Anova(lme_bin)</code></pre>
+<pre><code>## Analysis of Deviance Table (Type II Wald chisquare tests)
+## 
+## Response: sqrt(FR_Hz)
+##         Chisq Df Pr(&gt;Chisq)
+## Session     0  1     0.9982</code></pre>
+<pre class="r"><code>lme_data = graph_data[graph_data$Treatment == &#39;Muscimol&#39;,]
+lme_bin &lt;- glmmTMB(sqrt(FR_Hz)~ Session +  (1|Subject/Unit/Session) , data=lme_data, family=gaussian)
+simulationOutput &lt;- simulateResiduals(fittedModel = lme_bin, plot = T, re.form=NULL)  # passAnova(lme_bin)</code></pre>
+<p><img src="ACx_ephys_analyses_files/figure-html/unnamed-chunk-17-2.png" width="672" /></p>
+<pre class="r"><code>Anova(lme_bin)</code></pre>
+<pre><code>## Analysis of Deviance Table (Type II Wald chisquare tests)
+## 
+## Response: sqrt(FR_Hz)
+##          Chisq Df Pr(&gt;Chisq)
+## Session 0.2144  1     0.6434</code></pre>
+</div>
+<div id="fig-5f-delta-firing-rate-am---non-am" class="section level2">
+<h2>Fig 5F: Delta firing rate (AM - non-AM)</h2>
+<pre class="r"><code>df_grouped = df[df$Trial_type %notin% c(&#39;False alarm&#39;),] %&gt;% group_by(Unit, Subject, Session, Subject_date, Cluster_quality_Allen, Cluster_quality, Treatment, TrialID) %&gt;%
+  summarise( 
+    FR_Hz_Pre_AM_delta = (FR_Hz[Period==&#39;Trial&#39;] - FR_Hz[Period==&#39;Baseline&#39;])
+  )</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;Unit&#39;, &#39;Subject&#39;, &#39;Session&#39;, &#39;Subject_date&#39;, &#39;Cluster_quality_Allen&#39;,
+## &#39;Cluster_quality&#39;, &#39;Treatment&#39;. You can override using the `.groups` argument.</code></pre>
+<pre class="r"><code>levels(df_grouped$Session) = c(&#39;Passive&#39;, &#39;Task&#39;)
+
+graph_data = df_grouped %&gt;% group_by(Unit, Subject, Session, Subject_date, Cluster_quality_Allen, Cluster_quality, Treatment) %&gt;%
+  summarise(
+    FR_Hz_Pre_AM_delta = mean(FR_Hz_Pre_AM_delta, na.rm=T)
+  )</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;Unit&#39;, &#39;Subject&#39;, &#39;Session&#39;, &#39;Subject_date&#39;, &#39;Cluster_quality_Allen&#39;,
+## &#39;Cluster_quality&#39;. You can override using the `.groups` argument.</code></pre>
+<pre class="r"><code>graph_data$Session.Treatment = as.character(interaction(graph_data$Session, graph_data$Treatment))
+graph_data[grepl(&#39;Passive&#39;, graph_data$Session.Treatment),]$Session.Treatment = &#39;Passive&#39;
+graph_data$Session.Treatment = factor(graph_data$Session.Treatment, levels=c(&#39;Passive&#39;, &#39;Task.Saline&#39;, &#39;Task.Muscimol&#39;))
+session.treatment_colors = c(&#39;black&#39;, treatment_colors)
+
+y_axis = seq(-4, 4, 2)
+p =ggplot(data=graph_data, aes(x=Session, y=FR_Hz_Pre_AM_delta, fill=Session.Treatment, color=Session.Treatment)) + 
+  facet_grid(.~Treatment) +
+
+    stat_summary(fun.data=boxplot_whiskers, geom=&quot;boxplot&quot;, na.rm = T, alpha=0.25, lwd=LINE_THICKNESS/2, fatten=1, width=0.5)+
+  ylab(expression(~Delta*&#39;Firing rate (Hz) AM - non-AM&#39;)) + 
+  xlab(&#39;Trial type&#39;) +
+  
+  scale_fill_manual(name = &quot;Treatment&quot;,
+                   values = session.treatment_colors) +
+  scale_color_manual(name = &quot;Treatment&quot;,
+                   values = session.treatment_colors) +
+  
+  scale_y_continuous(breaks=y_axis, expand=c(0, 0)) +
+  coord_cartesian(ylim = c(min(y_axis), max(y_axis))) +
+  
+  theme(legend.position = &quot;none&quot;, 
+      strip.text.x = element_blank(),
+      axis.line.x = element_blank(),
+      axis.ticks.x = element_blank(),
+      axis.title.x = element_blank(),
+      panel.spacing.x = unit(1.5, &quot;lines&quot;))
+p</code></pre>
+<p><img src="ACx_ephys_analyses_files/figure-html/unnamed-chunk-18-1.png" width="480" />
+### Stats</p>
+<pre class="r"><code>lme_data = graph_data[graph_data$Treatment == &#39;Saline&#39;,]
+lme_bin &lt;- glmmTMB(log(zeromin(FR_Hz_Pre_AM_delta))~ Session +  (1|Subject/Unit/Session) , data=lme_data, family=gaussian)
+simulationOutput &lt;- simulateResiduals(fittedModel = lme_bin, plot = T, re.form=NULL)  # passAnova(lme_bin)</code></pre>
+<p><img src="ACx_ephys_analyses_files/figure-html/unnamed-chunk-19-1.png" width="672" /></p>
+<pre class="r"><code>Anova(lme_bin)</code></pre>
+<pre><code>## Analysis of Deviance Table (Type II Wald chisquare tests)
+## 
+## Response: log(zeromin(FR_Hz_Pre_AM_delta))
+##          Chisq Df Pr(&gt;Chisq)   
+## Session 8.2804  1   0.004008 **
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>lme_data = graph_data[graph_data$Treatment == &#39;Muscimol&#39;,]
+lme_bin &lt;- glmmTMB(log(zeromin(FR_Hz_Pre_AM_delta))~ Session +  (1|Subject/Unit/Session) , data=lme_data, family=gaussian)
+simulationOutput &lt;- simulateResiduals(fittedModel = lme_bin, plot = T, re.form=NULL)  # passAnova(lme_bin)</code></pre>
+<p><img src="ACx_ephys_analyses_files/figure-html/unnamed-chunk-19-2.png" width="672" /></p>
+<pre class="r"><code>Anova(lme_bin)</code></pre>
+<pre><code>## Analysis of Deviance Table (Type II Wald chisquare tests)
+## 
+## Response: log(zeromin(FR_Hz_Pre_AM_delta))
+##          Chisq Df Pr(&gt;Chisq)
+## Session 2.4053  1     0.1209</code></pre>
+</div>
+<div id="fig-s6c-non-am-firing-rate-variability-cv"
+class="section level2">
+<h2>Fig S6C: Non-AM firing rate variability (CV)</h2>
+<pre class="r"><code>df_grouped = df[df$Period %in% c(&#39;Baseline&#39;,&#39;Trial&#39;) &amp; df$Trial_type %notin% c(&#39;False alarm&#39;),] %&gt;% group_by(Unit, Subject, Subject_date, Session, Cluster_quality, Treatment) %&gt;%
+  summarise(
+    FR_cv_baseline = cv(FR_Hz[Period == &#39;Baseline&#39;]),
+    FR_cv_trial = cv(FR_Hz[Period == &#39;Trial&#39;]),
+    FR_cv_sum = FR_cv_baseline+FR_cv_trial,
+  )</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;Unit&#39;, &#39;Subject&#39;, &#39;Subject_date&#39;, &#39;Session&#39;, &#39;Cluster_quality&#39;. You
+## can override using the `.groups` argument.</code></pre>
+<pre class="r"><code>levels(df_grouped$Session) = c(&#39;Passive&#39;, &#39;Task&#39;)
+
+# Exclude units with NaN values in either session
+graph_data = df_grouped[!is.nan(df_grouped$FR_cv_baseline),]
+complete_case_units = Reduce(intersect, list(graph_data[graph_data$Session == &#39;Passive&#39;,]$Unit, graph_data[graph_data$Session == &#39;Task&#39;,]$Unit))
+graph_data = graph_data[graph_data$Unit %in% complete_case_units,]
+
+graph_data$Session.Treatment = as.character(interaction(graph_data$Session, graph_data$Treatment))
+graph_data[grepl(&#39;Passive&#39;, graph_data$Session.Treatment),]$Session.Treatment = &#39;Passive&#39;
+graph_data$Session.Treatment = factor(graph_data$Session.Treatment, levels=c(&#39;Passive&#39;, &#39;Task.Saline&#39;, &#39;Task.Muscimol&#39;))
+session.treatment_colors = c(&#39;black&#39;, treatment_colors)
+
+y_axis = seq(0, 3, 1)
+p =ggplot(data=graph_data, aes(x=Session, y=FR_cv_baseline, fill=Session.Treatment, color=Session.Treatment)) + 
+  facet_grid(.~Treatment) +
+
+    stat_summary(fun.data=boxplot_whiskers, geom=&quot;boxplot&quot;, na.rm = T, alpha=0.25, lwd=LINE_THICKNESS/2, fatten=1, width=0.5)+
+  ylab(&#39;Firing rate variability (CV)&#39;) + 
+  xlab(&#39;Trial type&#39;) +
+  
+  scale_fill_manual(name = &quot;Treatment&quot;,
+                   values = session.treatment_colors) +
+  scale_color_manual(name = &quot;Treatment&quot;,
+                   values = session.treatment_colors) +
+  
+  scale_y_continuous(breaks=y_axis, expand=c(0, 0)) +
+  coord_cartesian(ylim = c(min(y_axis), max(y_axis))) +
+  
+  theme(legend.position = &quot;none&quot;,
+      strip.text.x = element_blank(),
+      axis.line.x = element_blank(),
+      axis.ticks.x = element_blank(),
+      axis.title.x = element_blank(),
+      panel.spacing.x = unit(1.5, &quot;lines&quot;))
+p</code></pre>
+<p><img src="ACx_ephys_analyses_files/figure-html/unnamed-chunk-20-1.png" width="480" />
+### Stats</p>
+<pre class="r"><code>lme_data = graph_data[graph_data$Treatment == &#39;Saline&#39;,]
+lme_bin &lt;- glmmTMB(log((FR_cv_baseline))~ Session +  (1|Subject/Unit/Session) , data=lme_data, family=gaussian)
+simulationOutput &lt;- simulateResiduals(fittedModel = lme_bin, plot = T, re.form=NULL)  # passAnova(lme_bin)</code></pre>
+<p><img src="ACx_ephys_analyses_files/figure-html/unnamed-chunk-21-1.png" width="672" /></p>
+<pre class="r"><code>Anova(lme_bin)</code></pre>
+<pre><code>## Analysis of Deviance Table (Type II Wald chisquare tests)
+## 
+## Response: log((FR_cv_baseline))
+##          Chisq Df Pr(&gt;Chisq)
+## Session 0.1248  1     0.7239</code></pre>
+<pre class="r"><code>lme_data = graph_data[graph_data$Treatment == &#39;Muscimol&#39;,]
+lme_bin &lt;- glmmTMB(log((FR_cv_baseline))~ Session +  (1|Subject/Unit/Session) , data=lme_data, family=gaussian)
+simulationOutput &lt;- simulateResiduals(fittedModel = lme_bin, plot = T, re.form=NULL)  # passAnova(lme_bin)</code></pre>
+<p><img src="ACx_ephys_analyses_files/figure-html/unnamed-chunk-21-2.png" width="672" /></p>
+<pre class="r"><code>Anova(lme_bin)</code></pre>
+<pre><code>## Analysis of Deviance Table (Type II Wald chisquare tests)
+## 
+## Response: log((FR_cv_baseline))
+##          Chisq Df Pr(&gt;Chisq)
+## Session 1.8839  1     0.1699</code></pre>
+</div>
+<div id="fig-s6d-am-firing-rate-variability-cv" class="section level2">
+<h2>Fig S6D: AM firing rate variability (CV)</h2>
+<pre class="r"><code>graph_data = df_grouped[!is.nan(df_grouped$FR_cv_trial),]
+complete_case_units = Reduce(intersect, list(graph_data[graph_data$Session == &#39;Passive&#39;,]$Unit, graph_data[graph_data$Session == &#39;Task&#39;,]$Unit))
+graph_data = graph_data[graph_data$Unit %in% complete_case_units,]
+
+graph_data$Session.Treatment = as.character(interaction(graph_data$Session, graph_data$Treatment))
+graph_data[grepl(&#39;Passive&#39;, graph_data$Session.Treatment),]$Session.Treatment = &#39;Passive&#39;
+graph_data$Session.Treatment = factor(graph_data$Session.Treatment, levels=c(&#39;Passive&#39;, &#39;Task.Saline&#39;, &#39;Task.Muscimol&#39;))
+session.treatment_colors = c(&#39;black&#39;, treatment_colors)
+
+y_axis = seq(0, 3, 1)
+p =ggplot(data=graph_data, aes(x=Session, y=FR_cv_trial, fill=Session.Treatment, color=Session.Treatment)) + 
+  facet_grid(.~Treatment) +
+
+    stat_summary(fun.data=boxplot_whiskers, geom=&quot;boxplot&quot;, na.rm = T, alpha=0.25, lwd=LINE_THICKNESS/2, fatten=1, width=0.5)+
+  ylab(&#39;Firing rate variability (CV)&#39;) + 
+  xlab(&#39;Trial type&#39;) +
+  
+  scale_fill_manual(name = &quot;Treatment&quot;,
+                   values = session.treatment_colors) +
+  scale_color_manual(name = &quot;Treatment&quot;,
+                   values = session.treatment_colors) +
+  
+  scale_y_continuous(breaks=y_axis, expand=c(0, 0)) +
+  coord_cartesian(ylim = c(min(y_axis), max(y_axis))) +
+  
+  theme(legend.position = &quot;none&quot;,
+      strip.text.x = element_blank(),
+      axis.line.x = element_blank(),
+      axis.ticks.x = element_blank(),
+      axis.title.x = element_blank(),
+      panel.spacing.x = unit(1.5, &quot;lines&quot;))
+p</code></pre>
+<p><img src="ACx_ephys_analyses_files/figure-html/unnamed-chunk-22-1.png" width="480" />
+### Stats</p>
+<pre class="r"><code>lme_data = graph_data[graph_data$Treatment == &#39;Saline&#39;,]
+lme_bin &lt;- glmmTMB(log((FR_cv_trial))~ Session +  (1|Subject/Unit/Session) , data=lme_data, family=gaussian)
+simulationOutput &lt;- simulateResiduals(fittedModel = lme_bin, plot = T, re.form=NULL)  # passAnova(lme_bin)</code></pre>
+<p><img src="ACx_ephys_analyses_files/figure-html/unnamed-chunk-23-1.png" width="672" /></p>
+<pre class="r"><code>Anova(lme_bin)</code></pre>
+<pre><code>## Analysis of Deviance Table (Type II Wald chisquare tests)
+## 
+## Response: log((FR_cv_trial))
+##          Chisq Df Pr(&gt;Chisq)
+## Session 0.1066  1      0.744</code></pre>
+<pre class="r"><code>lme_data = graph_data[graph_data$Treatment == &#39;Muscimol&#39;,]
+lme_bin &lt;- glmmTMB(log((FR_cv_trial))~ Session +  (1|Subject/Unit/Session) , data=lme_data, family=gaussian)</code></pre>
+<pre><code>## Warning in finalizeTMB(TMBStruc, obj, fit, h, data.tmb.old): Model convergence
+## problem; non-positive-definite Hessian matrix. See vignette(&#39;troubleshooting&#39;)</code></pre>
+<pre class="r"><code>simulationOutput &lt;- simulateResiduals(fittedModel = lme_bin, plot = T, re.form=NULL)  # passAnova(lme_bin)</code></pre>
+<p><img src="ACx_ephys_analyses_files/figure-html/unnamed-chunk-23-2.png" width="672" /></p>
+<pre class="r"><code>Anova(lme_bin)</code></pre>
+<pre><code>## Analysis of Deviance Table (Type II Wald chisquare tests)
+## 
+## Response: log((FR_cv_trial))
+##          Chisq Df Pr(&gt;Chisq)
+## Session 0.9497  1     0.3298</code></pre>
+</div>
+<div id="fig-5g-pooled-firing-rate-variability-cv-non-am-am"
+class="section level2">
+<h2>Fig 5G: Pooled firing rate variability (CV; non-AM + AM)</h2>
+<pre class="r"><code>graph_data = df_grouped[!is.nan(df_grouped$FR_cv_sum),]
+complete_case_units = Reduce(intersect, list(graph_data[graph_data$Session == &#39;Passive&#39;,]$Unit, graph_data[graph_data$Session == &#39;Task&#39;,]$Unit))
+graph_data = graph_data[graph_data$Unit %in% complete_case_units,]
+
+graph_data$Session.Treatment = as.character(interaction(graph_data$Session, graph_data$Treatment))
+graph_data[grepl(&#39;Passive&#39;, graph_data$Session.Treatment),]$Session.Treatment = &#39;Passive&#39;
+graph_data$Session.Treatment = factor(graph_data$Session.Treatment, levels=c(&#39;Passive&#39;, &#39;Task.Saline&#39;, &#39;Task.Muscimol&#39;))
+session.treatment_colors = c(&#39;black&#39;, treatment_colors)
+
+y_axis = seq(0, 5, 1)
+p =ggplot(data=graph_data, aes(x=Session, y=FR_cv_sum, fill=Session.Treatment, color=Session.Treatment)) + 
+  facet_grid(.~Treatment) +
+
+    stat_summary(fun.data=boxplot_whiskers, geom=&quot;boxplot&quot;, na.rm = T, alpha=0.25, lwd=LINE_THICKNESS/2, fatten=1, width=0.5)+
+  ylab(&#39;Firing rate variability (CV)&#39;) + 
+  xlab(&#39;Trial type&#39;) +
+  
+  scale_fill_manual(name = &quot;Treatment&quot;,
+                   values = session.treatment_colors) +
+  scale_color_manual(name = &quot;Treatment&quot;,
+                   values = session.treatment_colors) +
+  
+  scale_y_continuous(breaks=y_axis, expand=c(0, 0)) +
+  coord_cartesian(ylim = c(min(y_axis), max(y_axis))) +
+  
+  theme(legend.position = &quot;none&quot;,
+      strip.text.x = element_blank(),
+      axis.line.x = element_blank(),
+      axis.ticks.x = element_blank(),
+      axis.title.x = element_blank(),
+      panel.spacing.x = unit(1.5, &quot;lines&quot;))
+p</code></pre>
+<p><img src="ACx_ephys_analyses_files/figure-html/unnamed-chunk-24-1.png" width="480" />
+### Stats</p>
+<pre class="r"><code>lme_data = graph_data[graph_data$Treatment == &#39;Saline&#39;,]
+lme_bin &lt;- glmmTMB(sqrt((FR_cv_sum))~ Session +  (1|Subject/Unit/Session) , data=lme_data, family=gaussian)
+simulationOutput &lt;- simulateResiduals(fittedModel = lme_bin, plot = T, re.form=NULL)  # passAnova(lme_bin)</code></pre>
+<p><img src="ACx_ephys_analyses_files/figure-html/unnamed-chunk-25-1.png" width="672" /></p>
+<pre class="r"><code>Anova(lme_bin)</code></pre>
+<pre><code>## Analysis of Deviance Table (Type II Wald chisquare tests)
+## 
+## Response: sqrt((FR_cv_sum))
+##          Chisq Df Pr(&gt;Chisq)
+## Session 0.3135  1     0.5756</code></pre>
+<pre class="r"><code>lme_data = graph_data[graph_data$Treatment == &#39;Muscimol&#39;,]
+lme_bin &lt;- glmmTMB(sqrt((FR_cv_sum))~ Session +  (1|Subject/Unit/Session) , data=lme_data, family=gaussian)
+simulationOutput &lt;- simulateResiduals(fittedModel = lme_bin, plot = T, re.form=NULL)  # passAnova(lme_bin)</code></pre>
+<p><img src="ACx_ephys_analyses_files/figure-html/unnamed-chunk-25-2.png" width="672" /></p>
+<pre class="r"><code>Anova(lme_bin)</code></pre>
+<pre><code>## Analysis of Deviance Table (Type II Wald chisquare tests)
+## 
+## Response: sqrt((FR_cv_sum))
+##          Chisq Df Pr(&gt;Chisq)
+## Session 1.7063  1     0.1915</code></pre>
+</div>
+<div id="fig-5h-vector-strength" class="section level2">
+<h2>Fig 5H: Vector strength</h2>
+<pre class="r"><code># Load VS data and merge to existent df
+vs_df = read.csv(&#39;./Data/OFC-cannula_ACx-recording_allTrial_VS.csv&#39;)
+vs_df$Session = &#39;Pre&#39;
+vs_df[grepl(&#39;Aversive|Active&#39;, vs_df$SessionID),]$Session = &#39;Active&#39;
+
+df = merge(df, vs_df, by=c(&#39;Unit&#39;, &#39;Session&#39;, &#39;Period&#39;))
+remove(vs_df)
+
+df_grouped = df %&gt;% group_by(Unit, Subject, Subject_date, Session, Cluster_quality_Allen, Cluster_quality, Treatment) %&gt;%
+  summarise( 
+    VSpp_baseline = mean(VSpp[Period == &#39;Baseline&#39;], na.rm=T),
+    VSpp_trial = mean(VSpp[Period == &#39;Trial&#39;], na.rm=T)
+  )</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;Unit&#39;, &#39;Subject&#39;, &#39;Subject_date&#39;, &#39;Session&#39;, &#39;Cluster_quality_Allen&#39;,
+## &#39;Cluster_quality&#39;. You can override using the `.groups` argument.</code></pre>
+<pre class="r"><code>df_grouped$Session = factor(df_grouped$Session, levels=c(&#39;Pre&#39;, &#39;Active&#39;))
+levels(df_grouped$Session) = c(&#39;Passive&#39;, &#39;Task&#39;)
+
+# # Only include units with both Passive and Task values
+graph_data = df_grouped[!is.nan(df_grouped$VSpp_trial),]
+complete_case_units = Reduce(intersect, list(graph_data[graph_data$Session == &#39;Passive&#39;,]$Unit, graph_data[df_grouped$Session == &#39;Task&#39;,]$Unit))
+graph_data = graph_data[graph_data$Unit %in% complete_case_units,]
+
+graph_data$Session.Treatment = as.character(interaction(graph_data$Session, graph_data$Treatment))
+graph_data[grepl(&#39;Passive&#39;, graph_data$Session.Treatment),]$Session.Treatment = &#39;Passive&#39;
+graph_data$Session.Treatment = factor(graph_data$Session.Treatment, levels=c(&#39;Passive&#39;, &#39;Task.Saline&#39;, &#39;Task.Muscimol&#39;))
+session.treatment_colors = c(&#39;black&#39;, treatment_colors)
+
+y_axis = seq(0, 0.3, 0.1)
+p =ggplot(data=graph_data, aes(x=Session, y=VSpp_trial, fill=Session.Treatment, color=Session.Treatment)) + 
+  facet_grid(.~Treatment) +
+
+    stat_summary(fun.data=boxplot_whiskers, geom=&quot;boxplot&quot;, na.rm = T, alpha=0.25, lwd=LINE_THICKNESS/2, fatten=1, width=0.5)+
+  ylab(&#39;Firing rate variability (CV)&#39;) + 
+  xlab(&#39;Trial type&#39;) +
+  
+  scale_fill_manual(name = &quot;Treatment&quot;,
+                   values = session.treatment_colors) +
+  scale_color_manual(name = &quot;Treatment&quot;,
+                   values = session.treatment_colors) +
+  
+  scale_y_continuous(breaks=y_axis, expand=c(0, 0)) +
+  coord_cartesian(ylim = c(min(y_axis), max(y_axis))) +
+  
+  theme(legend.position = &quot;none&quot;,
+      strip.text.x = element_blank(),
+      axis.line.x = element_blank(),
+      axis.ticks.x = element_blank(),
+      axis.title.x = element_blank(),
+      panel.spacing.x = unit(1.5, &quot;lines&quot;))
+p</code></pre>
+<p><img src="ACx_ephys_analyses_files/figure-html/unnamed-chunk-26-1.png" width="480" />
+### Stats</p>
+<pre class="r"><code>lme_data = graph_data[graph_data$Treatment == &#39;Saline&#39;,]
+lme_bin &lt;- glmmTMB(VSpp_trial*10~ Session +  (1|Subject/Unit/Session) , data=lme_data, family=gaussian)</code></pre>
+<pre><code>## Warning in finalizeTMB(TMBStruc, obj, fit, h, data.tmb.old): Model convergence
+## problem; non-positive-definite Hessian matrix. See vignette(&#39;troubleshooting&#39;)</code></pre>
+<pre class="r"><code>simulationOutput &lt;- simulateResiduals(fittedModel = lme_bin, plot = T, re.form=NULL)  # pass</code></pre>
+<p><img src="ACx_ephys_analyses_files/figure-html/unnamed-chunk-27-1.png" width="672" /></p>
+<pre class="r"><code>Anova(lme_bin)</code></pre>
+<pre><code>## Analysis of Deviance Table (Type II Wald chisquare tests)
+## 
+## Response: VSpp_trial * 10
+##         Chisq Df Pr(&gt;Chisq)
+## Session 8e-04  1     0.9777</code></pre>
+<pre class="r"><code>lme_data = graph_data[graph_data$Treatment == &#39;Muscimol&#39;,]
+lme_bin &lt;- glmmTMB(VSpp_trial~ Session +  (1|Subject/Unit/Session) , data=lme_data, family=gaussian)</code></pre>
+<pre><code>## Warning in finalizeTMB(TMBStruc, obj, fit, h, data.tmb.old): Model convergence
+## problem; non-positive-definite Hessian matrix. See vignette(&#39;troubleshooting&#39;)</code></pre>
+<pre class="r"><code>simulationOutput &lt;- simulateResiduals(fittedModel = lme_bin, plot = T, re.form=NULL)  # pass</code></pre>
+<p><img src="ACx_ephys_analyses_files/figure-html/unnamed-chunk-27-2.png" width="672" /></p>
+<pre class="r"><code>Anova(lme_bin)</code></pre>
+<pre><code>## Analysis of Deviance Table (Type II Wald chisquare tests)
+## 
+## Response: VSpp_trial
+##          Chisq Df Pr(&gt;Chisq)
+## Session 0.2388  1     0.6251</code></pre>
+</div>
+</div>
+<div
+id="figure-6-repeated-ofc-muscimol-treatments-effect-on-behavior-during-acx-recordings"
+class="section level1">
+<h1>Figure 6: Repeated OFC muscimol treatment’s effect on behavior
+during ACx recordings</h1>
+<div id="fig-6a-behavior" class="section level2">
+<h2>Fig 6A: Behavior</h2>
+<pre class="r"><code># Retrieve all day data
+df = df_all
+behavior_df = behavior_df_all
+
+# Include only 448 and 575, the ones with repeated muscimol administration
+good_subj = c(&#39;SUBJ-ID-448&#39;, &#39;SUBJ-ID-575&#39;)
+df = df[df$Subject %in% good_subj,]
+behavior_df = behavior_df[behavior_df$Subject %in% good_subj,]
+
+# Treatment days
+df$Treatment = &#39;Saline&#39;
+muscimol_1x_sessions = c(&#39;SUBJ-ID-448_221213&#39;, &#39;SUBJ-ID-448_221215&#39;)
+muscimol_2x_sessions = c(&#39;SUBJ-ID-448_221217&#39;, &#39;SUBJ-ID-448_221219&#39;, &#39;SUBJ-ID-448_221220&#39;, &#39;SUBJ-ID-448_221222&#39;)
+muscimol_1x_sessions = c(muscimol_1x_sessions, &#39;SUBJ-ID-575_230827&#39;, &#39;SUBJ-ID-575_230829&#39;, &#39;SUBJ-ID-575_230831&#39;)
+muscimol_2x_sessions = c(muscimol_2x_sessions, &#39;SUBJ-ID-575_230902&#39;)
+df[df$Subject_date %in% muscimol_1x_sessions,]$Treatment = &#39;Muscimol_1x&#39;
+df[df$Subject_date %in% muscimol_2x_sessions,]$Treatment = &#39;Muscimol_2x&#39;
+df$Treatment = factor(df$Treatment, levels=c(&#39;Saline&#39;, &#39;Muscimol_1x&#39;, &#39;Muscimol_2x&#39;))
+
+df$Treatment_noDose = &#39;Saline&#39;
+df[df$Subject_date %in% muscimol_1x_sessions,]$Treatment_noDose = &#39;Muscimol&#39;
+df[df$Subject_date %in% muscimol_2x_sessions,]$Treatment_noDose = &#39;Muscimol&#39;
+df$Treatment_noDose = factor(df$Treatment_noDose, levels=c(&#39;Saline&#39;, &#39;Muscimol&#39;))
+
+behavior_df$Treatment = &#39;Saline&#39;
+behavior_df[behavior_df$Subject_date %in% muscimol_1x_sessions,]$Treatment = &#39;Muscimol_1x&#39;
+behavior_df[behavior_df$Subject_date %in% muscimol_2x_sessions,]$Treatment = &#39;Muscimol_2x&#39;
+behavior_df$Treatment = factor(behavior_df$Treatment, levels=c(&#39;Saline&#39;, &#39;Muscimol_1x&#39;, &#39;Muscimol_2x&#39;))
+
+behavior_df$Treatment_noDose = &#39;Saline&#39;
+behavior_df[behavior_df$Subject_date %in% muscimol_1x_sessions,]$Treatment_noDose = &#39;Muscimol&#39;
+behavior_df[behavior_df$Subject_date %in% muscimol_2x_sessions,]$Treatment_noDose = &#39;Muscimol&#39;
+behavior_df$Treatment_noDose = factor(behavior_df$Treatment_noDose, levels=c(&#39;Saline&#39;, &#39;Muscimol&#39;))
+
+graph_data = behavior_df
+
+treatmentDose_colors = c(&quot;#0072B2&quot;, &quot;#EECBE1&quot;, &quot;#B9519E&quot;)
+y_axis = seq(0.5, 3.5, 0.5)
+x_axis = c(1, 5, 7, 10)
+p = ggplot(data=graph_data, aes(x=Day, y=D_prime, fill=Treatment, color=Treatment_noDose)) + 
+  
+  geom_line(aes(group = Subject), alpha=0.3, size=LINE_THICKNESS, color=&#39;black&#39;) +
+  geom_point(aes(group = Subject),  alpha=1, size=LINE_THICKNESS*4, shape=21) +
+  facet_grid(.~Subject) +
+
+  ylab(&#39;Behavioral d\&#39;&#39;) + xlab(&#39;Day&#39;) +
+  scale_fill_manual(name = &quot;&quot;,
+                   values = treatmentDose_colors, labels=c(&#39;Saline&#39;, &#39;Muscimol 1 mg/mL&#39;, &#39;Muscimol 2 mg/mL&#39;)) +
+  scale_color_manual(name = &quot;&quot;,
+                   values = treatment_colors, guide=&#39;none&#39;) +
+  
+  scale_y_continuous(breaks=y_axis, expand=c(0, 0)) +
+  scale_x_continuous(breaks=x_axis) +
+  coord_cartesian(ylim = c(min(y_axis), max(y_axis))) +
+  
+  theme(legend.position = c(0.25, 0.15))
+p</code></pre>
+<p><img src="ACx_ephys_analyses_files/figure-html/unnamed-chunk-28-1.png" width="672" /></p>
+</div>
+<div id="fig-6b-correlation-between-behavioral-and-neural-d"
+class="section level2">
+<h2>Fig 6B: Correlation between behavioral and neural d’</h2>
+<pre class="r"><code>df_grouped = df[df$Trial_type %notin% c(&#39;False alarm&#39;) &amp; df$Session == &#39;Active&#39; &amp; df$Period %in% c(&#39;Trial&#39;, &#39;Baseline&#39;) &amp; df$Treatment_noDose %in% c(&#39;Saline&#39;,&#39;Muscimol&#39;),] %&gt;% group_by(Unit, Subject, Date, Subject_date, Treatment_noDose) %&gt;%
+  summarise( 
+    Neural_dprime = d_prime(FR_Hz[Period == &#39;Trial&#39;], FR_Hz[Period == &#39;Baseline&#39;]),
+    Behavioral_dprime = mean(AMdprime)
+  )</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;Unit&#39;, &#39;Subject&#39;, &#39;Date&#39;, &#39;Subject_date&#39;. You can override using the
+## `.groups` argument.</code></pre>
+<pre class="r"><code>graph_data = df_grouped
+graph_means = graph_data %&gt;% group_by(Behavioral_dprime, Treatment_noDose) %&gt;%
+  summarise(
+    absNeural_dprime = mean(abs(Neural_dprime))
+  )</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;Behavioral_dprime&#39;. You can override using
+## the `.groups` argument.</code></pre>
+<pre class="r"><code>y_axis = seq(0, 3, 1)
+x_axis = seq(1, 3, 1)
+p =ggplot(data=graph_data, aes(x=Behavioral_dprime, y=abs(Neural_dprime), fill=Treatment_noDose)) + 
+  geom_point(size=LINE_THICKNESS*2,
+             shape=21,
+             color=&#39;NA&#39;,
+             alpha=0.3) +
+
+    stat_smooth(method = &quot;lm&quot;, se = T,  alpha=0.1, size=LINE_THICKNESS, formula=y~x, color=&#39;black&#39;, fill=&#39;black&#39;, aes(group=1)) +
+    geom_point(data=graph_means, aes(x=Behavioral_dprime, y=absNeural_dprime),
+               size=LINE_THICKNESS*3,
+               shape=21,
+               color=&#39;NA&#39;,
+               fill=&#39;black&#39;,
+               alpha=1) +
+  scale_fill_manual(name = &quot;Treatment&quot;, values = treatment_colors) +
+  scale_color_manual(name = &quot;Treatment&quot;,
+                   values = treatment_colors) +
+  ylab(&#39;|Task Neural d\&#39;|&#39;) + xlab(&#39;Behavioral d\&#39;&#39;) +
+  
+  scale_y_continuous(breaks=y_axis, expand=c(0, 0)) +
+  scale_x_continuous(breaks=y_axis) +
+  coord_cartesian(ylim = c(min(y_axis)-0.5, max(y_axis))) +
+  
+   theme(legend.position = &quot;none&quot;,
+         strip.text.x = element_blank())
+p</code></pre>
+<p><img src="ACx_ephys_analyses_files/figure-html/unnamed-chunk-29-1.png" width="576" />
+### Stats</p>
+<pre class="r"><code>lme_data = graph_data
+lme_bin &lt;- glmmTMB(sqrt(abs(Neural_dprime))*10~ Behavioral_dprime +  (1|Subject/Behavioral_dprime/Unit) , data=lme_data, family=gaussian)
+simulationOutput &lt;- simulateResiduals(fittedModel = lme_bin, plot = T, re.form=NULL)  # pass</code></pre>
+<p><img src="ACx_ephys_analyses_files/figure-html/unnamed-chunk-30-1.png" width="672" /></p>
+<pre class="r"><code>Anova(lme_bin)</code></pre>
+<pre><code>## Analysis of Deviance Table (Type II Wald chisquare tests)
+## 
+## Response: sqrt(abs(Neural_dprime)) * 10
+##                    Chisq Df Pr(&gt;Chisq)   
+## Behavioral_dprime 7.9799  1    0.00473 **
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+</div>
+<div id="fig-6c-behavioral-performance-vs-neural-d"
+class="section level2">
+<h2>Fig 6C: Behavioral performance vs Neural d’</h2>
+<pre class="r"><code># Label two best days and two worst days as good and bad performance respectively
+df_grouped$Behavioral_performance = &#39;&#39;
+
+good_behavior = c(&#39;221221&#39;, &#39;221216&#39;, &#39;230901&#39;, &#39;230902&#39;)
+poor_behavior = c(&#39;221213&#39;, &#39;221217&#39;, &#39;230827&#39;, &#39;230829&#39;)
+df_grouped[df_grouped$Date %in% good_behavior,]$Behavioral_performance = &#39;good&#39;
+df_grouped[df_grouped$Date %in% poor_behavior,]$Behavioral_performance = &#39;poor&#39;
+df_grouped = df_grouped[df_grouped$Behavioral_performance %in% c(&#39;poor&#39;,&#39;good&#39;),]
+
+df_grouped$Behavioral_performance = factor(df_grouped$Behavioral_performance, levels=c(&#39;poor&#39;, &#39;good&#39;))
+
+
+
+graph_data = df_grouped
+
+y_axis = seq(0, 2, 1)
+p =ggplot(data=graph_data, aes(x=Behavioral_performance, y=abs(Neural_dprime))) + 
+  stat_summary(fun.data=boxplot_whiskers, geom=&quot;boxplot&quot;, na.rm = T, alpha=0.3, lwd=LINE_THICKNESS, fatten=1, width=0.5, fill=&#39;black&#39;)+ 
+  ylab(&#39;|Task neural d\&#39;|&#39;) + xlab(&#39;Behavioral\nperformance&#39;) +
+  scale_y_continuous(breaks=y_axis, expand=c(0, 0)) +
+  coord_cartesian(ylim = c(min(y_axis), max(y_axis))) +
+    theme(
+    legend.position = &#39;none&#39;,
+    axis.line.x = element_blank(),
+    axis.ticks.x=element_blank()
+    ) 
+p</code></pre>
+<p><img src="ACx_ephys_analyses_files/figure-html/unnamed-chunk-31-1.png" width="288" />
+### Stats</p>
+<pre class="r"><code>lme_data = graph_data
+lme_bin &lt;- glmmTMB(sqrt((abs(Neural_dprime)))~ Behavioral_performance +  (1|Subject/Behavioral_performance/Unit) , data=lme_data, family=gaussian)
+simulationOutput &lt;- simulateResiduals(fittedModel = lme_bin, plot = T, re.form=NULL)  # pass</code></pre>
+<p><img src="ACx_ephys_analyses_files/figure-html/unnamed-chunk-32-1.png" width="672" /></p>
+<pre class="r"><code>Anova(lme_bin)</code></pre>
+<pre><code>## Analysis of Deviance Table (Type II Wald chisquare tests)
+## 
+## Response: sqrt((abs(Neural_dprime)))
+##                         Chisq Df Pr(&gt;Chisq)    
+## Behavioral_performance 11.526  1  0.0006863 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+</div>
+</div>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
