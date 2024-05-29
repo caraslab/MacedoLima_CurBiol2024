@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>Procedural training behavior - Analyses</title>
+
+<script src="site_libs/header-attrs-2.27/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Supporting code for Macedo-Lima et al., 2024 Current Biology</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="contact.html">Contact</a>
+</li>
+<li>
+  <a href="Behavior_proceduralTraining_analyses.html">Behavior (Fig 1)</a>
+</li>
+<li>
+  <a href="OFC_ephys_analyses.html">OFC ephys - Analyses (Figs 2, 3, S1-3)</a>
+</li>
+<li>
+  <a href="OFC-ACx_photometry_analyses.html">OFC-&gt;ACx photometry - Analyses (Fig S2)</a>
+</li>
+<li>
+  <a href="Behavior_OFCmuscimol_analyses.html">OFC muscimol behavior (Figs 4, S4)</a>
+</li>
+<li>
+  <a href="ACx_ephys_analyses.html">OFC muscimol + ACx ephys - Analyses (Figs 5-6, S5-6)</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Procedural training behavior -
+Analyses</h1>
+
+</div>
+
+
+<div id="load-behavioral-data" class="section level1">
+<h1>Load behavioral data</h1>
+<pre class="r"><code># Libraries and plotting parameters
+library(nlme)
+library(multcomp)
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(lsmeans)
+library(glmmTMB)
+library(DHARMa)
+library(car)
+library(ggpubr)
+library(reshape2)
+source(&#39;./r_theme.r&#39;, echo=F)
+
+theme_set(theme_mml(base_size = 20))
+# Some global plot parameters if modification is needed
+LINE_THICKNESS = 1
+ERRORBAR_THICKNESS = LINE_THICKNESS/2
+INDIVIDUAL_DATAPOINT_LINE = LINE_THICKNESS/1.5
+SMALL_PLOTS_LINE_THICKNESS = LINE_THICKNESS/3
+
+cbPalette = c(&quot;#999999&quot;, &quot;#E69F00&quot;, &quot;#56B4E9&quot;, &quot;#009E73&quot;, &quot;#F0E442&quot;, &quot;#0072B2&quot;, &quot;#D55E00&quot;, &quot;#CC79A7&quot;, &quot;#d55e00&quot;)
+
+# Create the notin operator
+`%notin%` &lt;- Negate(`%in%`)
+
+response_bias = function(Hit, Miss, Reject, False_alarm) {
+  hr = (Hit + 0.5) / (Hit + Miss + 1)
+  far = (False_alarm+0.5)/(False_alarm+Reject+1)
+  
+  return( -0.5 * (qnorm(hr) + qnorm(far)) )
+}
+
+
+get_dprime = function(hr, far) {
+  return( 
+      qnorm(hr) - qnorm(far)
+  )
+}
+
+df = read.csv(&#39;./Data/Behavior_proceduralTraining/Behavior_df_allSubjects_proceduralTraining_dailySummary.csv&#39;)
+
+# Some descriptives
+df_grouped = df %&gt;% group_by(Subject) %&gt;%
+    summarise(Training_days = max(Day.x), 
+              Total_trials = sum(N_trials.x))
+
+print(paste(&#39;Minimum number of trials for learning:&#39;, min(df_grouped$Total_trials)))</code></pre>
+<pre><code>## [1] &quot;Minimum number of trials for learning: 41&quot;</code></pre>
+<pre class="r"><code>print(paste(&#39;Maximum number of trials for learning:&#39;, max(df_grouped$Total_trials)))</code></pre>
+<pre><code>## [1] &quot;Maximum number of trials for learning: 953&quot;</code></pre>
+<pre class="r"><code>print(paste(&#39;Median number of trials for learning:&#39;, median(df_grouped$Total_trials)))</code></pre>
+<pre><code>## [1] &quot;Median number of trials for learning: 229&quot;</code></pre>
+<pre class="r"><code>print(paste(&#39;Median number of days for learning:&#39;, median(df_grouped$Total_trials)))</code></pre>
+<pre><code>## [1] &quot;Median number of days for learning: 229&quot;</code></pre>
+</div>
+<div id="fig-1b-d-prime-proggression-in-sliding-average-10-trial-blocks"
+class="section level1">
+<h1>Fig 1B: D prime proggression in sliding average 10-trial blocks</h1>
+<pre class="r"><code>df = read.csv(&#39;./Data/Behavior_proceduralTraining/Behavioral_df_allSubjects_proceduralTraining_10trialSlidingScale.csv&#39;)
+
+graph_data = df
+
+# Bring FA to d&#39; scale for dual-axis
+scale_factor = 30
+graph_data$FA_rate_secAxis = graph_data$FA_rate / scale_factor
+graph_data$Hit_rate_secAxis = graph_data$Hit_rate / scale_factor
+
+graph_means = graph_data %&gt;% group_by(Trial_block) %&gt;%
+  summarise(
+    D_prime_mean = mean(D_prime, na.rm=T),
+    D_prime_se = sd(D_prime, na.rm=T) / sqrt(n()-1),
+    FAR_mean = mean(FA_rate, na.rm=T),
+    FAR_se = sd(FA_rate, na.rm=T) / sqrt(n()-1),
+    HR_mean = mean(Hit_rate, na.rm=T),
+    HR_se = sd(Hit_rate, na.rm=T) / sqrt(n()-1)
+  )
+
+y_axis = seq(0, 3, 1)
+x_axis = seq(50, 250, 100)
+p = ggplot(data=graph_data, aes(x=Trial_block, group=Subject)) +
+
+  geom_ribbon(data = graph_means, aes(x=Trial_block, y=D_prime_mean, ymax=D_prime_mean+D_prime_se, ymin=D_prime_mean-D_prime_se, group=1), alpha=0.25, color=NA) +
+  stat_summary(aes(y=D_prime, group=1), fun.y=&quot;mean&quot;, geom=&quot;line&quot;, na.rm = T,  alpha = 1, size=LINE_THICKNESS/2) +
+  
+  scale_y_continuous(breaks=y_axis, expand=c(0, 0)) +
+  scale_x_continuous(breaks=x_axis, expand=c(0, 0)) +
+  coord_cartesian(ylim = c(min(y_axis), max(y_axis)),
+                  xlim = c(0, max(x_axis))) +
+  
+  xlab(&#39;Trials&#39;) +
+  ylab(&#39;d\&#39;&#39;) +
+  theme(legend.position = &#39;none&#39;)
+p</code></pre>
+<p><img src="Behavior_proceduralTraining_analyses_files/figure-html/unnamed-chunk-2-1.png" width="576" /></p>
+</div>
+<div
+id="fig-1c-hit-and-fa-rate-proggression-in-sliding-average-10-trial-blocks"
+class="section level1">
+<h1>Fig 1C: Hit and FA rate proggression in sliding average 10-trial
+blocks</h1>
+<pre class="r"><code>far_color = &#39;#9E4770&#39;
+hr_color = &#39;#40BCD8&#39;
+y_axis = seq(0, 80, 20)
+x_axis = seq(50, 250, 100)
+p = ggplot(data=graph_data, aes(x=Trial_block, group=Subject)) +
+  # FA
+  geom_ribbon(data = graph_means, aes(x=Trial_block, y=FAR_mean, ymax=FAR_mean+FAR_se, ymin=FAR_mean-FAR_se, group=1), alpha=0.25, color=NA, fill=far_color) +
+  stat_summary(aes(y=FA_rate, group=1), fun.y=&quot;mean&quot;, geom=&quot;line&quot;, na.rm = T,  alpha = 1, size=LINE_THICKNESS/2, color=far_color) +
+  
+  # HR
+  geom_ribbon(data = graph_means, aes(x=Trial_block, y=HR_mean, ymax=HR_mean+HR_se, ymin=HR_mean-HR_se, group=1), alpha=0.25, color=NA, fill=hr_color) +
+  stat_summary(aes(y=Hit_rate, group=1), fun.y=&quot;mean&quot;, geom=&quot;line&quot;, na.rm = T,  alpha = 1, size=LINE_THICKNESS/2, color=hr_color) +
+
+    
+  annotate(&quot;text&quot;, x=150, y=20, label=&#39;False alarms&#39;, color=far_color, size=7) + 
+  annotate(&quot;text&quot;, x=25, y=60, label=&#39;Hits&#39;, color=hr_color, size=7) + 
+    
+  scale_y_continuous(breaks=y_axis, expand=c(0, 0)) +
+  scale_x_continuous(breaks=x_axis, expand=c(0, 0)) +
+  coord_cartesian(ylim = c(min(y_axis), max(y_axis)),
+                  xlim = c(0, max(x_axis))) +
+  xlab(&#39;Trials&#39;) +
+  ylab(&#39;Responses (%)&#39;) +
+  theme(legend.position = &#39;none&#39;)
+
+p</code></pre>
+<p><img src="Behavior_proceduralTraining_analyses_files/figure-html/unnamed-chunk-3-1.png" width="576" /></p>
+</div>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

@@ -9,9 +9,11 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
+<meta name="author" content="Matheus Macedo-Lima" />
 
+<meta name="date" content="2024-05-29" />
 
-<title>OFC recordings - Analyses</title>
+<title>OFC ephys - Analyses (Figs 2, 3, S1-3)</title>
 
 <script src="site_libs/header-attrs-2.27/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
@@ -238,7 +240,7 @@ $(document).ready(function () {
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="index.html">My Website</a>
+      <a class="navbar-brand" href="index.html">Supporting code for Macedo-Lima et al., 2024 Current Biology</a>
     </div>
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
@@ -246,13 +248,22 @@ $(document).ready(function () {
   <a href="index.html">Home</a>
 </li>
 <li>
-  <a href="about.html">About</a>
+  <a href="contact.html">Contact</a>
+</li>
+<li>
+  <a href="Behavior_proceduralTraining_analyses.html">Behavior (Fig 1)</a>
 </li>
 <li>
   <a href="OFC_ephys_analyses.html">OFC ephys - Analyses (Figs 2, 3, S1-3)</a>
 </li>
 <li>
-  <a href="ACx_ephys_analyses.html">OFC muscimol + ACx ephys - Analyses (Figs 5, S5-6)</a>
+  <a href="OFC-ACx_photometry_analyses.html">OFC-&gt;ACx photometry - Analyses (Fig S2)</a>
+</li>
+<li>
+  <a href="Behavior_OFCmuscimol_analyses.html">OFC muscimol behavior (Figs 4, S4)</a>
+</li>
+<li>
+  <a href="ACx_ephys_analyses.html">OFC muscimol + ACx ephys - Analyses (Figs 5-6, S5-6)</a>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
@@ -266,20 +277,22 @@ $(document).ready(function () {
 
 
 
-<h1 class="title toc-ignore">OFC recordings - Analyses</h1>
+<h1 class="title toc-ignore">OFC ephys - Analyses (Figs 2, 3, S1-3)</h1>
+<h4 class="author">Matheus Macedo-Lima</h4>
+<h4 class="date">2024-05-29</h4>
 
 </div>
 
 
-<div id="load-libraries-and-data-from-preprocessing-pipeline"
+<div
+id="load-libraries-and-data-from-preprocessing-pipeline-ofc_ephys_preprocessing.rmd"
 class="section level1">
-<h1>Load libraries and data from preprocessing pipeline</h1>
-<div id="load-previously-exported-environment." class="section level2">
-<h2>Load previously exported environment.</h2>
+<h1>Load libraries and data from preprocessing pipeline
+(OFC_ephys_preprocessing.Rmd)</h1>
 <p>Uncomment chunk below if the second block of code has been run
 previously and does not need modifications</p>
 <pre class="r"><code># 
-# load(&#39;./Data/OFC_ephys_analyses_env.RData&#39;)
+# load(&#39;./Data/OFC_ephys/OFC_ephys_analyses_env.RData&#39;)
 # 
 # library(ggplot2)
 # library(dplyr)
@@ -305,9 +318,7 @@ previously and does not need modifications</p>
 # ACTIVEBASELINE_MODULATION_COLORS = c(&#39;#E39D51&#39;,&#39;#356B83&#39;, &#39;gray&#39;)  # task-suppressed, -enhanced, -unchanged
 # 
 # TRIALTYPE_MODULATION_COLORS = c(&#39;#46BDD7&#39;, &#39;#9E4770&#39;, &#39;#EB172C&#39;, &#39;black&#39;)  # Hit, FA, miss, passive</code></pre>
-</div>
-<div id="process" class="section level2">
-<h2>Process</h2>
+<p>No need to run if chunk above has been run</p>
 <pre class="r"><code>library(ggplot2)
 library(dplyr)
 library(tidyr)
@@ -362,7 +373,7 @@ zeromin = function(x) {
 }
 
 # Load data from preprocessing pipeline
-df = read.csv(&#39;./Data/OFCPL_allTrial_df.csv&#39;)
+df = read.csv(&#39;./Data/OFC_ephys/OFCPL_allTrial_df.csv&#39;)
 
 # Remove eventual NA rows
 df[df == &quot;NaN&quot;]&lt;-NA
@@ -371,7 +382,7 @@ df = df[!is.na(df$Subject),]
 
 # Factorize some columns
 df$Session = factor(df$Session, levels=c(&#39;Pre&#39;, &#39;Active&#39;, &#39;Post&#39;, &#39;Post1h&#39;))
-cols_to_factorize = c(&#39;Unit&#39;, &#39;Subject&#39;, &#39;Date&#39;, &#39;TrialID&#39;, &#39;AMdepth&#39;, &#39;Period&#39;, &#39;Subject_date&#39;, &#39;Cluster_quality_MML&#39;, &#39;Cluster_quality_Allen&#39;, &#39;First_am_above_threshold_flag&#39;, &#39;AM_above_threshold_flag&#39;, &#39;AMThreshold_modulated&#39;, &#39;AMThreshold_modulation_direction&#39;)
+cols_to_factorize = c(&#39;Unit&#39;, &#39;Subject&#39;, &#39;Date&#39;, &#39;TrialID&#39;, &#39;AMdepth&#39;, &#39;Period&#39;, &#39;Subject_date&#39;, &#39;Cluster_quality_MML&#39;, &#39;Cluster_quality_Allen&#39;)
 df[cols_to_factorize] &lt;- lapply(df[cols_to_factorize], factor) 
 
 # Separate SU and MU activity
@@ -386,12 +397,6 @@ df[df$Miss == 1 &amp; df$ShockFlag == 1,]$Trial_type = &#39;Miss (shock)&#39;
 df[df$FA == 1,]$Trial_type = &#39;False alarm&#39;
 
 df$Trial_type = factor(df$Trial_type, levels=c(&#39;Miss (shock)&#39;, &#39;Hit&#39;, &#39;False alarm&#39;, &#39;Miss (no shock)&#39;))
-
-# Load behavioral files
-threshold_df = read.csv(&#39;./Data/OFCPL_behavior_df.csv&#39;)
-
-# Elliminate eventual subjects not in behavioral threshold_df
-df = df[df$Subject %in% unique(threshold_df$Subject),]
 
 df$Cluster_quality_Allen = &#39;mua&#39;
 df[(df$ISI_FPRate &lt; 0.5) &amp; (df$Fraction_missing &lt; 0.1) &amp; (df$Presence_ratio &gt; 0.9) &amp; (df$ISI_ViolationRate &lt; 2),]$Cluster_quality_Allen = &#39;good&#39;
@@ -422,14 +427,13 @@ df = droplevels(df)
 # ---------------------------------------------------------------------------
 
 # Save image for faster loading
-save.image(&#39;./Data/OFC_ephys_analyses_env.RData&#39;)
+save.image(&#39;./Data/OFC_ephys/OFC_ephys_analyses_env.RData&#39;)
 
 # Some garbage collection
 gc()</code></pre>
-<pre><code>##            used  (Mb) gc trigger  (Mb)  max used   (Mb)
-## Ncells  3090522 165.1    9849321 526.1   8962634  478.7
-## Vcells 36125409 275.7  118875496 907.0 141093357 1076.5</code></pre>
-</div>
+<pre><code>##            used  (Mb) gc trigger  (Mb)  max used  (Mb)
+## Ncells  3121726 166.8    9653627 515.6   9653627 515.6
+## Vcells 29010424 221.4   96068696 733.0 112541207 858.7</code></pre>
 </div>
 <div id="get-some-descriptives" class="section level1">
 <h1>Get some descriptives</h1>
@@ -451,8 +455,8 @@ df_info = df[df$AMdepth_db != -40 &amp; df$Period == &#39;Baseline&#39;,] %&gt;%
   summarise(
     Trial_count = length(unique(TrialID))
   )</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;Subject&#39;, &#39;Session&#39;. You can override
-## using the `.groups` argument.</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;Subject&#39;, &#39;Session&#39;. You can override using the `.groups`
+## argument.</code></pre>
 <pre class="r"><code>df_info %&gt;% group_by(Session) %&gt;%
   summarise(
     Trial_count_mean = mean(Trial_count),
@@ -466,15 +470,15 @@ df_info = df[df$AMdepth_db != -40 &amp; df$Period == &#39;Baseline&#39;,] %&gt;%
 ## 3 Post                101.          0.236 
 ## 4 Post1h              101.          0.0645</code></pre>
 <pre class="r"><code># How many single units?
-df_info = df[df$AMdepth_db != -40 &amp; df$Period == &#39;Baseline&#39;,] %&gt;% group_by(Subject, Unit, Subject_date, Cluster_quality, ActiveTrial_modulation_direction) %&gt;%
+df_info = df[df$AMdepth_db != -40 &amp; df$Period == &#39;Baseline&#39;,] %&gt;% group_by(Subject, Unit, Subject_date, Cluster_quality) %&gt;%
   summarise(
     Trial_count = length(unique(TrialID)),
     ISI_FPRate = mean(ISI_FPRate),
     ISI_ViolationRate = mean(ISI_ViolationRate),
     Fraction_missing = mean(Fraction_missing)
   )</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;Subject&#39;, &#39;Unit&#39;, &#39;Subject_date&#39;, &#39;Cluster_quality&#39;. You can override
-## using the `.groups` argument.</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;Subject&#39;, &#39;Unit&#39;, &#39;Subject_date&#39;. You can override using
+## the `.groups` argument.</code></pre>
 <pre class="r"><code>table(df_info$Cluster_quality)</code></pre>
 <pre><code>## 
 ## good  mua 
@@ -492,8 +496,8 @@ df_grouped = df[df$Trial_type != &#39;False alarm&#39; &amp; df$Period == &#39;B
     FR_Hz_baseline = mean(FR_Hz),
     Zscore_taskPassive = z_score(FR_Hz[Session==&#39;Active&#39;], FR_Hz[Session==&#39;Pre&#39;])
   )</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;Unit&#39;, &#39;Subject&#39;, &#39;Date&#39;, &#39;Day_of_training&#39;. You can override using
-## the `.groups` argument.</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;Unit&#39;, &#39;Subject&#39;, &#39;Date&#39;, &#39;Day_of_training&#39;. You can
+## override using the `.groups` argument.</code></pre>
 <pre class="r"><code>df_grouped$ActiveBaseline_modulation_direction = factor(df_grouped$ActiveBaseline_modulation_direction, levels=c(&#39;decrease&#39;, &#39;increase&#39;, &#39;none&#39;))
 
 # Plot
@@ -523,7 +527,7 @@ p = ggplot(data=graph_data, aes(x = Plot_order, y = Zscore_taskPassive, fill=Act
   ) +
   guides(x = &quot;none&quot;)
 p</code></pre>
-<p><img src="OFC_ephys_analyses_files/figure-html/unnamed-chunk-4-1.png" width="1152" /></p>
+<p><img src="OFC_ephys_analyses_files/figure-html/unnamed-chunk-4-1.png" width="576" /></p>
 </div>
 <div id="fig-2f-modulation-strength-comparison-among-groups"
 class="section level2">
@@ -534,8 +538,8 @@ df_grouped = df[df$Trial_type != &#39;False alarm&#39; &amp; df$Period == &#39;B
     FR_Hz_baseline = mean(FR_Hz),
     Zscore_taskPassive = z_score(FR_Hz[Session==&#39;Active&#39;], FR_Hz[Session==&#39;Pre&#39;])
   )</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;Unit&#39;, &#39;Subject&#39;, &#39;Date&#39;, &#39;Day_of_training&#39;. You can override using
-## the `.groups` argument.</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;Unit&#39;, &#39;Subject&#39;, &#39;Date&#39;, &#39;Day_of_training&#39;. You can
+## override using the `.groups` argument.</code></pre>
 <pre class="r"><code>df_grouped$ActiveBaseline_modulation_direction = factor(df_grouped$ActiveBaseline_modulation_direction, levels=c(&#39;decrease&#39;, &#39;increase&#39;, &#39;none&#39;))
 
 # Plot
@@ -557,15 +561,16 @@ p = ggplot(data=graph_data, aes(x = ActiveBaseline_modulation_direction, y = abs
   coord_cartesian(ylim = c(min(y_axis), max(y_axis))) +
 
   theme(
-    legend.position = c(0.2, 0.85),
+    legend.position = c(0.2, 0.9),
     axis.title.x=element_blank(),
     axis.line.x = element_blank(),
     axis.text.x=element_blank(),
     axis.ticks.x=element_blank()
   )
 p</code></pre>
-<p><img src="OFC_ephys_analyses_files/figure-html/unnamed-chunk-5-1.png" width="1152" />
-### Stats</p>
+<p><img src="OFC_ephys_analyses_files/figure-html/unnamed-chunk-5-1.png" width="576" /></p>
+<div id="stats" class="section level3">
+<h3>Stats</h3>
 <pre class="r"><code>lme_data = graph_data
 lme_bin &lt;- glmmTMB(sqrt(sqrt(abs(Zscore_taskPassive))) ~ ActiveBaseline_modulation_direction + (1 | Subject/Unit),  data=lme_data, family=gaussian)
 simulationOutput &lt;- simulateResiduals(fittedModel = lme_bin, plot = T, re.form=NULL)  # pass</code></pre>
@@ -588,6 +593,7 @@ simulationOutput &lt;- simulateResiduals(fittedModel = lme_bin, plot = T, re.for
 ## 
 ## P value adjustment: bonferroni method for 3 tests</code></pre>
 </div>
+</div>
 <div id="fig-2g-task-dependent-firing-rate-change"
 class="section level2">
 <h2>Fig 2G: Task-dependent firing rate change</h2>
@@ -602,8 +608,8 @@ df_grouped = df[df$Trial_type != &#39;False alarm&#39;,] %&gt;% group_by(Unit, S
     Threshold = mean(Threshold, na.rm=T)
   )</code></pre>
 <pre><code>## `summarise()` has grouped output by &#39;Unit&#39;, &#39;Subject&#39;, &#39;Subject_date&#39;, &#39;Session&#39;, &#39;Period&#39;,
-## &#39;ActiveBaseline_modulated&#39;, &#39;ActiveBaseline_modulation_direction&#39;. You can override using the `.groups`
-## argument.</code></pre>
+## &#39;ActiveBaseline_modulated&#39;, &#39;ActiveBaseline_modulation_direction&#39;. You can override using the
+## `.groups` argument.</code></pre>
 <pre class="r"><code>df_grouped$ActiveBaseline_modulation_direction = factor(df_grouped$ActiveBaseline_modulation_direction, levels=c(&#39;decrease&#39;, &#39;increase&#39;, &#39;none&#39;))
 df_grouped$Session = factor(df_grouped$Session, levels=c(&#39;Pre&#39;, &#39;Active&#39;, &#39;Post&#39;))
 df_grouped = df_grouped[!is.na(df_grouped$Session),]
@@ -641,8 +647,8 @@ p =ggplot(data=graph_data, aes(x=Session, y=(FR_Hz), fill=ActiveBaseline_modulat
     axis.text.x = element_text(angle = 270, vjust = 0.5, hjust=0)
   ) 
 p</code></pre>
-<p><img src="OFC_ephys_analyses_files/figure-html/unnamed-chunk-7-1.png" width="1440" /></p>
-<div id="stats" class="section level3">
+<p><img src="OFC_ephys_analyses_files/figure-html/unnamed-chunk-7-1.png" width="576" /></p>
+<div id="stats-1" class="section level3">
 <h3>Stats</h3>
 <pre class="r"><code>lme_data = graph_data[graph_data$ActiveBaseline_modulation_direction == &#39;decrease&#39;,]
 lme_bin &lt;- glmmTMB(sqrt(FR_Hz)~Session + (1 | Subject/Unit/Session), data=lme_data, family=gaussian)
@@ -703,8 +709,11 @@ simulationOutput &lt;- simulateResiduals(fittedModel = lme_bin, plot = T, re.for
 </div>
 <div id="fig-3b-c-pre-spout-withdrawal" class="section level1">
 <h1>Fig 3B-C: Pre-spout withdrawal</h1>
-<p>Analyze auROC data extracted from the Python pipeline ## Fig 3B</p>
-<pre class="r"><code>auroc_df = read.csv(&#39;./Data/TrialType_preSpoutOffset_allUnitsauROC_plotData.csv&#39;)
+<p>Analyze auROC data extracted from the Python pipeline</p>
+<div id="fig-3b-distribution-of-phasic-modulation-values"
+class="section level2">
+<h2>Fig 3B: Distribution of phasic modulation values</h2>
+<pre class="r"><code>auroc_df = read.csv(&#39;./Data/OFC_ephys/TrialType_preSpoutOffset_allUnitsauROC_plotData.csv&#39;)
 auroc_df = separate(data = auroc_df, col = Unit,  sep = &quot;_&quot;, into=c(&quot;Subject&quot;, &quot;Date&quot;, &quot;temp1&quot;), remove=F)
 # Remove temp columns
 auroc_df = auroc_df[, -grep(&quot;temp&quot;, colnames(auroc_df))]
@@ -719,8 +728,8 @@ df_grouped = auroc_df[auroc_df$TrialType != &#39;SpoutOff_misses_auroc&#39;,] %&
     auroc_timeSlice_abs = mean(abs(auROC[(Time_s &gt;= time_slice[1]) &amp; (Time_s &lt; time_slice[2])] - 0.5), na.rm=T),
     auroc_timeSlice_all = all( abs(auROC[(Time_s &gt;= time_slice[1]) &amp; (Time_s &lt; time_slice[2])] - 0.5) &gt; 0.1)
   )</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;Unit&#39;, &#39;Subject&#39;, &#39;TrialType&#39;. You can override using the `.groups`
-## argument.</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;Unit&#39;, &#39;Subject&#39;, &#39;TrialType&#39;. You can override using the
+## `.groups` argument.</code></pre>
 <pre class="r"><code>df_grouped = df_grouped[!is.na(df_grouped$auroc_timeSlice_mean),]
 df_grouped$TrialType = factor(df_grouped$TrialType, levels=c(&#39;SpoutOff_hits_auroc&#39;, &#39;SpoutOff_FAs_auroc&#39;))
 levels(df_grouped$TrialType) = c(&#39;Hit&#39;, &#39;False alarm&#39;)
@@ -816,16 +825,18 @@ p = ggplot(df_grouped, aes(x=auroc_timeSlice_mean, fill=TrialType)) +
   xlab(&#39;Phasic modulation&#39;) +
   
   # Add percentage values
-  annotate(&quot;text&quot;, x=c(0.2, 0.8), y=c(20, 20), label=paste(round(hit_values, 0), &#39;%&#39;, sep=&#39;&#39;), color=TRIALTYPE_MODULATION_COLORS[1]) + 
-  annotate(&quot;text&quot;, x=c(0.2, 0.8), y=c(18, 18), label=paste(round(fa_values, 0), &#39;%&#39;, sep=&#39;&#39;), color=TRIALTYPE_MODULATION_COLORS[2]) + 
+  annotate(&quot;text&quot;, x=c(0.2, 0.8), y=c(20, 20), label=paste(round(hit_values, 0), &#39;%&#39;, sep=&#39;&#39;), color=TRIALTYPE_MODULATION_COLORS[1], size=7) + 
+  annotate(&quot;text&quot;, x=c(0.2, 0.8), y=c(18, 18), label=paste(round(fa_values, 0), &#39;%&#39;, sep=&#39;&#39;), color=TRIALTYPE_MODULATION_COLORS[2], size=7) + 
   
   theme(
     legend.position=c(0.85, 0.85)
   )
 p</code></pre>
-<p><img src="OFC_ephys_analyses_files/figure-html/unnamed-chunk-9-1.png" width="1440" /></p>
-<div id="fig-3c" class="section level2">
-<h2>Fig 3C</h2>
+<p><img src="OFC_ephys_analyses_files/figure-html/unnamed-chunk-9-1.png" width="576" /></p>
+</div>
+<div id="fig-3c-phasic-modulation-before-spout-withdrawal"
+class="section level2">
+<h2>Fig 3C: Phasic modulation before spout withdrawal</h2>
 <pre class="r"><code>graph_data = auroc_df[(auroc_df$Time_s &gt;= -1) &amp; (auroc_df$Time_s &lt; 0) &amp; auroc_df$TrialType != &#39;SpoutOff_misses_auroc&#39;,]
 graph_data = graph_data[!is.na(graph_data$auROC),]
 graph_data$TrialType = factor(graph_data$TrialType, levels=c(&#39;SpoutOff_hits_auroc&#39;, &#39;SpoutOff_FAs_auroc&#39;))
@@ -859,8 +870,8 @@ p =ggplot(data=graph_data, aes(x=Time_s, y=abs(auROC-0.5), fill=TrialType, color
   )
 
 p</code></pre>
-<p><img src="OFC_ephys_analyses_files/figure-html/unnamed-chunk-10-1.png" width="1440" /></p>
-<div id="stats-1" class="section level3">
+<p><img src="OFC_ephys_analyses_files/figure-html/unnamed-chunk-10-1.png" width="576" /></p>
+<div id="stats-2" class="section level3">
 <h3>Stats</h3>
 <pre class="r"><code>lme_data = df_grouped
 lme_bin &lt;- glmmTMB((blom(auroc_timeSlice_abs, method=&#39;rankit&#39;))~ TrialType + (1 | Subject/Unit/TrialType),  data=lme_data, family=gaussian)
@@ -879,9 +890,10 @@ simulationOutput &lt;- simulateResiduals(fittedModel = lme_bin, plot = T, re.for
 </div>
 <div id="fig-s2-post-spout-withdrawal" class="section level1">
 <h1>Fig S2: Post-spout withdrawal</h1>
-<div id="fig-s2b" class="section level2">
-<h2>Fig S2B</h2>
-<pre class="r"><code>auroc_df = read.csv(&#39;./Data/TrialType_postSpoutOffset_allUnitsauROC_plotData.csv&#39;)
+<div id="fig-s2b-distribution-of-phasic-modulation-values"
+class="section level2">
+<h2>Fig S2B: Distribution of phasic modulation values</h2>
+<pre class="r"><code>auroc_df = read.csv(&#39;./Data/OFC_ephys/TrialType_postSpoutOffset_allUnitsauROC_plotData.csv&#39;)
 auroc_df = separate(data = auroc_df, col = Unit,  sep = &quot;_&quot;, into=c(&quot;Subject&quot;, &quot;Date&quot;, &quot;temp1&quot;), remove=F)
 auroc_df = auroc_df[, -grep(&quot;temp&quot;, colnames(auroc_df))]  # Remove temp columns
 
@@ -895,8 +907,8 @@ df_grouped = auroc_df[auroc_df$TrialType %in% c(&#39;SpoutOff_hits_auroc&#39;, &
     auroc_timeSlice_abs = mean(abs(auROC[(Time_s &gt;= time_slice[1]) &amp; (Time_s &lt; time_slice[2])] - 0.5), na.rm=T),
     auroc_timeSlice_all = all( abs(auROC[(Time_s &gt;= time_slice[1]) &amp; (Time_s &lt; time_slice[2])] - 0.5) &gt;= 0.1)
   )</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;Unit&#39;, &#39;Subject&#39;, &#39;TrialType&#39;. You can override using the `.groups`
-## argument.</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;Unit&#39;, &#39;Subject&#39;, &#39;TrialType&#39;. You can override using the
+## `.groups` argument.</code></pre>
 <pre class="r"><code>df_grouped = df_grouped[!is.na(df_grouped$auroc_timeSlice_mean),]
 df_grouped$TrialType = factor(df_grouped$TrialType, levels=c(&#39;SpoutOff_hits_auroc&#39;, &#39;SpoutOff_FAs_auroc&#39;, &#39;SpoutOff_misses_auroc&#39;))
 levels(df_grouped$TrialType) = c(&#39;Hit&#39;, &#39;False alarm&#39;, &#39;Miss&#39;)
@@ -1017,18 +1029,19 @@ p = ggplot(df_grouped, aes(x=auroc_timeSlice_mean, fill=TrialType)) +
   xlab(&#39;Phasic modulation&#39;) +
   
   # Add percentage values
-  annotate(&quot;text&quot;, x=c(0.2, 0.8), y=c(20, 20), label=paste(round(hit_values, 0), &#39;%&#39;, sep=&#39;&#39;), color=TRIALTYPE_MODULATION_COLORS[1]) + 
-  annotate(&quot;text&quot;, x=c(0.2, 0.8), y=c(18, 18), label=paste(round(fa_values, 0), &#39;%&#39;, sep=&#39;&#39;), color=TRIALTYPE_MODULATION_COLORS[2]) + 
-  annotate(&quot;text&quot;, x=c(0.2, 0.8), y=c(16, 16), label=paste(round(miss_values, 0), &#39;%&#39;, sep=&#39;&#39;), color=TRIALTYPE_MODULATION_COLORS[3]) + 
+  annotate(&quot;text&quot;, x=c(0.2, 0.8), y=c(20, 20), label=paste(round(hit_values, 0), &#39;%&#39;, sep=&#39;&#39;), color=TRIALTYPE_MODULATION_COLORS[1], size=7) + 
+  annotate(&quot;text&quot;, x=c(0.2, 0.8), y=c(18, 18), label=paste(round(fa_values, 0), &#39;%&#39;, sep=&#39;&#39;), color=TRIALTYPE_MODULATION_COLORS[2], size=7) + 
+  annotate(&quot;text&quot;, x=c(0.2, 0.8), y=c(16, 16), label=paste(round(miss_values, 0), &#39;%&#39;, sep=&#39;&#39;), color=TRIALTYPE_MODULATION_COLORS[3], size=7) + 
   
   theme(
     legend.position = c(0.85, 0.85)
   )
 p</code></pre>
-<p><img src="OFC_ephys_analyses_files/figure-html/unnamed-chunk-12-1.png" width="1440" /></p>
+<p><img src="OFC_ephys_analyses_files/figure-html/unnamed-chunk-12-1.png" width="576" /></p>
 </div>
-<div id="fig-s2c" class="section level2">
-<h2>Fig S2C</h2>
+<div id="fig-s2c-phasic-modulation-after-spout-withdrawal"
+class="section level2">
+<h2>Fig S2C: Phasic modulation after spout withdrawal</h2>
 <pre class="r"><code>graph_data =  df_grouped
 # Plot the curves
 graph_data = auroc_df[(auroc_df$Time_s &gt;= 0.3) &amp; (auroc_df$Time_s &lt; 2),]
@@ -1065,8 +1078,8 @@ p =ggplot(data=graph_data, aes(x=Time_s, y=abs(auROC-0.5), color=TrialType, fill
   )
 
 p</code></pre>
-<p><img src="OFC_ephys_analyses_files/figure-html/unnamed-chunk-13-1.png" width="1440" /></p>
-<div id="stats-2" class="section level3">
+<p><img src="OFC_ephys_analyses_files/figure-html/unnamed-chunk-13-1.png" width="576" /></p>
+<div id="stats-3" class="section level3">
 <h3>Stats</h3>
 <pre class="r"><code>lme_data = df_grouped
 lme_bin &lt;- glmmTMB(blom(auroc_timeSlice_abs, method=&#39;rankit&#39;)*10~ TrialType + (1 | Subject/Unit/TrialType),  data=lme_data, family=gaussian)
@@ -1097,7 +1110,7 @@ class="section level1">
 <h1>Fig S3: Phasic firing by tonic modulation</h1>
 <div id="fig-s3b" class="section level2">
 <h2>Fig S3B</h2>
-<pre class="r"><code>auroc_df = read.csv(&#39;./Data/TrialType_postSpoutOffset_allUnitsauROC_plotData.csv&#39;)
+<pre class="r"><code>auroc_df = read.csv(&#39;./Data/OFC_ephys/TrialType_postSpoutOffset_allUnitsauROC_plotData.csv&#39;)
 auroc_df = separate(data = auroc_df, col = Unit,  sep = &quot;_&quot;, into=c(&quot;Subject&quot;, &quot;Date&quot;, &quot;temp1&quot;), remove=F)
 # Remove temp columns
 auroc_df = auroc_df[, -grep(&quot;temp&quot;, colnames(auroc_df))]
@@ -1128,317 +1141,26 @@ p =ggplot(data=graph_data, aes(x=Time_s, y=abs(auROC-0.5), color=TrialType, fill
   coord_cartesian(ylim = c(min(y_axis), max(y_axis)), 
                   xlim = c(min(x_axis), max(x_axis))) +
 
-  scale_color_manual(values = TRIALTYPE_MODULATION_COLORS) +
-  scale_fill_manual(values = TRIALTYPE_MODULATION_COLORS)
+  scale_color_manual(values = TRIALTYPE_MODULATION_COLORS, name=&#39;&#39;) +
+  scale_fill_manual(values = TRIALTYPE_MODULATION_COLORS, name=&#39;&#39;) +
 
   theme(
     strip.background = element_blank(),
-    legend.position = &#39;none&#39;,
+    legend.position = c(0.85, 0.9),
     panel.spacing = unit(2.5, &quot;lines&quot;)
-  ) +
+  )
 
 p</code></pre>
-<pre><code>## List of 14
-##  $ legend.position : chr &quot;none&quot;
-##  $ panel.spacing   : &#39;simpleUnit&#39; num 2.5lines
-##   ..- attr(*, &quot;unit&quot;)= int 3
-##  $ strip.background: list()
-##   ..- attr(*, &quot;class&quot;)= chr [1:2] &quot;element_blank&quot; &quot;element&quot;
-##  $ data            :&#39;data.frame&#39;:    26911 obs. of  7 variables:
-##   ..$ Unit                               : chr [1:26911] &quot;SUBJ-ID-151_210507_concat_cluster2492&quot; &quot;SUBJ-ID-151_210507_concat_cluster2492&quot; &quot;SUBJ-ID-151_210507_concat_cluster2492&quot; &quot;SUBJ-ID-151_210507_concat_cluster2492&quot; ...
-##   ..$ Subject                            : chr [1:26911] &quot;SUBJ-ID-151&quot; &quot;SUBJ-ID-151&quot; &quot;SUBJ-ID-151&quot; &quot;SUBJ-ID-151&quot; ...
-##   ..$ Date                               : chr [1:26911] &quot;210507&quot; &quot;210507&quot; &quot;210507&quot; &quot;210507&quot; ...
-##   ..$ Time_s                             : num [1:26911] 0.3 0.4 0.5 0.6 0.7 ...
-##   ..$ auROC                              : num [1:26911] 0.485 0.485 0.485 0.485 0.585 ...
-##   ..$ TrialType                          : Factor w/ 3 levels &quot;Hit&quot;,&quot;False alarm&quot;,..: 1 1 1 1 1 1 1 1 1 1 ...
-##   ..$ ActiveBaseline_modulation_direction: Factor w/ 3 levels &quot;Task-suppressed&quot;,..: 1 1 1 1 1 1 1 1 1 1 ...
-##  $ layers          :List of 2
-##   ..$ :Classes &#39;LayerInstance&#39;, &#39;Layer&#39;, &#39;ggproto&#39;, &#39;gg&#39; &lt;ggproto object: Class LayerInstance, Layer, gg&gt;
-##     aes_params: list
-##     compute_aesthetics: function
-##     compute_geom_1: function
-##     compute_geom_2: function
-##     compute_position: function
-##     compute_statistic: function
-##     computed_geom_params: NULL
-##     computed_mapping: NULL
-##     computed_stat_params: NULL
-##     constructor: call
-##     data: waiver
-##     draw_geom: function
-##     finish_statistics: function
-##     geom: &lt;ggproto object: Class GeomRibbon, Geom, gg&gt;
-##         aesthetics: function
-##         default_aes: uneval
-##         draw_group: function
-##         draw_key: function
-##         draw_layer: function
-##         draw_panel: function
-##         extra_params: na.rm orientation
-##         handle_na: function
-##         non_missing_aes: 
-##         optional_aes: 
-##         parameters: function
-##         rename_size: TRUE
-##         required_aes: x|y ymin|xmin ymax|xmax
-##         setup_data: function
-##         setup_params: function
-##         use_defaults: function
-##         super:  &lt;ggproto object: Class Geom, gg&gt;
-##     geom_params: list
-##     inherit.aes: TRUE
-##     layer_data: function
-##     map_statistic: function
-##     mapping: NULL
-##     position: &lt;ggproto object: Class PositionIdentity, Position, gg&gt;
-##         compute_layer: function
-##         compute_panel: function
-##         required_aes: 
-##         setup_data: function
-##         setup_params: function
-##         super:  &lt;ggproto object: Class Position, gg&gt;
-##     print: function
-##     setup_layer: function
-##     show.legend: NA
-##     stat: &lt;ggproto object: Class StatSummary, Stat, gg&gt;
-##         aesthetics: function
-##         compute_group: function
-##         compute_layer: function
-##         compute_panel: function
-##         default_aes: uneval
-##         dropped_aes: 
-##         extra_params: na.rm orientation
-##         finish_layer: function
-##         non_missing_aes: 
-##         optional_aes: 
-##         parameters: function
-##         required_aes: x y
-##         retransform: TRUE
-##         setup_data: function
-##         setup_params: function
-##         super:  &lt;ggproto object: Class Stat, gg&gt;
-##     stat_params: list
-##     super:  &lt;ggproto object: Class Layer, gg&gt; 
-##   ..$ :Classes &#39;LayerInstance&#39;, &#39;Layer&#39;, &#39;ggproto&#39;, &#39;gg&#39; &lt;ggproto object: Class LayerInstance, Layer, gg&gt;
-##     aes_params: list
-##     compute_aesthetics: function
-##     compute_geom_1: function
-##     compute_geom_2: function
-##     compute_position: function
-##     compute_statistic: function
-##     computed_geom_params: NULL
-##     computed_mapping: NULL
-##     computed_stat_params: NULL
-##     constructor: call
-##     data: waiver
-##     draw_geom: function
-##     finish_statistics: function
-##     geom: &lt;ggproto object: Class GeomLine, GeomPath, Geom, gg&gt;
-##         aesthetics: function
-##         default_aes: uneval
-##         draw_group: function
-##         draw_key: function
-##         draw_layer: function
-##         draw_panel: function
-##         extra_params: na.rm orientation
-##         handle_na: function
-##         non_missing_aes: linewidth colour linetype
-##         optional_aes: 
-##         parameters: function
-##         rename_size: TRUE
-##         required_aes: x y
-##         setup_data: function
-##         setup_params: function
-##         use_defaults: function
-##         super:  &lt;ggproto object: Class GeomPath, Geom, gg&gt;
-##     geom_params: list
-##     inherit.aes: TRUE
-##     layer_data: function
-##     map_statistic: function
-##     mapping: NULL
-##     position: &lt;ggproto object: Class PositionIdentity, Position, gg&gt;
-##         compute_layer: function
-##         compute_panel: function
-##         required_aes: 
-##         setup_data: function
-##         setup_params: function
-##         super:  &lt;ggproto object: Class Position, gg&gt;
-##     print: function
-##     setup_layer: function
-##     show.legend: NA
-##     stat: &lt;ggproto object: Class StatSummary, Stat, gg&gt;
-##         aesthetics: function
-##         compute_group: function
-##         compute_layer: function
-##         compute_panel: function
-##         default_aes: uneval
-##         dropped_aes: 
-##         extra_params: na.rm orientation
-##         finish_layer: function
-##         non_missing_aes: 
-##         optional_aes: 
-##         parameters: function
-##         required_aes: x y
-##         retransform: TRUE
-##         setup_data: function
-##         setup_params: function
-##         super:  &lt;ggproto object: Class Stat, gg&gt;
-##     stat_params: list
-##     super:  &lt;ggproto object: Class Layer, gg&gt; 
-##  $ scales          :Classes &#39;ScalesList&#39;, &#39;ggproto&#39;, &#39;gg&#39; &lt;ggproto object: Class ScalesList, gg&gt;
-##     add: function
-##     add_defaults: function
-##     add_missing: function
-##     backtransform_df: function
-##     clone: function
-##     find: function
-##     get_scales: function
-##     has_scale: function
-##     input: function
-##     map_df: function
-##     n: function
-##     non_position_scales: function
-##     scales: list
-##     train_df: function
-##     transform_df: function
-##     super:  &lt;ggproto object: Class ScalesList, gg&gt; 
-##  $ guides          :Classes &#39;Guides&#39;, &#39;ggproto&#39;, &#39;gg&#39; &lt;ggproto object: Class Guides, gg&gt;
-##     add: function
-##     assemble: function
-##     build: function
-##     draw: function
-##     get_custom: function
-##     get_guide: function
-##     get_params: function
-##     get_position: function
-##     guides: NULL
-##     merge: function
-##     missing: &lt;ggproto object: Class GuideNone, Guide, gg&gt;
-##         add_title: function
-##         arrange_layout: function
-##         assemble_drawing: function
-##         available_aes: any
-##         build_decor: function
-##         build_labels: function
-##         build_ticks: function
-##         build_title: function
-##         draw: function
-##         draw_early_exit: function
-##         elements: list
-##         extract_decor: function
-##         extract_key: function
-##         extract_params: function
-##         get_layer_key: function
-##         hashables: list
-##         measure_grobs: function
-##         merge: function
-##         override_elements: function
-##         params: list
-##         process_layers: function
-##         setup_elements: function
-##         setup_params: function
-##         train: function
-##         transform: function
-##         super:  &lt;ggproto object: Class GuideNone, Guide, gg&gt;
-##     package_box: function
-##     print: function
-##     process_layers: function
-##     setup: function
-##     subset_guides: function
-##     train: function
-##     update_params: function
-##     super:  &lt;ggproto object: Class Guides, gg&gt; 
-##  $ mapping         :List of 4
-##   ..$ x     : language ~Time_s
-##   .. ..- attr(*, &quot;.Environment&quot;)=&lt;environment: R_GlobalEnv&gt; 
-##   ..$ y     : language ~abs(auROC - 0.5)
-##   .. ..- attr(*, &quot;.Environment&quot;)=&lt;environment: R_GlobalEnv&gt; 
-##   ..$ colour: language ~TrialType
-##   .. ..- attr(*, &quot;.Environment&quot;)=&lt;environment: R_GlobalEnv&gt; 
-##   ..$ fill  : language ~TrialType
-##   .. ..- attr(*, &quot;.Environment&quot;)=&lt;environment: R_GlobalEnv&gt; 
-##   ..- attr(*, &quot;class&quot;)= chr &quot;uneval&quot;
-##  $ theme           : list()
-##  $ coordinates     :Classes &#39;CoordCartesian&#39;, &#39;Coord&#39;, &#39;ggproto&#39;, &#39;gg&#39; &lt;ggproto object: Class CoordCartesian, Coord, gg&gt;
-##     aspect: function
-##     backtransform_range: function
-##     clip: on
-##     default: FALSE
-##     distance: function
-##     expand: TRUE
-##     is_free: function
-##     is_linear: function
-##     labels: function
-##     limits: list
-##     modify_scales: function
-##     range: function
-##     render_axis_h: function
-##     render_axis_v: function
-##     render_bg: function
-##     render_fg: function
-##     setup_data: function
-##     setup_layout: function
-##     setup_panel_guides: function
-##     setup_panel_params: function
-##     setup_params: function
-##     train_panel_guides: function
-##     transform: function
-##     super:  &lt;ggproto object: Class CoordCartesian, Coord, gg&gt; 
-##  $ facet           :Classes &#39;FacetGrid&#39;, &#39;Facet&#39;, &#39;ggproto&#39;, &#39;gg&#39; &lt;ggproto object: Class FacetGrid, Facet, gg&gt;
-##     compute_layout: function
-##     draw_back: function
-##     draw_front: function
-##     draw_labels: function
-##     draw_panels: function
-##     finish_data: function
-##     init_scales: function
-##     map_data: function
-##     params: list
-##     setup_data: function
-##     setup_params: function
-##     shrink: TRUE
-##     train_scales: function
-##     vars: function
-##     super:  &lt;ggproto object: Class FacetGrid, Facet, gg&gt; 
-##  $ plot_env        :&lt;environment: R_GlobalEnv&gt; 
-##  $ layout          :Classes &#39;Layout&#39;, &#39;ggproto&#39;, &#39;gg&#39; &lt;ggproto object: Class Layout, gg&gt;
-##     coord: NULL
-##     coord_params: list
-##     facet: NULL
-##     facet_params: list
-##     finish_data: function
-##     get_scales: function
-##     layout: NULL
-##     map_position: function
-##     panel_params: NULL
-##     panel_scales_x: NULL
-##     panel_scales_y: NULL
-##     render: function
-##     render_labels: function
-##     reset_scales: function
-##     resolve_label: function
-##     setup: function
-##     setup_panel_guides: function
-##     setup_panel_params: function
-##     train_position: function
-##     super:  &lt;ggproto object: Class Layout, gg&gt; 
-##  $ labels          :List of 4
-##   ..$ x     : chr &quot;Time re: spout withdrawal (s)&quot;
-##   ..$ y     : chr &quot;Phasic modulation&quot;
-##   ..$ colour: chr &quot;TrialType&quot;
-##   ..$ fill  : chr &quot;TrialType&quot;
-##  - attr(*, &quot;class&quot;)= chr [1:2] &quot;theme&quot; &quot;gg&quot;
-##  - attr(*, &quot;complete&quot;)= logi FALSE
-##  - attr(*, &quot;validate&quot;)= logi TRUE</code></pre>
-<div id="stats-3" class="section level3">
+<p><img src="OFC_ephys_analyses_files/figure-html/unnamed-chunk-15-1.png" width="768" /></p>
+<div id="stats-4" class="section level3">
 <h3>Stats</h3>
 <pre class="r"><code>time_slice = c(0.3, 0.8)
 df_grouped = auroc_df %&gt;% group_by(Unit, Subject, TrialType, ActiveBaseline_modulation_direction) %&gt;%
   summarise( 
     auroc_timeSlice_abs = mean(abs(auROC[(Time_s &gt;= time_slice[1]) &amp; (Time_s &lt; time_slice[2])] - 0.5), na.rm=T)
   )</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;Unit&#39;, &#39;Subject&#39;, &#39;TrialType&#39;. You can override using the `.groups`
-## argument.</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;Unit&#39;, &#39;Subject&#39;, &#39;TrialType&#39;. You can override using the
+## `.groups` argument.</code></pre>
 <pre class="r"><code>df_grouped$TrialType = factor(df_grouped$TrialType, levels=c(&#39;SpoutOff_hits_auroc&#39;, &#39;SpoutOff_FAs_auroc&#39;, &#39;SpoutOff_misses_auroc&#39;))
 levels(df_grouped$TrialType) = c(&#39;Hit&#39;, &#39;False alarm&#39;, &#39;Miss&#39;)
 df_grouped$ActiveBaseline_modulation_direction = factor(df_grouped$ActiveBaseline_modulation_direction, levels=c(&#39;decrease&#39;, &#39;increase&#39;, &#39;none&#39;))
@@ -1550,16 +1272,16 @@ p =ggplot(data=graph_data, aes(x=Time_s, y=abs(auROC-0.5), color=TrialType, fill
     panel.spacing = unit(2.5, &quot;lines&quot;)
   ) 
 p</code></pre>
-<p><img src="OFC_ephys_analyses_files/figure-html/unnamed-chunk-17-1.png" width="1440" /></p>
-<div id="stats-4" class="section level3">
+<p><img src="OFC_ephys_analyses_files/figure-html/unnamed-chunk-17-1.png" width="768" /></p>
+<div id="stats-5" class="section level3">
 <h3>Stats</h3>
 <pre class="r"><code>time_slice = c(-0.5, 0)
 df_grouped = auroc_df[auroc_df$TrialType %in% c(&#39;SpoutOff_hits_auroc&#39;, &#39;SpoutOff_FAs_auroc&#39;),] %&gt;% group_by(Unit, Subject, TrialType, ActiveBaseline_modulation_direction) %&gt;%
   summarise( 
     auroc_timeSlice_abs = mean(abs(auROC[(Time_s &gt;= time_slice[1]) &amp; (Time_s &lt; time_slice[2])] - 0.5), na.rm=T)
   )</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;Unit&#39;, &#39;Subject&#39;, &#39;TrialType&#39;. You can override using the `.groups`
-## argument.</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;Unit&#39;, &#39;Subject&#39;, &#39;TrialType&#39;. You can override using the
+## `.groups` argument.</code></pre>
 <pre class="r"><code>df_grouped$TrialType = factor(df_grouped$TrialType, levels=c(&#39;SpoutOff_hits_auroc&#39;, &#39;SpoutOff_FAs_auroc&#39;))
 levels(df_grouped$TrialType) = c(&#39;Hit&#39;, &#39;False alarm&#39;)
 df_grouped$ActiveBaseline_modulation_direction = factor(df_grouped$ActiveBaseline_modulation_direction, levels=c(&#39;decrease&#39;, &#39;increase&#39;, &#39;none&#39;))
@@ -1601,6 +1323,12 @@ simulationOutput &lt;- simulateResiduals(fittedModel = lme_bin, plot = T, re.for
 ## TrialType 2.4882  1     0.1147</code></pre>
 </div>
 </div>
+</div>
+<div id="fig-s1g-heatmaps-were-generated-using-python."
+class="section level1">
+<h1>Fig S1G heatmaps were generated using Python.</h1>
+<p>You can find this code here: <a href="https://"
+class="uri">https://</a></p>
 </div>
 
 

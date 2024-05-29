@@ -1,9 +1,17 @@
 ---
-title: "My Website"
+title: "Supporting code for Macedo-Lima et al., 2024 Current Biology"
 ---
 
-Hello, Website!
+The code illustrated in this website is read-only. For modifiable files, download .Rmd files
 
-For more information about simple R Markdown websites, please read the documentation at https://bookdown.org/yihui/rmarkdown/rmarkdown-site.html.
+More analyses can be found in associated python notebook and MatLab pipelines.
 
-Please also note that simple R Markdown sites are _not_ based on **blogdown**. They are probably good for websites with only a few Rmd documents. For larger-scale and more sophisticated websites (such as blogs), you may want to use **blogdown** instead: https://github.com/rstudio/blogdown.
+The workflow for most datasets in this project was:
+
+1. Raw data collection with MatLab or Intan/Synapse software
+
+2. Data preprocessing with MatLab pipeline
+
+3. Data preprocessing and plotting with Python pipeline
+
+4. Data analysis and plotting with R pipeline

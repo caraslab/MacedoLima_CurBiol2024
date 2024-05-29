@@ -1,0 +1,268 @@
+---
+title: "OFC ephys recordings during perceptual training - Preprocessing"
+chunk_output_type: console
+---
+
+# Load data originated from the Python pipeline and get it ready
+```{r echo=TRUE, warning=FALSE, message=FALSE}
+# Libraries and plotting parameters
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+
+# Create the notin operator
+`%notin%` <- Negate(`%in%`)
+
+df = read.csv('../Data/OFC_ephys/OFCPL_AMsound_firing_rate.csv')
+df = separate(data = df, col = Key_file,  sep = "_", into=c("Subject", "temp1"), remove=F)
+
+# Handle non-OFC subjects and bad sessions here
+# Remove 232 and 270 from main df (insufficient training days and units, respectively)
+# SUBJ-ID-197 anatomy looked off; probably only in OFC towards the end of training
+subjects_to_exclude = c('SUBJ-ID-232', 'SUBJ-ID-270', 'SUBJ-ID-197')
+df = df[df$Subject %notin% subjects_to_exclude,]
+
+# SUBJ-ID-390_2022-06-24_16-37-06_PassivePost eliminate trials between 108.5 and 171.1 s when animal unplugged SPI cable; these translate to trials 77 through 119
+df = df[!(df$Key_file == 'SUBJ-ID-390_SUBJ-ID-390_2022-06-24_16-37-06_PassivePost_trialInfo' & df$TrialID %in% 77:119),]
+
+# Something strange happened on SUBJ-ID-390 6/27/22 Active where DACs become out of sync with ePsych by a variable offset starting when the animal regressed in AM depth difficulty after AM trial 7 (TrialID 178 on); remove trials after that here
+df = df[!(df$Key_file == 'SUBJ-ID-390_SUBJ-ID-390_2022-06-27_18-11-15_Active_trialInfo' & as.numeric(as.character(df$TrialID)) > 177),]
+
+df = droplevels(df)
+
+df$Recording_format = ''
+intan_subjects = c('SUBJ-ID-231', 'SUBJ-ID-232', 'SUBJ-ID-270', 'SUBJ-ID-389', 'SUBJ-ID-390')
+df[df$Subject %in% intan_subjects,]$Recording_format = 'intan' 
+df[df$Subject %notin% intan_subjects,]$Recording_format = 'synapse' 
+
+intan_df = df[df$Recording_format == 'intan',]
+
+# Key file names in 389 and 390 have an extra SUBJ field in the beginning; deal with that here
+intan_df_temp1 = intan_df[intan_df$Subject %in% c('SUBJ-ID-389', 'SUBJ-ID-390'),]
+intan_df_temp1 = separate(data = intan_df_temp1, col = Key_file,  sep = "_", into=c("temp1", "temp2", "Date_fromSession", "Session_timestamp", "temp3", "temp4"), remove=F)
+intan_df_temp1$SessionID = paste(intan_df_temp1$Date_fromSession, intan_df_temp1$Session_timestamp, intan_df_temp1$temp3, sep="_")
+intan_df_temp1$Date = strptime(intan_df_temp1$Date_fromSession, format = '%Y-%m-%d')
+intan_df_temp1$Date = strftime(intan_df_temp1$Date, format='%y%m%d')
+
+intan_df_temp2 = intan_df[intan_df$Subject %notin% c('SUBJ-ID-389', 'SUBJ-ID-390'),]
+intan_df_temp2 = separate(data = intan_df_temp2, col = Key_file,  sep = "_", into=c("temp1", "Date_fromSession", "Session_timestamp", "temp2", "temp3"), remove=F)
+intan_df_temp2$SessionID = paste(intan_df_temp2$Date_fromSession, intan_df_temp2$Session_timestamp, intan_df_temp2$temp2, sep="_")
+intan_df_temp2$Date = strptime(intan_df_temp2$Date_fromSession, format = '%Y-%m-%d')
+intan_df_temp2$Date = strftime(intan_df_temp2$Date, format='%y%m%d')
+
+intan_df =  merge(intan_df_temp1, intan_df_temp2, all=T)
+
+synapse_df = df[df$Recording_format == 'synapse',]
+synapse_df = separate(data = synapse_df, col = Key_file,  sep = "_", into=c("Subject", "SessionID", "temp1"), remove=F)
+
+# Remove MML tag from experiment name
+synapse_df$SessionID = gsub("MML-", "", synapse_df$SessionID)
+
+synapse_df = separate(data = synapse_df, col = SessionID,  sep = "-", into=c("temp2", "temp3", "Date", "Session_timestamp"), remove=F)
+
+df = merge(intan_df, synapse_df, all=T)
+
+df = separate(data = df, col = Unit,  sep = "_", into=c("temp7", "temp8","temp9", "Cluster"), remove=F)
+
+# Remove temp columns
+df = df[, -grep("temp", colnames(df))]
+
+df$Subject_date = interaction(df$Subject, df$Date, sep="_")
+
+df$Session = ''
+df[(grepl('Aversive', df$Key_file)) | (grepl('Active', df$Key_file)),]$Session = 'Active'
+df[(grepl('Pre', df$Key_file)),]$Session = 'Pre'
+df[(grepl('Post', df$Key_file)),]$Session = 'Post'
+
+# Check for Post1h
+for(subject_date in unique(df$Subject_date)) {
+  cur_post = df[grepl('Post', df$Key_file) & df$Subject_date == subject_date,]
+  if(length(cur_post) == 0) {
+    next
+  }
+
+  if(length(unique(cur_post$SessionID)) > 1) {
+    post1h_timestamp = sort(unique(cur_post$Session_timestamp))[2]
+    df[(df$Subject_date == subject_date) & (df$Session_timestamp == post1h_timestamp),]$Session = 'Post1h'
+  }
+}
+df$Session = factor(df$Session, levels=c('Pre', 'Active', 'Post', 'Post1h'))
+
+# Detail the trial outcomes
+df$MissShockFA_interaction = interaction(df$Miss, df$ShockFlag, df$FA)
+df$Trial_code = ''
+df[df$MissShockFA_interaction %in% c('0.0.0', '0.1.0'),]$Trial_code = 'hit'
+df[df$MissShockFA_interaction %in% c('1.1.0'),]$Trial_code = 'miss - shock'
+df[df$MissShockFA_interaction %in% c('1.0.0'),]$Trial_code = 'miss - no shock'
+df[df$MissShockFA_interaction %in% c('0.0.1', '0.1.1'),]$Trial_code = 'false alarm'
+
+df$Trial_type = 'Miss (no shock)'
+df[df$Hit == 1,]$Trial_type = 'Hit'
+df[df$Miss == 1 & df$ShockFlag == 1,]$Trial_type = 'Miss (shock)'
+df[df$FA == 1,]$Trial_type = 'False alarm'
+
+df$Trial_type = factor(df$Trial_type, levels=c('Miss (shock)', 'Hit', 'False alarm', 'Miss (no shock)'))
+
+df$Period = factor(df$Period, levels=c('Baseline', 'Trial', 'Aftertrial'))
+
+
+# Add waveform measurements
+wf_measurement_files = Sys.glob(file.path("../Data/OFC_ephys/Waveform measurements/*waveform_measurements.csv"))
+# Add quality metrics
+wf_quality_files = Sys.glob(file.path("../Data/OFC_ephys/Quality metrics/*quality_metrics.csv"))
+
+# Sort by Unit then trialID for counting trials consecutively
+df = df[
+  with(df, order(Unit, TrialID)),
+]
+
+
+df$ISI_FPRate = NA
+df$ISI_ViolationRate = NA
+df$Fraction_missing = NA
+df$Presence_ratio = NA
+df$PTP_duration = 0
+df$PTP_ratio = 0
+df$Repolarization = 0
+df$Best_channel = NA
+df$Shank = NA
+df$Cluster_quality_MML = ''
+all_start = Sys.time()
+for (cur_subject in unique(df$Subject)) {
+  for (cur_date in unique(df[df$Subject == cur_subject,]$Date)) {
+    
+    cur_date_df = df[df$Subject == cur_subject & df$Date == cur_date,]
+    
+    cur_file = wf_measurement_files[
+      intersect(grep(cur_subject, wf_measurement_files), grep(cur_date, wf_measurement_files))]
+    wf_measurements = read.csv(cur_file)
+    
+    cur_file = wf_quality_files[
+      intersect(grep(cur_subject, wf_quality_files), grep(cur_date, wf_quality_files))]
+    wf_quality = read.csv(cur_file)
+    
+    for (cluster in unique(cur_date_df$Cluster)) {
+      unit_start = Sys.time()
+      cluster_n = as.numeric(substr(cluster, 8, nchar(cluster)))
+      cur_unit_measurements_df = wf_measurements[wf_measurements$Cluster == cluster_n,]
+      cur_unit_quality_df = wf_quality[wf_quality$Cluster == cluster_n,]
+  
+      # Remove extra channels
+      if (cur_subject %notin% c('SUBJ-ID-13', 'SUBJ-ID-14')) {
+        if (cur_unit_measurements_df$Shank > 4) { # shanks >4 are extra sites
+          df = df[!( (grepl(cluster, df$Unit)) & (df$Subject == cur_subject) & (df$Date == cur_date) ), ]
+          next
+        }
+      } else {
+        if (cur_unit_measurements_df$Shank > 5) { # shanks >5 are extra sites
+          df = df[!( (grepl(cluster, df$Unit))& (df$Subject == cur_subject) & (df$Date == cur_date) ), ]
+          next
+        }
+      }
+  
+      # Store best channel, shank and cluster quality
+      df[(grepl(cluster, df$Unit)) & (df$Subject == cur_subject) & (df$Date == cur_date), ]$Best_channel = cur_unit_measurements_df$Best_channel
+      df[(grepl(cluster, df$Unit)) & (df$Subject == cur_subject) & (df$Date == cur_date), ]$Shank = cur_unit_measurements_df$Shank
+      df[(grepl(cluster, df$Unit)) & (df$Subject == cur_subject) & (df$Date == cur_date), ]$Cluster_quality_MML = as.character(cur_unit_measurements_df$Cluster_quality)
+      
+      # Store unit measurements
+      df[(grepl(cluster, df$Unit)) & (df$Subject == cur_subject) & (df$Date == cur_date), ]$PTP_duration = cur_unit_measurements_df$PTP_duration_ms
+      df[(grepl(cluster, df$Unit)) & (df$Subject == cur_subject) & (df$Date == cur_date), ]$PTP_ratio = cur_unit_measurements_df$PTP_ratio
+      df[(grepl(cluster, df$Unit)) & (df$Subject == cur_subject) & (df$Date == cur_date), ]$Repolarization = cur_unit_measurements_df$Repolarization_duration_ms
+      
+      # Store unit quality metrics
+      df[(grepl(cluster, df$Unit)) & (df$Subject == cur_subject) & (df$Date == cur_date), ]$ISI_FPRate = cur_unit_quality_df$ISI_FPRate
+      df[(grepl(cluster, df$Unit)) & (df$Subject == cur_subject) & (df$Date == cur_date), ]$ISI_ViolationRate = cur_unit_quality_df$ISI_ViolationRate
+      df[(grepl(cluster, df$Unit)) & (df$Subject == cur_subject) & (df$Date == cur_date), ]$Fraction_missing = cur_unit_quality_df$Fraction_missing
+      df[(grepl(cluster, df$Unit)) & (df$Subject == cur_subject) & (df$Date == cur_date), ]$Presence_ratio = cur_unit_quality_df$Presence_ratio
+      
+      print(paste(paste(cur_subject, cur_date, cluster, sep="_"), " runtime: ", Sys.time() - unit_start, sep=""))
+    }
+  }
+}
+
+print("All units time: ")
+Sys.time() - all_start
+
+df$Cluster_quality_MML = factor(df$Cluster_quality_MML, levels=c('good', 'mua'))
+
+df$Cluster_quality_Allen = 'mua'
+df[(df$ISI_FPRate < 0.5) & (df$Fraction_missing < 0.1) & (df$Presence_ratio > 0.9),]$Cluster_quality_Allen = 'good'
+df$Cluster_quality_Allen = factor(df$Cluster_quality_Allen, levels=c('good', 'mua'))
+
+cur_temp_id = 1
+write.csv(df, paste('../Data/OFC_ephys/OFCPL_allTrial_df_temp_', as.character(cur_temp_id), '.csv', sep=''), row.names=FALSE) # Save temp copy of dataframe because the above takes a while to run
+
+```
+
+# Let's categorize these neurons into increase, decrease or none in Active - Pre baseline firing
+```{r echo=TRUE, fig.height=10, fig.width=15, warning=FALSE}
+df = read.csv(paste('../Data/OFC_ephys/OFCPL_allTrial_df_temp_', as.character(cur_temp_id), '.csv', sep=''))
+
+df_temp = df[df$Period=='Baseline' & df$Session %in% c('Pre', 'Active'),]
+df_temp$Session = factor(df_temp$Session, levels=c('Active', 'Pre'))
+unit_list = c()
+p_list = c()
+v_list = c()
+pseudomedian_list = c()  # gives the direction of the difference:  Active - Pre
+for (unit in unique(df_temp$Unit)) {
+  
+  cur_unit_df = df_temp[df_temp$Unit == unit,]
+  cur_unit_df = cur_unit_df[!is.na(cur_unit_df$Unit),]
+  
+  if(length(unique(cur_unit_df$Session)) < 2) { next }  # skip if unit has no PRE
+  
+  active_trials = cur_unit_df[(cur_unit_df$Session == 'Active'),]$FR_Hz
+  passive_trials = cur_unit_df[(cur_unit_df$Session == 'Pre'),]$FR_Hz
+  active_trials = active_trials[!is.na(active_trials)]
+  passive_trials = passive_trials[!is.na(passive_trials)]
+  
+  if(mean(active_trials) == 0 & mean(passive_trials) == 0) { next }
+  
+  # Equalize trial count
+  min_trials = min(length(active_trials), length(passive_trials))
+  active_trials = active_trials[1:min_trials]
+  passive_trials = passive_trials[1:min_trials]
+  
+  test_result = wilcox.test(active_trials, passive_trials, paired=T, alternative="two.sided", conf.int=T)
+  
+  unit_list = c(unit_list, unit)
+  p_list = c(p_list, test_result$p.value)
+  v_list = c(v_list, test_result$statistic[[1]])
+  pseudomedian_list = c(pseudomedian_list, test_result$estimate[[1]])
+
+}
+
+p_df = data.frame(Unit=unit_list, P_value=p_list, V_value=v_list, Pseudomedian=pseudomedian_list)
+
+# Distribution of pseudomedians
+# ggplot(p_df, aes(x=Pseudomedian)) + geom_histogram()
+
+# Add info to trial firing rate
+df = merge(df, p_df, by='Unit', all=T)
+
+# Replace NAs with 1s to avoid needing to remove units
+if( length(df[is.na(df$P_value),]$P_value) > 1) {
+  df[is.na(df$P_value),]$P_value = 1
+}
+
+# Label units
+df$ActiveBaseline_modulated = NA
+df$ActiveBaseline_modulation_direction = NA
+nan_df = df[is.na(df$P_value),]  # In case of units that don't have PRE
+notnan_df = df[!is.na(df$P_value),]
+notnan_df[notnan_df$P_value < 0.05,]$ActiveBaseline_modulated = 1
+notnan_df[notnan_df$P_value >= 0.05,]$ActiveBaseline_modulated = 0
+notnan_df[notnan_df$P_value < 0.05 & notnan_df$Pseudomedian > 0,]$ActiveBaseline_modulation_direction = 'increase'
+notnan_df[notnan_df$P_value < 0.05 & notnan_df$Pseudomedian < 0,]$ActiveBaseline_modulation_direction = 'decrease'
+notnan_df[notnan_df$P_value >= 0.05,]$ActiveBaseline_modulation_direction = 'none'
+
+df = merge(nan_df, notnan_df, all=T)
+
+df$ActiveBaseline_modulation_direction = factor(df$ActiveBaseline_modulation_direction, levels=c('decrease', 'none', 'increase', "<NA>"))
+
+df = subset(df, select=-c(P_value, V_value, Pseudomedian))
+
+# Save final df
+write.csv(df, '../Data/OFC_ephys/OFCPL_allTrial_df.csv', row.names=FALSE)
+```

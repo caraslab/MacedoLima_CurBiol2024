@@ -1,17 +1,16 @@
 ---
-title: "OFC recordings - Analyses"
-editor_options:
-  chunk_output_type: inline
-chunk_output_type: console
+title: "OFC ephys - Analyses (Figs 2, 3, S1-3)"
+author: "Matheus Macedo-Lima"
+date: "2024-05-29"
+output: html_document
 ---
 
-# Load libraries and data from preprocessing pipeline
-## Load previously exported environment. 
+# Load libraries and data from preprocessing pipeline (OFC_ephys_preprocessing.Rmd)
 Uncomment chunk below if the second block of code has been run previously and does not need modifications
 ```{r echo=TRUE}
 
 # 
-# load('./Data/OFC_ephys_analyses_env.RData')
+# load('./Data/OFC_ephys/OFC_ephys_analyses_env.RData')
 # 
 # library(ggplot2)
 # library(dplyr)
@@ -40,7 +39,7 @@ Uncomment chunk below if the second block of code has been run previously and do
 
 ```
 
-## Process 
+No need to run if chunk above has been run
 ```{r echo=TRUE}
 library(ggplot2)
 library(dplyr)
@@ -96,7 +95,7 @@ zeromin = function(x) {
 }
 
 # Load data from preprocessing pipeline
-df = read.csv('./Data/OFCPL_allTrial_df.csv')
+df = read.csv('./Data/OFC_ephys/OFCPL_allTrial_df.csv')
 
 # Remove eventual NA rows
 df[df == "NaN"]<-NA
@@ -105,7 +104,7 @@ df = df[!is.na(df$Subject),]
 
 # Factorize some columns
 df$Session = factor(df$Session, levels=c('Pre', 'Active', 'Post', 'Post1h'))
-cols_to_factorize = c('Unit', 'Subject', 'Date', 'TrialID', 'AMdepth', 'Period', 'Subject_date', 'Cluster_quality_MML', 'Cluster_quality_Allen', 'First_am_above_threshold_flag', 'AM_above_threshold_flag', 'AMThreshold_modulated', 'AMThreshold_modulation_direction')
+cols_to_factorize = c('Unit', 'Subject', 'Date', 'TrialID', 'AMdepth', 'Period', 'Subject_date', 'Cluster_quality_MML', 'Cluster_quality_Allen')
 df[cols_to_factorize] <- lapply(df[cols_to_factorize], factor) 
 
 # Separate SU and MU activity
@@ -120,12 +119,6 @@ df[df$Miss == 1 & df$ShockFlag == 1,]$Trial_type = 'Miss (shock)'
 df[df$FA == 1,]$Trial_type = 'False alarm'
 
 df$Trial_type = factor(df$Trial_type, levels=c('Miss (shock)', 'Hit', 'False alarm', 'Miss (no shock)'))
-
-# Load behavioral files
-threshold_df = read.csv('./Data/OFCPL_behavior_df.csv')
-
-# Elliminate eventual subjects not in behavioral threshold_df
-df = df[df$Subject %in% unique(threshold_df$Subject),]
 
 df$Cluster_quality_Allen = 'mua'
 df[(df$ISI_FPRate < 0.5) & (df$Fraction_missing < 0.1) & (df$Presence_ratio > 0.9) & (df$ISI_ViolationRate < 2),]$Cluster_quality_Allen = 'good'
@@ -156,7 +149,7 @@ df = droplevels(df)
 # ---------------------------------------------------------------------------
 
 # Save image for faster loading
-save.image('./Data/OFC_ephys_analyses_env.RData')
+save.image('./Data/OFC_ephys/OFC_ephys_analyses_env.RData')
 
 # Some garbage collection
 gc()
@@ -182,7 +175,7 @@ df_info %>% group_by(Session) %>%
   )
 
 # How many single units?
-df_info = df[df$AMdepth_db != -40 & df$Period == 'Baseline',] %>% group_by(Subject, Unit, Subject_date, Cluster_quality, ActiveTrial_modulation_direction) %>%
+df_info = df[df$AMdepth_db != -40 & df$Period == 'Baseline',] %>% group_by(Subject, Unit, Subject_date, Cluster_quality) %>%
   summarise(
     Trial_count = length(unique(TrialID)),
     ISI_FPRate = mean(ISI_FPRate),
@@ -196,7 +189,7 @@ table(df_info$Cluster_quality)
 
 # Figure 2E-G: Task-dependent tonic modulation
 ## Fig 2E: Modulation strength distribution 
-```{r echo=TRUE, fig.height=12, fig.width=12, warning=FALSE}
+```{r echo=TRUE, fig.height=6, fig.width=6, warning=FALSE}
 # Prepare data using relevant variables
 df_grouped = df[df$Trial_type != 'False alarm' & df$Period == 'Baseline',] %>% group_by(Unit, Subject, Date, Day_of_training, ActiveBaseline_modulation_direction) %>%
   summarise( 
@@ -236,7 +229,7 @@ p
 
 
 ## Fig 2F: Modulation strength comparison among groups
-```{r echo=TRUE, fig.height=12, fig.width=12, warning=FALSE}
+```{r echo=TRUE, fig.height=6, fig.width=6, warning=FALSE}
 # Prepare data using relevant variables
 df_grouped = df[df$Trial_type != 'False alarm' & df$Period == 'Baseline',] %>% group_by(Unit, Subject, Date, Day_of_training, ActiveBaseline_modulation_direction) %>%
   summarise( 
@@ -264,7 +257,7 @@ p = ggplot(data=graph_data, aes(x = ActiveBaseline_modulation_direction, y = abs
   coord_cartesian(ylim = c(min(y_axis), max(y_axis))) +
 
   theme(
-    legend.position = c(0.2, 0.85),
+    legend.position = c(0.2, 0.9),
     axis.title.x=element_blank(),
     axis.line.x = element_blank(),
     axis.text.x=element_blank(),
@@ -272,6 +265,7 @@ p = ggplot(data=graph_data, aes(x = ActiveBaseline_modulation_direction, y = abs
   )
 p
 ```
+
 ### Stats
 ```{r echo=TRUE}
 lme_data = graph_data
@@ -282,7 +276,7 @@ pairs(regrid(emmeans(lme_bin,  ~ActiveBaseline_modulation_direction)),  adjust='
 ```
 
 ## Fig 2G: Task-dependent firing rate change 
-```{r echo=TRUE, fig.height=10, fig.width=15, warning=FALSE}
+```{r echo=TRUE, fig.height=6, fig.width=6, warning=FALSE}
 # Group data using relevant columns
 df_grouped = df[df$Trial_type != 'False alarm',] %>% group_by(Unit, Subject, Subject_date, Session, Period, ActiveBaseline_modulated, ActiveBaseline_modulation_direction, Cluster_quality) %>%
   summarise( 
@@ -357,10 +351,12 @@ Anova(lme_bin)
 
 
 # Fig 3B-C: Pre-spout withdrawal
+
 Analyze auROC data extracted from the Python pipeline
-## Fig 3B
-```{r echo=TRUE, fig.height=10, fig.width=15, warning=FALSE}
-auroc_df = read.csv('./Data/TrialType_preSpoutOffset_allUnitsauROC_plotData.csv')
+
+## Fig 3B: Distribution of phasic modulation values
+```{r echo=TRUE, fig.height=6, fig.width=6, warning=FALSE}
+auroc_df = read.csv('./Data/OFC_ephys/TrialType_preSpoutOffset_allUnitsauROC_plotData.csv')
 auroc_df = separate(data = auroc_df, col = Unit,  sep = "_", into=c("Subject", "Date", "temp1"), remove=F)
 # Remove temp columns
 auroc_df = auroc_df[, -grep("temp", colnames(auroc_df))]
@@ -453,8 +449,8 @@ p = ggplot(df_grouped, aes(x=auroc_timeSlice_mean, fill=TrialType)) +
   xlab('Phasic modulation') +
   
   # Add percentage values
-  annotate("text", x=c(0.2, 0.8), y=c(20, 20), label=paste(round(hit_values, 0), '%', sep=''), color=TRIALTYPE_MODULATION_COLORS[1]) + 
-  annotate("text", x=c(0.2, 0.8), y=c(18, 18), label=paste(round(fa_values, 0), '%', sep=''), color=TRIALTYPE_MODULATION_COLORS[2]) + 
+  annotate("text", x=c(0.2, 0.8), y=c(20, 20), label=paste(round(hit_values, 0), '%', sep=''), color=TRIALTYPE_MODULATION_COLORS[1], size=7) + 
+  annotate("text", x=c(0.2, 0.8), y=c(18, 18), label=paste(round(fa_values, 0), '%', sep=''), color=TRIALTYPE_MODULATION_COLORS[2], size=7) + 
   
   theme(
     legend.position=c(0.85, 0.85)
@@ -462,8 +458,8 @@ p = ggplot(df_grouped, aes(x=auroc_timeSlice_mean, fill=TrialType)) +
 p
 ```
 
-## Fig 3C
-```{r echo=TRUE, fig.height=10, fig.width=15, warning=FALSE}
+## Fig 3C: Phasic modulation before spout withdrawal
+```{r echo=TRUE, fig.height=6, fig.width=6, warning=FALSE}
 graph_data = auroc_df[(auroc_df$Time_s >= -1) & (auroc_df$Time_s < 0) & auroc_df$TrialType != 'SpoutOff_misses_auroc',]
 graph_data = graph_data[!is.na(graph_data$auROC),]
 graph_data$TrialType = factor(graph_data$TrialType, levels=c('SpoutOff_hits_auroc', 'SpoutOff_FAs_auroc'))
@@ -509,9 +505,9 @@ Anova(lme_bin)
 ```
 
 # Fig S2: Post-spout withdrawal
-## Fig S2B
-```{r echo=TRUE, fig.height=10, fig.width=15, warning=FALSE}
-auroc_df = read.csv('./Data/TrialType_postSpoutOffset_allUnitsauROC_plotData.csv')
+## Fig S2B: Distribution of phasic modulation values
+```{r echo=TRUE, fig.height=6, fig.width=6, warning=FALSE}
+auroc_df = read.csv('./Data/OFC_ephys/TrialType_postSpoutOffset_allUnitsauROC_plotData.csv')
 auroc_df = separate(data = auroc_df, col = Unit,  sep = "_", into=c("Subject", "Date", "temp1"), remove=F)
 auroc_df = auroc_df[, -grep("temp", colnames(auroc_df))]  # Remove temp columns
 
@@ -622,9 +618,9 @@ p = ggplot(df_grouped, aes(x=auroc_timeSlice_mean, fill=TrialType)) +
   xlab('Phasic modulation') +
   
   # Add percentage values
-  annotate("text", x=c(0.2, 0.8), y=c(20, 20), label=paste(round(hit_values, 0), '%', sep=''), color=TRIALTYPE_MODULATION_COLORS[1]) + 
-  annotate("text", x=c(0.2, 0.8), y=c(18, 18), label=paste(round(fa_values, 0), '%', sep=''), color=TRIALTYPE_MODULATION_COLORS[2]) + 
-  annotate("text", x=c(0.2, 0.8), y=c(16, 16), label=paste(round(miss_values, 0), '%', sep=''), color=TRIALTYPE_MODULATION_COLORS[3]) + 
+  annotate("text", x=c(0.2, 0.8), y=c(20, 20), label=paste(round(hit_values, 0), '%', sep=''), color=TRIALTYPE_MODULATION_COLORS[1], size=7) + 
+  annotate("text", x=c(0.2, 0.8), y=c(18, 18), label=paste(round(fa_values, 0), '%', sep=''), color=TRIALTYPE_MODULATION_COLORS[2], size=7) + 
+  annotate("text", x=c(0.2, 0.8), y=c(16, 16), label=paste(round(miss_values, 0), '%', sep=''), color=TRIALTYPE_MODULATION_COLORS[3], size=7) + 
   
   theme(
     legend.position = c(0.85, 0.85)
@@ -632,8 +628,8 @@ p = ggplot(df_grouped, aes(x=auroc_timeSlice_mean, fill=TrialType)) +
 p
 ```
 
-## Fig S2C
-```{r echo=TRUE, fig.height=10, fig.width=15, warning=FALSE}
+## Fig S2C: Phasic modulation after spout withdrawal
+```{r echo=TRUE, fig.height=6, fig.width=6, warning=FALSE}
 graph_data =  df_grouped
 # Plot the curves
 graph_data = auroc_df[(auroc_df$Time_s >= 0.3) & (auroc_df$Time_s < 2),]
@@ -685,8 +681,8 @@ pairs(regrid(emmeans(lme_bin,  ~TrialType)),  adjust='Bonferroni')
 
 # Fig S3: Phasic firing by tonic modulation
 ## Fig S3B
-```{r echo=TRUE, fig.height=10, fig.width=15, warning=FALSE}
-auroc_df = read.csv('./Data/TrialType_postSpoutOffset_allUnitsauROC_plotData.csv')
+```{r echo=TRUE, fig.height=6, fig.width=8, warning=FALSE}
+auroc_df = read.csv('./Data/OFC_ephys/TrialType_postSpoutOffset_allUnitsauROC_plotData.csv')
 auroc_df = separate(data = auroc_df, col = Unit,  sep = "_", into=c("Subject", "Date", "temp1"), remove=F)
 # Remove temp columns
 auroc_df = auroc_df[, -grep("temp", colnames(auroc_df))]
@@ -717,14 +713,14 @@ p =ggplot(data=graph_data, aes(x=Time_s, y=abs(auROC-0.5), color=TrialType, fill
   coord_cartesian(ylim = c(min(y_axis), max(y_axis)), 
                   xlim = c(min(x_axis), max(x_axis))) +
 
-  scale_color_manual(values = TRIALTYPE_MODULATION_COLORS) +
-  scale_fill_manual(values = TRIALTYPE_MODULATION_COLORS)
+  scale_color_manual(values = TRIALTYPE_MODULATION_COLORS, name='') +
+  scale_fill_manual(values = TRIALTYPE_MODULATION_COLORS, name='') +
 
   theme(
     strip.background = element_blank(),
-    legend.position = 'none',
+    legend.position = c(0.85, 0.9),
     panel.spacing = unit(2.5, "lines")
-  ) +
+  )
 
 p
 ```
@@ -762,7 +758,7 @@ pairs(regrid(emmeans(lme_bin,  ~TrialType)),  adjust='Bonferroni')
 ```
 
 ## Fig S3C
-```{r echo=TRUE, fig.height=10, fig.width=15, warning=FALSE}
+```{r echo=TRUE, fig.height=6, fig.width=8, warning=FALSE}
 # Plot the curves
 graph_data = auroc_df[(auroc_df$Time_s >= -1) & (auroc_df$Time_s < 0) & auroc_df$TrialType != 'SpoutOff_misses_auroc',]
 graph_data = graph_data[!is.na(graph_data$auROC),]
@@ -829,3 +825,6 @@ lme_bin <- glmmTMB((log(auroc_timeSlice_abs+0.1))~ TrialType + (1 | Subject/Unit
 simulationOutput <- simulateResiduals(fittedModel = lme_bin, plot = T, re.form=NULL)  # pass
 Anova(lme_bin)
 ```
+
+# Fig S1G heatmaps were generated using Python.
+You can find this code here: https://

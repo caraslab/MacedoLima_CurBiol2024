@@ -1,17 +1,15 @@
 ---
-title: "ACx recordings with OFC inactivation - Analyses"
-editor_options: 
-  chunk_output_type: inline
-chunk_output_type: console
+title: "OFC muscimol + ACx ephys - Analyses (Figs 5-6, S5-6)"
+author: "Matheus Macedo-Lima"
+date: "2024-05-29"
+output: html_document
 ---
 
-# Load libraries and data from preprocessing pipeline
-
-## Load previously exported environment. 
+# Load libraries and data from preprocessing pipeline (ACx_ephys_preprocessing.Rmd)
 Uncomment chunk below if the second block of code has been run previously and does not need modifications
 ```{r echo=TRUE}
 
-# load('./Data/ACx_ephys_analyses_env.RData')
+# load('./Data/ACx_ephys/ACx_ephys_analyses_env.RData')
 # 
 # library(ggplot2)
 # library(dplyr)
@@ -39,7 +37,7 @@ Uncomment chunk below if the second block of code has been run previously and do
 
 ```
 
-## Process 
+No need to run if chunk above has been run
 ```{r echo=TRUE}
 library(ggplot2)
 library(dplyr)
@@ -119,8 +117,8 @@ zeromin = function(x) {
 `%notin%` <- Negate(`%in%`)
 
 ### Load previously saved dataframe
-df = read.csv('./Data/OFC-cannula_ACx-recording_allTrial_df.csv')
-behavior_df = read.csv('./Data/OFC-cannula_ACx-recording_behavior_df.csv')
+df = read.csv('./Data/ACx_ephys/OFC-cannula_ACx-recording_allTrial_df.csv')
+behavior_df = read.csv('./Data/ACx_ephys/OFC-cannula_ACx-recording_behavior_df.csv')
 
 df[df == "NaN"]<-NA
 
@@ -182,9 +180,6 @@ df = df[df$Subject == 'SUBJ-ID-174' | df$Subject_date %in% good_subj_date,]
 behavior_df = behavior_df[behavior_df$Subject == 'SUBJ-ID-174' | behavior_df$Subject_date %in% good_subj_date,]
 # ---------------------------------------------------------------------------
 
-
-
-
 # Treatment days
 df$Treatment = 'Saline'
 muscimol_sessions = c('SUBJ-ID-174_201116')
@@ -198,7 +193,7 @@ behavior_df[behavior_df$Subject_date %in% muscimol_sessions,]$Treatment = 'Musci
 behavior_df$Treatment = factor(behavior_df$Treatment, levels=c('Saline', 'Muscimol'))
 
 
-save.image('./Data/ACx_ephys_analyses_env.RData')
+save.image('./Data/ACx_ephys/ACx_ephys_analyses_env.RData')
 
 # Some garbage collection
 gc()
@@ -224,7 +219,7 @@ df_info %>% group_by(Session) %>%
   )
 
 # How many single units?
-df_info = df[df$AMdepth_db != -40 & df$Period == 'Baseline',] %>% group_by(Subject, Unit, Subject_date, Cluster_quality, ActiveTrial_modulation_direction) %>%
+df_info = df[df$AMdepth_db != -40 & df$Period == 'Baseline',] %>% group_by(Subject, Unit, Subject_date, Cluster_quality) %>%
   summarise(
     Trial_count = length(unique(TrialID)),
     ISI_FPRate = mean(ISI_FPRate),
@@ -234,7 +229,7 @@ df_info = df[df$AMdepth_db != -40 & df$Period == 'Baseline',] %>% group_by(Subje
 table(df_info$Cluster_quality)
 
 # How many units per treatment?
-df_info = df[df$AMdepth_db != -40 & df$Period == 'Baseline',] %>% group_by(Subject, Unit, Subject_date, Cluster_quality, ActiveTrial_modulation_direction, Treatment) %>%
+df_info = df[df$AMdepth_db != -40 & df$Period == 'Baseline',] %>% group_by(Subject, Unit, Subject_date, Cluster_quality, Treatment) %>%
   summarise(
     Trial_count = length(unique(TrialID)),
     ISI_FPRate = mean(ISI_FPRate),
@@ -243,6 +238,7 @@ df_info = df[df$AMdepth_db != -40 & df$Period == 'Baseline',] %>% group_by(Subje
   )
 table(df_info$Cluster_quality, df_info$Treatment)
 ```
+
 # Figure 5C and S5: OFC muscimol's effect on behavior during ACx recordings
 ## Fig 5C: Behavioral d'
 ```{r echo=TRUE, fig.height=6, fig.width=3, warning=FALSE}
@@ -268,6 +264,9 @@ p = ggplot(data=graph_data, aes(x=Treatment, y=D_prime, color=Treatment, fill=Tr
   scale_y_continuous(breaks=y_axis, expand=c(0, 0)) +
   coord_cartesian(ylim = c(min(y_axis), max(y_axis))) +
   
+  annotate("text", x=1.5, y=2.8, label='Saline', color=treatment_colors[1], size=5, hjust=0) + 
+  annotate("text", x=1.5, y=2.7, label='Muscimol', color=treatment_colors[2], size=5, hjust=0) + 
+  
   theme(
     legend.position = 'none',
     axis.title.x=element_blank(),
@@ -277,6 +276,7 @@ p = ggplot(data=graph_data, aes(x=Treatment, y=D_prime, color=Treatment, fill=Tr
 p
 # ggsave(plot=p, 'OFC-cannula_ACx-recording_behaviorDprime_lines.pdf', width=0.75, height=1.5,dpi=600, useDingbats=FALSE)
 ```
+
 ### Stats
 ```{r echo=TRUE}
 lme_data = graph_data
@@ -304,6 +304,9 @@ p = ggplot(data=graph_data, aes(x=Treatment, y=Hit_rate, color=Treatment, fill=T
   scale_y_continuous(breaks=y_axis, expand=c(0, 0)) +
   coord_cartesian(ylim = c(min(y_axis), max(y_axis))) +
   
+  annotate("text", x=1.5, y=95, label='Saline', color=treatment_colors[1], size=5, hjust=0) + 
+  annotate("text", x=1.5, y=91, label='Muscimol', color=treatment_colors[2], size=5, hjust=0) + 
+  
   theme(
     legend.position = 'none',
     axis.title.x=element_blank(),
@@ -312,6 +315,7 @@ p = ggplot(data=graph_data, aes(x=Treatment, y=Hit_rate, color=Treatment, fill=T
         axis.ticks.x=element_blank())
 p
 ```
+
 ### Stats
 ```{r echo=TRUE}
 lme_data = graph_data
@@ -339,6 +343,9 @@ p = ggplot(data=graph_data, aes(x=Treatment, y=FA_rate, color=Treatment, fill=Tr
   scale_y_continuous(breaks=y_axis, expand=c(0, 0)) +
   coord_cartesian(ylim = c(min(y_axis), max(y_axis))) +
   
+  annotate("text", x=1.5, y=75, label='Saline', color=treatment_colors[1], size=5, hjust=0) + 
+  annotate("text", x=1.5, y=71, label='Muscimol', color=treatment_colors[2], size=5, hjust=0) + 
+  
   theme(
     legend.position = 'none',
     axis.title.x=element_blank(),
@@ -347,6 +354,7 @@ p = ggplot(data=graph_data, aes(x=Treatment, y=FA_rate, color=Treatment, fill=Tr
         axis.ticks.x=element_blank())
 p
 ```
+
 ### Stats
 ```{r echo=TRUE}
 lme_data = graph_data
@@ -374,6 +382,9 @@ p = ggplot(data=graph_data, aes(x=Treatment, y=WaterConsumed, color=Treatment, f
   scale_y_continuous(breaks=y_axis, expand=c(0, 0)) +
   coord_cartesian(ylim = c(min(y_axis), max(y_axis))) +
   
+  annotate("text", x=1.5, y=1.05, label='Saline', color=treatment_colors[1], size=5, hjust=0) + 
+  annotate("text", x=1.5, y=1.03, label='Muscimol', color=treatment_colors[2], size=5, hjust=0) + 
+  
   theme(
     legend.position = 'none',
     axis.title.x=element_blank(),
@@ -382,6 +393,7 @@ p = ggplot(data=graph_data, aes(x=Treatment, y=WaterConsumed, color=Treatment, f
         axis.ticks.x=element_blank())
 p
 ```
+
 ### Stats
 ```{r echo=TRUE}
 lme_data = graph_data
@@ -422,15 +434,15 @@ p =ggplot(data=graph_data, aes(x=Session, y=(absNeural_d_trial), fill=Session.Tr
     stat_summary(fun.data=boxplot_whiskers, geom="boxplot", na.rm = T, alpha=0.25, lwd=LINE_THICKNESS/2, fatten=1, width=0.5)+
   ylab('|Neural d\'|') + xlab('Trial type') +
   
-  scale_fill_manual(name = "Treatment",
+  scale_fill_manual(name = "",
                    values = session.treatment_colors) +
-  scale_color_manual(name = "Treatment",
+  scale_color_manual(name = "",
                    values = session.treatment_colors) +
   
   scale_y_continuous(breaks=y_axis, expand=c(0, 0)) +
   coord_cartesian(ylim = c(min(y_axis), max(y_axis))) +
-  
-  theme(legend.position = "none", 
+    
+  theme(legend.position = c(0.7, 0.95), 
       strip.text.x = element_blank(),
       axis.line.x = element_blank(),
       axis.ticks.x = element_blank(),
@@ -438,6 +450,7 @@ p =ggplot(data=graph_data, aes(x=Session, y=(absNeural_d_trial), fill=Session.Tr
       panel.spacing.x = unit(1.5, "lines"))
 p
 ```
+
 ### Stats
 ```{r echo=TRUE}
 lme_data = graph_data[graph_data$Treatment == 'Saline',]
@@ -450,6 +463,7 @@ lme_bin <- glmmTMB((sqrt(absNeural_d_trial))~ Session +  (1|Subject/Unit/Session
 simulationOutput <- simulateResiduals(fittedModel = lme_bin, plot = T, re.form=NULL)  # pass
 Anova(lme_bin)
 ```
+
 ## Fig S6A: Non-AM firing rate
 ```{r echo=TRUE, fig.height=6, fig.width=5, warning=FALSE}
 df_grouped = df[df$Period %in% c('Baseline','Trial') & df$Trial_type %notin% c('False alarm'),] %>% group_by(Unit, Subject, Session, Subject_date, Period, Cluster_quality, Treatment) %>%
@@ -477,15 +491,15 @@ p =ggplot(data=graph_data, aes(x=Session, y=FR_Hz, fill=Session.Treatment, color
     stat_summary(fun.data=boxplot_whiskers, geom="boxplot", na.rm = T, alpha=0.25, lwd=LINE_THICKNESS/2, fatten=1, width=0.5)+
   ylab('Firing rate (Hz)') + xlab('Trial type') +
   
-  scale_fill_manual(name = "Treatment",
+  scale_fill_manual(name = "",
                    values = session.treatment_colors) +
-  scale_color_manual(name = "Treatment",
+  scale_color_manual(name = "",
                    values = session.treatment_colors) +
   
   scale_y_continuous(breaks=y_axis, expand=c(0, 0)) +
   coord_cartesian(ylim = c(min(y_axis), max(y_axis))) +
   
-  theme(legend.position = "none", 
+  theme(legend.position = c(0.7, 0.95), 
       strip.text.x = element_blank(),
       axis.line.x = element_blank(),
       axis.ticks.x = element_blank(),
@@ -493,6 +507,7 @@ p =ggplot(data=graph_data, aes(x=Session, y=FR_Hz, fill=Session.Treatment, color
       panel.spacing.x = unit(1.5, "lines"))
 p
 ```
+
 ### Stats
 ```{r echo=TRUE}
 lme_data = graph_data[graph_data$Treatment == 'Saline',]
@@ -505,7 +520,6 @@ lme_bin <- glmmTMB(sqrt(FR_Hz)~ Session +  (1|Subject/Unit/Session) , data=lme_d
 simulationOutput <- simulateResiduals(fittedModel = lme_bin, plot = T, re.form=NULL)  # passAnova(lme_bin)
 Anova(lme_bin)
 ```
-
 
 ## Fig S6B: AM firing rate
 ```{r echo=TRUE, fig.height=6, fig.width=5, warning=FALSE}
@@ -522,15 +536,15 @@ p =ggplot(data=graph_data, aes(x=Session, y=FR_Hz, fill=Session.Treatment, color
     stat_summary(fun.data=boxplot_whiskers, geom="boxplot", na.rm = T, alpha=0.25, lwd=LINE_THICKNESS/2, fatten=1, width=0.5)+
   ylab('Firing rate (Hz)') + xlab('Trial type') +
   
-  scale_fill_manual(name = "Treatment",
+  scale_fill_manual(name = "",
                    values = session.treatment_colors) +
-  scale_color_manual(name = "Treatment",
+  scale_color_manual(name = "",
                    values = session.treatment_colors) +
   
   scale_y_continuous(breaks=y_axis, expand=c(0, 0)) +
   coord_cartesian(ylim = c(min(y_axis), max(y_axis))) +
   
-  theme(legend.position = "none", 
+  theme(legend.position = c(0.7, 0.95), 
       strip.text.x = element_blank(),
       axis.line.x = element_blank(),
       axis.ticks.x = element_blank(),
@@ -538,6 +552,7 @@ p =ggplot(data=graph_data, aes(x=Session, y=FR_Hz, fill=Session.Treatment, color
       panel.spacing.x = unit(1.5, "lines"))
 p
 ```
+
 ### Stats
 ```{r echo=TRUE}
 lme_data = graph_data[graph_data$Treatment == 'Saline',]
@@ -577,15 +592,15 @@ p =ggplot(data=graph_data, aes(x=Session, y=FR_Hz_Pre_AM_delta, fill=Session.Tre
   ylab(expression(~Delta*'Firing rate (Hz) AM - non-AM')) + 
   xlab('Trial type') +
   
-  scale_fill_manual(name = "Treatment",
+  scale_fill_manual(name = "",
                    values = session.treatment_colors) +
-  scale_color_manual(name = "Treatment",
+  scale_color_manual(name = "",
                    values = session.treatment_colors) +
   
   scale_y_continuous(breaks=y_axis, expand=c(0, 0)) +
   coord_cartesian(ylim = c(min(y_axis), max(y_axis))) +
   
-  theme(legend.position = "none", 
+  theme(legend.position = c(0.7, 0.95), 
       strip.text.x = element_blank(),
       axis.line.x = element_blank(),
       axis.ticks.x = element_blank(),
@@ -593,6 +608,7 @@ p =ggplot(data=graph_data, aes(x=Session, y=FR_Hz_Pre_AM_delta, fill=Session.Tre
       panel.spacing.x = unit(1.5, "lines"))
 p
 ```
+
 ### Stats
 ```{r echo=TRUE}
 lme_data = graph_data[graph_data$Treatment == 'Saline',]
@@ -635,15 +651,15 @@ p =ggplot(data=graph_data, aes(x=Session, y=FR_cv_baseline, fill=Session.Treatme
   ylab('Firing rate variability (CV)') + 
   xlab('Trial type') +
   
-  scale_fill_manual(name = "Treatment",
+  scale_fill_manual(name = "",
                    values = session.treatment_colors) +
-  scale_color_manual(name = "Treatment",
+  scale_color_manual(name = "",
                    values = session.treatment_colors) +
   
   scale_y_continuous(breaks=y_axis, expand=c(0, 0)) +
   coord_cartesian(ylim = c(min(y_axis), max(y_axis))) +
   
-  theme(legend.position = "none",
+  theme(legend.position = c(0.7, 0.95), 
       strip.text.x = element_blank(),
       axis.line.x = element_blank(),
       axis.ticks.x = element_blank(),
@@ -651,6 +667,7 @@ p =ggplot(data=graph_data, aes(x=Session, y=FR_cv_baseline, fill=Session.Treatme
       panel.spacing.x = unit(1.5, "lines"))
 p
 ```
+
 ### Stats
 ```{r echo=TRUE}
 lme_data = graph_data[graph_data$Treatment == 'Saline',]
@@ -683,15 +700,15 @@ p =ggplot(data=graph_data, aes(x=Session, y=FR_cv_trial, fill=Session.Treatment,
   ylab('Firing rate variability (CV)') + 
   xlab('Trial type') +
   
-  scale_fill_manual(name = "Treatment",
+  scale_fill_manual(name = "",
                    values = session.treatment_colors) +
-  scale_color_manual(name = "Treatment",
+  scale_color_manual(name = "",
                    values = session.treatment_colors) +
   
   scale_y_continuous(breaks=y_axis, expand=c(0, 0)) +
   coord_cartesian(ylim = c(min(y_axis), max(y_axis))) +
   
-  theme(legend.position = "none",
+  theme(legend.position = c(0.7, 0.95), 
       strip.text.x = element_blank(),
       axis.line.x = element_blank(),
       axis.ticks.x = element_blank(),
@@ -699,6 +716,7 @@ p =ggplot(data=graph_data, aes(x=Session, y=FR_cv_trial, fill=Session.Treatment,
       panel.spacing.x = unit(1.5, "lines"))
 p
 ```
+
 ### Stats
 ```{r echo=TRUE}
 lme_data = graph_data[graph_data$Treatment == 'Saline',]
@@ -711,6 +729,7 @@ lme_bin <- glmmTMB(log((FR_cv_trial))~ Session +  (1|Subject/Unit/Session) , dat
 simulationOutput <- simulateResiduals(fittedModel = lme_bin, plot = T, re.form=NULL)  # passAnova(lme_bin)
 Anova(lme_bin)
 ```
+
 ## Fig 5G: Pooled firing rate variability (CV; non-AM + AM)
 ```{r echo=TRUE, fig.height=6, fig.width=5, warning=FALSE}
 graph_data = df_grouped[!is.nan(df_grouped$FR_cv_sum),]
@@ -730,15 +749,15 @@ p =ggplot(data=graph_data, aes(x=Session, y=FR_cv_sum, fill=Session.Treatment, c
   ylab('Firing rate variability (CV)') + 
   xlab('Trial type') +
   
-  scale_fill_manual(name = "Treatment",
+  scale_fill_manual(name = "",
                    values = session.treatment_colors) +
-  scale_color_manual(name = "Treatment",
+  scale_color_manual(name = "",
                    values = session.treatment_colors) +
   
   scale_y_continuous(breaks=y_axis, expand=c(0, 0)) +
   coord_cartesian(ylim = c(min(y_axis), max(y_axis))) +
   
-  theme(legend.position = "none",
+  theme(legend.position = c(0.7, 0.95), 
       strip.text.x = element_blank(),
       axis.line.x = element_blank(),
       axis.ticks.x = element_blank(),
@@ -746,6 +765,7 @@ p =ggplot(data=graph_data, aes(x=Session, y=FR_cv_sum, fill=Session.Treatment, c
       panel.spacing.x = unit(1.5, "lines"))
 p
 ```
+
 ### Stats
 ```{r echo=TRUE}
 lme_data = graph_data[graph_data$Treatment == 'Saline',]
@@ -758,10 +778,11 @@ lme_bin <- glmmTMB(sqrt((FR_cv_sum))~ Session +  (1|Subject/Unit/Session) , data
 simulationOutput <- simulateResiduals(fittedModel = lme_bin, plot = T, re.form=NULL)  # passAnova(lme_bin)
 Anova(lme_bin)
 ```
+
 ## Fig 5H: Vector strength
 ```{r echo=TRUE, fig.height=6, fig.width=5, warning=FALSE}
 # Load VS data and merge to existent df
-vs_df = read.csv('./Data/OFC-cannula_ACx-recording_allTrial_VS.csv')
+vs_df = read.csv('./Data/ACx_ephys/OFC-cannula_ACx-recording_allTrial_VS.csv')
 vs_df$Session = 'Pre'
 vs_df[grepl('Aversive|Active', vs_df$SessionID),]$Session = 'Active'
 
@@ -795,15 +816,15 @@ p =ggplot(data=graph_data, aes(x=Session, y=VSpp_trial, fill=Session.Treatment, 
   ylab('Firing rate variability (CV)') + 
   xlab('Trial type') +
   
-  scale_fill_manual(name = "Treatment",
+  scale_fill_manual(name = "",
                    values = session.treatment_colors) +
-  scale_color_manual(name = "Treatment",
+  scale_color_manual(name = "",
                    values = session.treatment_colors) +
   
   scale_y_continuous(breaks=y_axis, expand=c(0, 0)) +
   coord_cartesian(ylim = c(min(y_axis), max(y_axis))) +
   
-  theme(legend.position = "none",
+  theme(legend.position = c(0.3, 0.2), 
       strip.text.x = element_blank(),
       axis.line.x = element_blank(),
       axis.ticks.x = element_blank(),
@@ -811,6 +832,7 @@ p =ggplot(data=graph_data, aes(x=Session, y=VSpp_trial, fill=Session.Treatment, 
       panel.spacing.x = unit(1.5, "lines"))
 p
 ```
+
 ### Stats
 ```{r echo=TRUE}
 lme_data = graph_data[graph_data$Treatment == 'Saline',]
@@ -931,6 +953,7 @@ p =ggplot(data=graph_data, aes(x=Behavioral_dprime, y=abs(Neural_dprime), fill=T
          strip.text.x = element_blank())
 p
 ```
+
 ### Stats
 ```{r echo=TRUE}
 lme_data = graph_data
@@ -952,8 +975,6 @@ df_grouped = df_grouped[df_grouped$Behavioral_performance %in% c('poor','good'),
 
 df_grouped$Behavioral_performance = factor(df_grouped$Behavioral_performance, levels=c('poor', 'good'))
 
-
-
 graph_data = df_grouped
 
 y_axis = seq(0, 2, 1)
@@ -968,10 +989,8 @@ p =ggplot(data=graph_data, aes(x=Behavioral_performance, y=abs(Neural_dprime))) 
     axis.ticks.x=element_blank()
     ) 
 p
-
-
-
 ```
+
 ### Stats
 ```{r echo=TRUE}
 lme_data = graph_data

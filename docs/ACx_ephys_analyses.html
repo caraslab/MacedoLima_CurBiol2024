@@ -9,9 +9,11 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
+<meta name="author" content="Matheus Macedo-Lima" />
 
+<meta name="date" content="2024-05-29" />
 
-<title>ACx recordings with OFC inactivation - Analyses</title>
+<title>OFC muscimol + ACx ephys - Analyses (Figs 5-6, S5-6)</title>
 
 <script src="site_libs/header-attrs-2.27/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
@@ -238,7 +240,7 @@ $(document).ready(function () {
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="index.html">My Website</a>
+      <a class="navbar-brand" href="index.html">Supporting code for Macedo-Lima et al., 2024 Current Biology</a>
     </div>
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
@@ -246,13 +248,22 @@ $(document).ready(function () {
   <a href="index.html">Home</a>
 </li>
 <li>
-  <a href="about.html">About</a>
+  <a href="contact.html">Contact</a>
+</li>
+<li>
+  <a href="Behavior_proceduralTraining_analyses.html">Behavior (Fig 1)</a>
 </li>
 <li>
   <a href="OFC_ephys_analyses.html">OFC ephys - Analyses (Figs 2, 3, S1-3)</a>
 </li>
 <li>
-  <a href="ACx_ephys_analyses.html">OFC muscimol + ACx ephys - Analyses (Figs 5, S5-6)</a>
+  <a href="OFC-ACx_photometry_analyses.html">OFC-&gt;ACx photometry - Analyses (Fig S2)</a>
+</li>
+<li>
+  <a href="Behavior_OFCmuscimol_analyses.html">OFC muscimol behavior (Figs 4, S4)</a>
+</li>
+<li>
+  <a href="ACx_ephys_analyses.html">OFC muscimol + ACx ephys - Analyses (Figs 5-6, S5-6)</a>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
@@ -266,20 +277,22 @@ $(document).ready(function () {
 
 
 
-<h1 class="title toc-ignore">ACx recordings with OFC inactivation -
-Analyses</h1>
+<h1 class="title toc-ignore">OFC muscimol + ACx ephys - Analyses (Figs
+5-6, S5-6)</h1>
+<h4 class="author">Matheus Macedo-Lima</h4>
+<h4 class="date">2024-05-29</h4>
 
 </div>
 
 
-<div id="load-libraries-and-data-from-preprocessing-pipeline"
+<div
+id="load-libraries-and-data-from-preprocessing-pipeline-acx_ephys_preprocessing.rmd"
 class="section level1">
-<h1>Load libraries and data from preprocessing pipeline</h1>
-<div id="load-previously-exported-environment." class="section level2">
-<h2>Load previously exported environment.</h2>
+<h1>Load libraries and data from preprocessing pipeline
+(ACx_ephys_preprocessing.Rmd)</h1>
 <p>Uncomment chunk below if the second block of code has been run
 previously and does not need modifications</p>
-<pre class="r"><code># load(&#39;./Data/ACx_ephys_analyses_env.RData&#39;)
+<pre class="r"><code># load(&#39;./Data/ACx_ephys/ACx_ephys_analyses_env.RData&#39;)
 # 
 # library(ggplot2)
 # library(dplyr)
@@ -304,9 +317,7 @@ previously and does not need modifications</p>
 # SMALL_PLOTS_LINE_THICKNESS = LINE_THICKNESS/3
 # cbPalette = c(&quot;#999999&quot;, &quot;#E69F00&quot;, &quot;#56B4E9&quot;, &quot;#009E73&quot;, &quot;#F0E442&quot;, &quot;#0072B2&quot;, &quot;#D55E00&quot;, &quot;#CC79A7&quot;, &quot;#d55e00&quot;)
 # treatment_colors = c(&#39;#0072B2&#39;, &#39;#B9519E&#39;)</code></pre>
-</div>
-<div id="process" class="section level2">
-<h2>Process</h2>
+<p>No need to run if chunk above has been run</p>
 <pre class="r"><code>library(ggplot2)
 library(dplyr)</code></pre>
 <pre><code>## 
@@ -408,8 +419,8 @@ zeromin = function(x) {
 `%notin%` &lt;- Negate(`%in%`)
 
 ### Load previously saved dataframe
-df = read.csv(&#39;./Data/OFC-cannula_ACx-recording_allTrial_df.csv&#39;)
-behavior_df = read.csv(&#39;./Data/OFC-cannula_ACx-recording_behavior_df.csv&#39;)
+df = read.csv(&#39;./Data/ACx_ephys/OFC-cannula_ACx-recording_allTrial_df.csv&#39;)
+behavior_df = read.csv(&#39;./Data/ACx_ephys/OFC-cannula_ACx-recording_behavior_df.csv&#39;)
 
 df[df == &quot;NaN&quot;]&lt;-NA
 
@@ -471,9 +482,6 @@ df = df[df$Subject == &#39;SUBJ-ID-174&#39; | df$Subject_date %in% good_subj_dat
 behavior_df = behavior_df[behavior_df$Subject == &#39;SUBJ-ID-174&#39; | behavior_df$Subject_date %in% good_subj_date,]
 # ---------------------------------------------------------------------------
 
-
-
-
 # Treatment days
 df$Treatment = &#39;Saline&#39;
 muscimol_sessions = c(&#39;SUBJ-ID-174_201116&#39;)
@@ -487,14 +495,13 @@ behavior_df[behavior_df$Subject_date %in% muscimol_sessions,]$Treatment = &#39;M
 behavior_df$Treatment = factor(behavior_df$Treatment, levels=c(&#39;Saline&#39;, &#39;Muscimol&#39;))
 
 
-save.image(&#39;./Data/ACx_ephys_analyses_env.RData&#39;)
+save.image(&#39;./Data/ACx_ephys/ACx_ephys_analyses_env.RData&#39;)
 
 # Some garbage collection
 gc()</code></pre>
 <pre><code>##            used  (Mb) gc trigger  (Mb) max used  (Mb)
-## Ncells  2455222 131.2    4601572 245.8  3601804 192.4
-## Vcells 12760602  97.4   34878729 266.2 34877231 266.1</code></pre>
-</div>
+## Ncells  2440517 130.4    4888735 261.1  3024343 161.6
+## Vcells 10469437  79.9   24184045 184.6 24184045 184.6</code></pre>
 </div>
 <div id="get-some-descriptives" class="section level1">
 <h1>Get some descriptives</h1>
@@ -514,8 +521,8 @@ df_info = df[df$AMdepth_db != -40 &amp; df$Period == &#39;Baseline&#39;,] %&gt;%
   summarise(
     Trial_count = length(unique(TrialID))
   )</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;Subject&#39;, &#39;Session&#39;. You can override
-## using the `.groups` argument.</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;Subject&#39;, &#39;Session&#39;. You can override using the `.groups`
+## argument.</code></pre>
 <pre class="r"><code>df_info %&gt;% group_by(Session) %&gt;%
   summarise(
     Trial_count_mean = mean(Trial_count),
@@ -527,29 +534,29 @@ df_info = df[df$AMdepth_db != -40 &amp; df$Period == &#39;Baseline&#39;,] %&gt;%
 ## 1 Pre                 38.3            8.08
 ## 2 Active              55.5           12.5</code></pre>
 <pre class="r"><code># How many single units?
-df_info = df[df$AMdepth_db != -40 &amp; df$Period == &#39;Baseline&#39;,] %&gt;% group_by(Subject, Unit, Subject_date, Cluster_quality, ActiveTrial_modulation_direction) %&gt;%
+df_info = df[df$AMdepth_db != -40 &amp; df$Period == &#39;Baseline&#39;,] %&gt;% group_by(Subject, Unit, Subject_date, Cluster_quality) %&gt;%
   summarise(
     Trial_count = length(unique(TrialID)),
     ISI_FPRate = mean(ISI_FPRate),
     ISI_ViolationRate = mean(ISI_ViolationRate),
     Fraction_missing = mean(Fraction_missing)
   )</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;Subject&#39;, &#39;Unit&#39;, &#39;Subject_date&#39;, &#39;Cluster_quality&#39;. You can override
-## using the `.groups` argument.</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;Subject&#39;, &#39;Unit&#39;, &#39;Subject_date&#39;. You can override using
+## the `.groups` argument.</code></pre>
 <pre class="r"><code>table(df_info$Cluster_quality)</code></pre>
 <pre><code>## 
 ## good  mua 
 ##   22   45</code></pre>
 <pre class="r"><code># How many units per treatment?
-df_info = df[df$AMdepth_db != -40 &amp; df$Period == &#39;Baseline&#39;,] %&gt;% group_by(Subject, Unit, Subject_date, Cluster_quality, ActiveTrial_modulation_direction, Treatment) %&gt;%
+df_info = df[df$AMdepth_db != -40 &amp; df$Period == &#39;Baseline&#39;,] %&gt;% group_by(Subject, Unit, Subject_date, Cluster_quality, Treatment) %&gt;%
   summarise(
     Trial_count = length(unique(TrialID)),
     ISI_FPRate = mean(ISI_FPRate),
     ISI_ViolationRate = mean(ISI_ViolationRate),
     Fraction_missing = mean(Fraction_missing)
   )</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;Subject&#39;, &#39;Unit&#39;, &#39;Subject_date&#39;, &#39;Cluster_quality&#39;,
-## &#39;ActiveTrial_modulation_direction&#39;. You can override using the `.groups` argument.</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;Subject&#39;, &#39;Unit&#39;, &#39;Subject_date&#39;, &#39;Cluster_quality&#39;. You
+## can override using the `.groups` argument.</code></pre>
 <pre class="r"><code>table(df_info$Cluster_quality, df_info$Treatment)</code></pre>
 <pre><code>##       
 ##        Saline Muscimol
@@ -584,6 +591,9 @@ p = ggplot(data=graph_data, aes(x=Treatment, y=D_prime, color=Treatment, fill=Tr
   
   scale_y_continuous(breaks=y_axis, expand=c(0, 0)) +
   coord_cartesian(ylim = c(min(y_axis), max(y_axis))) +
+  
+  annotate(&quot;text&quot;, x=1.5, y=2.8, label=&#39;Saline&#39;, color=treatment_colors[1], size=5, hjust=0) + 
+  annotate(&quot;text&quot;, x=1.5, y=2.7, label=&#39;Muscimol&#39;, color=treatment_colors[2], size=5, hjust=0) + 
   
   theme(
     legend.position = &#39;none&#39;,
@@ -635,6 +645,9 @@ p = ggplot(data=graph_data, aes(x=Treatment, y=Hit_rate, color=Treatment, fill=T
   scale_y_continuous(breaks=y_axis, expand=c(0, 0)) +
   coord_cartesian(ylim = c(min(y_axis), max(y_axis))) +
   
+  annotate(&quot;text&quot;, x=1.5, y=95, label=&#39;Saline&#39;, color=treatment_colors[1], size=5, hjust=0) + 
+  annotate(&quot;text&quot;, x=1.5, y=91, label=&#39;Muscimol&#39;, color=treatment_colors[2], size=5, hjust=0) + 
+  
   theme(
     legend.position = &#39;none&#39;,
     axis.title.x=element_blank(),
@@ -642,8 +655,9 @@ p = ggplot(data=graph_data, aes(x=Treatment, y=Hit_rate, color=Treatment, fill=T
         axis.text.x=element_blank(),
         axis.ticks.x=element_blank())
 p</code></pre>
-<p><img src="ACx_ephys_analyses_files/figure-html/unnamed-chunk-6-1.png" width="288" />
-### Stats</p>
+<p><img src="ACx_ephys_analyses_files/figure-html/unnamed-chunk-6-1.png" width="288" /></p>
+<div id="stats-1" class="section level3">
+<h3>Stats</h3>
 <pre class="r"><code>lme_data = graph_data
 lme_bin &lt;- glmmTMB(Hit_rate~ Treatment +  (1|Subject) , data=lme_data, family=gaussian)
 simulationOutput &lt;- simulateResiduals(fittedModel = lme_bin, plot = T, re.form=NULL)  # pass</code></pre>
@@ -662,6 +676,7 @@ simulationOutput &lt;- simulateResiduals(fittedModel = lme_bin, plot = T, re.for
 ## Treatment 8.2715  1   0.004027 **
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+</div>
 </div>
 <div id="fig-s5b-false-alarm-rate" class="section level2">
 <h2>Fig S5B: False alarm rate</h2>
@@ -682,6 +697,9 @@ p = ggplot(data=graph_data, aes(x=Treatment, y=FA_rate, color=Treatment, fill=Tr
   scale_y_continuous(breaks=y_axis, expand=c(0, 0)) +
   coord_cartesian(ylim = c(min(y_axis), max(y_axis))) +
   
+  annotate(&quot;text&quot;, x=1.5, y=75, label=&#39;Saline&#39;, color=treatment_colors[1], size=5, hjust=0) + 
+  annotate(&quot;text&quot;, x=1.5, y=71, label=&#39;Muscimol&#39;, color=treatment_colors[2], size=5, hjust=0) + 
+  
   theme(
     legend.position = &#39;none&#39;,
     axis.title.x=element_blank(),
@@ -689,8 +707,9 @@ p = ggplot(data=graph_data, aes(x=Treatment, y=FA_rate, color=Treatment, fill=Tr
         axis.text.x=element_blank(),
         axis.ticks.x=element_blank())
 p</code></pre>
-<p><img src="ACx_ephys_analyses_files/figure-html/unnamed-chunk-8-1.png" width="288" />
-### Stats</p>
+<p><img src="ACx_ephys_analyses_files/figure-html/unnamed-chunk-8-1.png" width="288" /></p>
+<div id="stats-2" class="section level3">
+<h3>Stats</h3>
 <pre class="r"><code>lme_data = graph_data
 lme_bin &lt;- glmmTMB(FA_rate~ Treatment +  (1|Subject) , data=lme_data, family=gaussian)
 simulationOutput &lt;- simulateResiduals(fittedModel = lme_bin, plot = T, re.form=NULL)  # pass</code></pre>
@@ -709,6 +728,7 @@ simulationOutput &lt;- simulateResiduals(fittedModel = lme_bin, plot = T, re.for
 ## Treatment 2.7146  1    0.09944 .
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+</div>
 </div>
 <div id="fig-s5c-water-consumed" class="section level2">
 <h2>Fig S5C: Water consumed</h2>
@@ -729,6 +749,9 @@ p = ggplot(data=graph_data, aes(x=Treatment, y=WaterConsumed, color=Treatment, f
   scale_y_continuous(breaks=y_axis, expand=c(0, 0)) +
   coord_cartesian(ylim = c(min(y_axis), max(y_axis))) +
   
+  annotate(&quot;text&quot;, x=1.5, y=1.05, label=&#39;Saline&#39;, color=treatment_colors[1], size=5, hjust=0) + 
+  annotate(&quot;text&quot;, x=1.5, y=1.03, label=&#39;Muscimol&#39;, color=treatment_colors[2], size=5, hjust=0) + 
+  
   theme(
     legend.position = &#39;none&#39;,
     axis.title.x=element_blank(),
@@ -736,8 +759,9 @@ p = ggplot(data=graph_data, aes(x=Treatment, y=WaterConsumed, color=Treatment, f
         axis.text.x=element_blank(),
         axis.ticks.x=element_blank())
 p</code></pre>
-<p><img src="ACx_ephys_analyses_files/figure-html/unnamed-chunk-10-1.png" width="288" />
-### Stats</p>
+<p><img src="ACx_ephys_analyses_files/figure-html/unnamed-chunk-10-1.png" width="288" /></p>
+<div id="stats-3" class="section level3">
+<h3>Stats</h3>
 <pre class="r"><code>lme_data = graph_data
 lme_bin &lt;- glmmTMB(WaterConsumed~ Treatment +  (1|Subject) , data=lme_data, family=gaussian)
 simulationOutput &lt;- simulateResiduals(fittedModel = lme_bin, plot = T, re.form=NULL)  # pass</code></pre>
@@ -756,6 +780,7 @@ simulationOutput &lt;- simulateResiduals(fittedModel = lme_bin, plot = T, re.for
 ## Treatment 2.3234  1     0.1274</code></pre>
 </div>
 </div>
+</div>
 <div
 id="figure-5e-f-and-s6-ofc-muscimols-effect-on-behavior-during-acx-recordings"
 class="section level1">
@@ -769,8 +794,8 @@ recordings</h1>
     FR_Hz_trial = mean(FR_Hz[Period == &#39;Trial&#39;]),
     absNeural_d_trial = abs(d_prime(FR_Hz[Period == &#39;Trial&#39;], FR_Hz[Period == &#39;Baseline&#39;])),
   )</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;Unit&#39;, &#39;Subject&#39;, &#39;Subject_date&#39;, &#39;Session&#39;, &#39;Treatment&#39;. You can
-## override using the `.groups` argument.</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;Unit&#39;, &#39;Subject&#39;, &#39;Subject_date&#39;, &#39;Session&#39;, &#39;Treatment&#39;.
+## You can override using the `.groups` argument.</code></pre>
 <pre class="r"><code>df_grouped$Session = factor(df_grouped$Session, levels=c(&#39;Pre&#39;, &#39;Active&#39;))
 levels(df_grouped$Session) = c(&#39;Passive&#39;, &#39;Task&#39;)
 
@@ -793,23 +818,24 @@ p =ggplot(data=graph_data, aes(x=Session, y=(absNeural_d_trial), fill=Session.Tr
     stat_summary(fun.data=boxplot_whiskers, geom=&quot;boxplot&quot;, na.rm = T, alpha=0.25, lwd=LINE_THICKNESS/2, fatten=1, width=0.5)+
   ylab(&#39;|Neural d\&#39;|&#39;) + xlab(&#39;Trial type&#39;) +
   
-  scale_fill_manual(name = &quot;Treatment&quot;,
+  scale_fill_manual(name = &quot;&quot;,
                    values = session.treatment_colors) +
-  scale_color_manual(name = &quot;Treatment&quot;,
+  scale_color_manual(name = &quot;&quot;,
                    values = session.treatment_colors) +
   
   scale_y_continuous(breaks=y_axis, expand=c(0, 0)) +
   coord_cartesian(ylim = c(min(y_axis), max(y_axis))) +
-  
-  theme(legend.position = &quot;none&quot;, 
+    
+  theme(legend.position = c(0.7, 0.95), 
       strip.text.x = element_blank(),
       axis.line.x = element_blank(),
       axis.ticks.x = element_blank(),
       axis.title.x = element_blank(),
       panel.spacing.x = unit(1.5, &quot;lines&quot;))
 p</code></pre>
-<p><img src="ACx_ephys_analyses_files/figure-html/unnamed-chunk-12-1.png" width="480" />
-### Stats</p>
+<p><img src="ACx_ephys_analyses_files/figure-html/unnamed-chunk-12-1.png" width="480" /></p>
+<div id="stats-4" class="section level3">
+<h3>Stats</h3>
 <pre class="r"><code>lme_data = graph_data[graph_data$Treatment == &#39;Saline&#39;,]
 lme_bin &lt;- glmmTMB(sqrt(absNeural_d_trial)~ Session +  (1|Subject/Unit/Session) , data=lme_data, family=gaussian)
 simulationOutput &lt;- simulateResiduals(fittedModel = lme_bin, plot = T, re.form=NULL)  # pass</code></pre>
@@ -832,6 +858,7 @@ simulationOutput &lt;- simulateResiduals(fittedModel = lme_bin, plot = T, re.for
 ## Response: (sqrt(absNeural_d_trial))
 ##          Chisq Df Pr(&gt;Chisq)
 ## Session 1.9521  1     0.1624</code></pre>
+</div>
 </div>
 <div id="fig-s6a-non-am-firing-rate" class="section level2">
 <h2>Fig S6A: Non-AM firing rate</h2>
@@ -861,23 +888,24 @@ p =ggplot(data=graph_data, aes(x=Session, y=FR_Hz, fill=Session.Treatment, color
     stat_summary(fun.data=boxplot_whiskers, geom=&quot;boxplot&quot;, na.rm = T, alpha=0.25, lwd=LINE_THICKNESS/2, fatten=1, width=0.5)+
   ylab(&#39;Firing rate (Hz)&#39;) + xlab(&#39;Trial type&#39;) +
   
-  scale_fill_manual(name = &quot;Treatment&quot;,
+  scale_fill_manual(name = &quot;&quot;,
                    values = session.treatment_colors) +
-  scale_color_manual(name = &quot;Treatment&quot;,
+  scale_color_manual(name = &quot;&quot;,
                    values = session.treatment_colors) +
   
   scale_y_continuous(breaks=y_axis, expand=c(0, 0)) +
   coord_cartesian(ylim = c(min(y_axis), max(y_axis))) +
   
-  theme(legend.position = &quot;none&quot;, 
+  theme(legend.position = c(0.7, 0.95), 
       strip.text.x = element_blank(),
       axis.line.x = element_blank(),
       axis.ticks.x = element_blank(),
       axis.title.x = element_blank(),
       panel.spacing.x = unit(1.5, &quot;lines&quot;))
 p</code></pre>
-<p><img src="ACx_ephys_analyses_files/figure-html/unnamed-chunk-14-1.png" width="480" />
-### Stats</p>
+<p><img src="ACx_ephys_analyses_files/figure-html/unnamed-chunk-14-1.png" width="480" /></p>
+<div id="stats-5" class="section level3">
+<h3>Stats</h3>
 <pre class="r"><code>lme_data = graph_data[graph_data$Treatment == &#39;Saline&#39;,]
 lme_bin &lt;- glmmTMB(sqrt(FR_Hz)~ Session +  (1|Subject/Unit/Session) , data=lme_data, family=gaussian)
 simulationOutput &lt;- simulateResiduals(fittedModel = lme_bin, plot = T, re.form=NULL)  # passAnova(lme_bin)</code></pre>
@@ -899,6 +927,7 @@ simulationOutput &lt;- simulateResiduals(fittedModel = lme_bin, plot = T, re.for
 ##          Chisq Df Pr(&gt;Chisq)
 ## Session 1.9001  1     0.1681</code></pre>
 </div>
+</div>
 <div id="fig-s6b-am-firing-rate" class="section level2">
 <h2>Fig S6B: AM firing rate</h2>
 <pre class="r"><code>graph_data = df_grouped[df_grouped$Period == &#39;AM&#39;,]
@@ -914,23 +943,24 @@ p =ggplot(data=graph_data, aes(x=Session, y=FR_Hz, fill=Session.Treatment, color
     stat_summary(fun.data=boxplot_whiskers, geom=&quot;boxplot&quot;, na.rm = T, alpha=0.25, lwd=LINE_THICKNESS/2, fatten=1, width=0.5)+
   ylab(&#39;Firing rate (Hz)&#39;) + xlab(&#39;Trial type&#39;) +
   
-  scale_fill_manual(name = &quot;Treatment&quot;,
+  scale_fill_manual(name = &quot;&quot;,
                    values = session.treatment_colors) +
-  scale_color_manual(name = &quot;Treatment&quot;,
+  scale_color_manual(name = &quot;&quot;,
                    values = session.treatment_colors) +
   
   scale_y_continuous(breaks=y_axis, expand=c(0, 0)) +
   coord_cartesian(ylim = c(min(y_axis), max(y_axis))) +
   
-  theme(legend.position = &quot;none&quot;, 
+  theme(legend.position = c(0.7, 0.95), 
       strip.text.x = element_blank(),
       axis.line.x = element_blank(),
       axis.ticks.x = element_blank(),
       axis.title.x = element_blank(),
       panel.spacing.x = unit(1.5, &quot;lines&quot;))
 p</code></pre>
-<p><img src="ACx_ephys_analyses_files/figure-html/unnamed-chunk-16-1.png" width="480" />
-### Stats</p>
+<p><img src="ACx_ephys_analyses_files/figure-html/unnamed-chunk-16-1.png" width="480" /></p>
+<div id="stats-6" class="section level3">
+<h3>Stats</h3>
 <pre class="r"><code>lme_data = graph_data[graph_data$Treatment == &#39;Saline&#39;,]
 lme_bin &lt;- glmmTMB(sqrt(FR_Hz)~ Session +  (1|Subject/Unit/Session) , data=lme_data, family=gaussian)
 simulationOutput &lt;- simulateResiduals(fittedModel = lme_bin, plot = T, re.form=NULL)  # passAnova(lme_bin)</code></pre>
@@ -952,22 +982,24 @@ simulationOutput &lt;- simulateResiduals(fittedModel = lme_bin, plot = T, re.for
 ##          Chisq Df Pr(&gt;Chisq)
 ## Session 0.2144  1     0.6434</code></pre>
 </div>
+</div>
 <div id="fig-5f-delta-firing-rate-am---non-am" class="section level2">
 <h2>Fig 5F: Delta firing rate (AM - non-AM)</h2>
 <pre class="r"><code>df_grouped = df[df$Trial_type %notin% c(&#39;False alarm&#39;),] %&gt;% group_by(Unit, Subject, Session, Subject_date, Cluster_quality_Allen, Cluster_quality, Treatment, TrialID) %&gt;%
   summarise( 
     FR_Hz_Pre_AM_delta = (FR_Hz[Period==&#39;Trial&#39;] - FR_Hz[Period==&#39;Baseline&#39;])
   )</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;Unit&#39;, &#39;Subject&#39;, &#39;Session&#39;, &#39;Subject_date&#39;, &#39;Cluster_quality_Allen&#39;,
-## &#39;Cluster_quality&#39;, &#39;Treatment&#39;. You can override using the `.groups` argument.</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;Unit&#39;, &#39;Subject&#39;, &#39;Session&#39;, &#39;Subject_date&#39;,
+## &#39;Cluster_quality_Allen&#39;, &#39;Cluster_quality&#39;, &#39;Treatment&#39;. You can override using the `.groups`
+## argument.</code></pre>
 <pre class="r"><code>levels(df_grouped$Session) = c(&#39;Passive&#39;, &#39;Task&#39;)
 
 graph_data = df_grouped %&gt;% group_by(Unit, Subject, Session, Subject_date, Cluster_quality_Allen, Cluster_quality, Treatment) %&gt;%
   summarise(
     FR_Hz_Pre_AM_delta = mean(FR_Hz_Pre_AM_delta, na.rm=T)
   )</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;Unit&#39;, &#39;Subject&#39;, &#39;Session&#39;, &#39;Subject_date&#39;, &#39;Cluster_quality_Allen&#39;,
-## &#39;Cluster_quality&#39;. You can override using the `.groups` argument.</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;Unit&#39;, &#39;Subject&#39;, &#39;Session&#39;, &#39;Subject_date&#39;,
+## &#39;Cluster_quality_Allen&#39;, &#39;Cluster_quality&#39;. You can override using the `.groups` argument.</code></pre>
 <pre class="r"><code>graph_data$Session.Treatment = as.character(interaction(graph_data$Session, graph_data$Treatment))
 graph_data[grepl(&#39;Passive&#39;, graph_data$Session.Treatment),]$Session.Treatment = &#39;Passive&#39;
 graph_data$Session.Treatment = factor(graph_data$Session.Treatment, levels=c(&#39;Passive&#39;, &#39;Task.Saline&#39;, &#39;Task.Muscimol&#39;))
@@ -981,23 +1013,24 @@ p =ggplot(data=graph_data, aes(x=Session, y=FR_Hz_Pre_AM_delta, fill=Session.Tre
   ylab(expression(~Delta*&#39;Firing rate (Hz) AM - non-AM&#39;)) + 
   xlab(&#39;Trial type&#39;) +
   
-  scale_fill_manual(name = &quot;Treatment&quot;,
+  scale_fill_manual(name = &quot;&quot;,
                    values = session.treatment_colors) +
-  scale_color_manual(name = &quot;Treatment&quot;,
+  scale_color_manual(name = &quot;&quot;,
                    values = session.treatment_colors) +
   
   scale_y_continuous(breaks=y_axis, expand=c(0, 0)) +
   coord_cartesian(ylim = c(min(y_axis), max(y_axis))) +
   
-  theme(legend.position = &quot;none&quot;, 
+  theme(legend.position = c(0.7, 0.95), 
       strip.text.x = element_blank(),
       axis.line.x = element_blank(),
       axis.ticks.x = element_blank(),
       axis.title.x = element_blank(),
       panel.spacing.x = unit(1.5, &quot;lines&quot;))
 p</code></pre>
-<p><img src="ACx_ephys_analyses_files/figure-html/unnamed-chunk-18-1.png" width="480" />
-### Stats</p>
+<p><img src="ACx_ephys_analyses_files/figure-html/unnamed-chunk-18-1.png" width="480" /></p>
+<div id="stats-7" class="section level3">
+<h3>Stats</h3>
 <pre class="r"><code>lme_data = graph_data[graph_data$Treatment == &#39;Saline&#39;,]
 lme_bin &lt;- glmmTMB(log(zeromin(FR_Hz_Pre_AM_delta))~ Session +  (1|Subject/Unit/Session) , data=lme_data, family=gaussian)
 simulationOutput &lt;- simulateResiduals(fittedModel = lme_bin, plot = T, re.form=NULL)  # passAnova(lme_bin)</code></pre>
@@ -1021,6 +1054,7 @@ simulationOutput &lt;- simulateResiduals(fittedModel = lme_bin, plot = T, re.for
 ##          Chisq Df Pr(&gt;Chisq)
 ## Session 2.4053  1     0.1209</code></pre>
 </div>
+</div>
 <div id="fig-s6c-non-am-firing-rate-variability-cv"
 class="section level2">
 <h2>Fig S6C: Non-AM firing rate variability (CV)</h2>
@@ -1030,8 +1064,8 @@ class="section level2">
     FR_cv_trial = cv(FR_Hz[Period == &#39;Trial&#39;]),
     FR_cv_sum = FR_cv_baseline+FR_cv_trial,
   )</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;Unit&#39;, &#39;Subject&#39;, &#39;Subject_date&#39;, &#39;Session&#39;, &#39;Cluster_quality&#39;. You
-## can override using the `.groups` argument.</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;Unit&#39;, &#39;Subject&#39;, &#39;Subject_date&#39;, &#39;Session&#39;,
+## &#39;Cluster_quality&#39;. You can override using the `.groups` argument.</code></pre>
 <pre class="r"><code>levels(df_grouped$Session) = c(&#39;Passive&#39;, &#39;Task&#39;)
 
 # Exclude units with NaN values in either session
@@ -1052,23 +1086,24 @@ p =ggplot(data=graph_data, aes(x=Session, y=FR_cv_baseline, fill=Session.Treatme
   ylab(&#39;Firing rate variability (CV)&#39;) + 
   xlab(&#39;Trial type&#39;) +
   
-  scale_fill_manual(name = &quot;Treatment&quot;,
+  scale_fill_manual(name = &quot;&quot;,
                    values = session.treatment_colors) +
-  scale_color_manual(name = &quot;Treatment&quot;,
+  scale_color_manual(name = &quot;&quot;,
                    values = session.treatment_colors) +
   
   scale_y_continuous(breaks=y_axis, expand=c(0, 0)) +
   coord_cartesian(ylim = c(min(y_axis), max(y_axis))) +
   
-  theme(legend.position = &quot;none&quot;,
+  theme(legend.position = c(0.7, 0.95), 
       strip.text.x = element_blank(),
       axis.line.x = element_blank(),
       axis.ticks.x = element_blank(),
       axis.title.x = element_blank(),
       panel.spacing.x = unit(1.5, &quot;lines&quot;))
 p</code></pre>
-<p><img src="ACx_ephys_analyses_files/figure-html/unnamed-chunk-20-1.png" width="480" />
-### Stats</p>
+<p><img src="ACx_ephys_analyses_files/figure-html/unnamed-chunk-20-1.png" width="480" /></p>
+<div id="stats-8" class="section level3">
+<h3>Stats</h3>
 <pre class="r"><code>lme_data = graph_data[graph_data$Treatment == &#39;Saline&#39;,]
 lme_bin &lt;- glmmTMB(log((FR_cv_baseline))~ Session +  (1|Subject/Unit/Session) , data=lme_data, family=gaussian)
 simulationOutput &lt;- simulateResiduals(fittedModel = lme_bin, plot = T, re.form=NULL)  # passAnova(lme_bin)</code></pre>
@@ -1090,6 +1125,7 @@ simulationOutput &lt;- simulateResiduals(fittedModel = lme_bin, plot = T, re.for
 ##          Chisq Df Pr(&gt;Chisq)
 ## Session 1.8839  1     0.1699</code></pre>
 </div>
+</div>
 <div id="fig-s6d-am-firing-rate-variability-cv" class="section level2">
 <h2>Fig S6D: AM firing rate variability (CV)</h2>
 <pre class="r"><code>graph_data = df_grouped[!is.nan(df_grouped$FR_cv_trial),]
@@ -1109,23 +1145,24 @@ p =ggplot(data=graph_data, aes(x=Session, y=FR_cv_trial, fill=Session.Treatment,
   ylab(&#39;Firing rate variability (CV)&#39;) + 
   xlab(&#39;Trial type&#39;) +
   
-  scale_fill_manual(name = &quot;Treatment&quot;,
+  scale_fill_manual(name = &quot;&quot;,
                    values = session.treatment_colors) +
-  scale_color_manual(name = &quot;Treatment&quot;,
+  scale_color_manual(name = &quot;&quot;,
                    values = session.treatment_colors) +
   
   scale_y_continuous(breaks=y_axis, expand=c(0, 0)) +
   coord_cartesian(ylim = c(min(y_axis), max(y_axis))) +
   
-  theme(legend.position = &quot;none&quot;,
+  theme(legend.position = c(0.7, 0.95), 
       strip.text.x = element_blank(),
       axis.line.x = element_blank(),
       axis.ticks.x = element_blank(),
       axis.title.x = element_blank(),
       panel.spacing.x = unit(1.5, &quot;lines&quot;))
 p</code></pre>
-<p><img src="ACx_ephys_analyses_files/figure-html/unnamed-chunk-22-1.png" width="480" />
-### Stats</p>
+<p><img src="ACx_ephys_analyses_files/figure-html/unnamed-chunk-22-1.png" width="480" /></p>
+<div id="stats-9" class="section level3">
+<h3>Stats</h3>
 <pre class="r"><code>lme_data = graph_data[graph_data$Treatment == &#39;Saline&#39;,]
 lme_bin &lt;- glmmTMB(log((FR_cv_trial))~ Session +  (1|Subject/Unit/Session) , data=lme_data, family=gaussian)
 simulationOutput &lt;- simulateResiduals(fittedModel = lme_bin, plot = T, re.form=NULL)  # passAnova(lme_bin)</code></pre>
@@ -1149,6 +1186,7 @@ lme_bin &lt;- glmmTMB(log((FR_cv_trial))~ Session +  (1|Subject/Unit/Session) , 
 ##          Chisq Df Pr(&gt;Chisq)
 ## Session 0.9497  1     0.3298</code></pre>
 </div>
+</div>
 <div id="fig-5g-pooled-firing-rate-variability-cv-non-am-am"
 class="section level2">
 <h2>Fig 5G: Pooled firing rate variability (CV; non-AM + AM)</h2>
@@ -1169,23 +1207,24 @@ p =ggplot(data=graph_data, aes(x=Session, y=FR_cv_sum, fill=Session.Treatment, c
   ylab(&#39;Firing rate variability (CV)&#39;) + 
   xlab(&#39;Trial type&#39;) +
   
-  scale_fill_manual(name = &quot;Treatment&quot;,
+  scale_fill_manual(name = &quot;&quot;,
                    values = session.treatment_colors) +
-  scale_color_manual(name = &quot;Treatment&quot;,
+  scale_color_manual(name = &quot;&quot;,
                    values = session.treatment_colors) +
   
   scale_y_continuous(breaks=y_axis, expand=c(0, 0)) +
   coord_cartesian(ylim = c(min(y_axis), max(y_axis))) +
   
-  theme(legend.position = &quot;none&quot;,
+  theme(legend.position = c(0.7, 0.95), 
       strip.text.x = element_blank(),
       axis.line.x = element_blank(),
       axis.ticks.x = element_blank(),
       axis.title.x = element_blank(),
       panel.spacing.x = unit(1.5, &quot;lines&quot;))
 p</code></pre>
-<p><img src="ACx_ephys_analyses_files/figure-html/unnamed-chunk-24-1.png" width="480" />
-### Stats</p>
+<p><img src="ACx_ephys_analyses_files/figure-html/unnamed-chunk-24-1.png" width="480" /></p>
+<div id="stats-10" class="section level3">
+<h3>Stats</h3>
 <pre class="r"><code>lme_data = graph_data[graph_data$Treatment == &#39;Saline&#39;,]
 lme_bin &lt;- glmmTMB(sqrt((FR_cv_sum))~ Session +  (1|Subject/Unit/Session) , data=lme_data, family=gaussian)
 simulationOutput &lt;- simulateResiduals(fittedModel = lme_bin, plot = T, re.form=NULL)  # passAnova(lme_bin)</code></pre>
@@ -1207,10 +1246,11 @@ simulationOutput &lt;- simulateResiduals(fittedModel = lme_bin, plot = T, re.for
 ##          Chisq Df Pr(&gt;Chisq)
 ## Session 1.7063  1     0.1915</code></pre>
 </div>
+</div>
 <div id="fig-5h-vector-strength" class="section level2">
 <h2>Fig 5H: Vector strength</h2>
 <pre class="r"><code># Load VS data and merge to existent df
-vs_df = read.csv(&#39;./Data/OFC-cannula_ACx-recording_allTrial_VS.csv&#39;)
+vs_df = read.csv(&#39;./Data/ACx_ephys/OFC-cannula_ACx-recording_allTrial_VS.csv&#39;)
 vs_df$Session = &#39;Pre&#39;
 vs_df[grepl(&#39;Aversive|Active&#39;, vs_df$SessionID),]$Session = &#39;Active&#39;
 
@@ -1222,8 +1262,8 @@ df_grouped = df %&gt;% group_by(Unit, Subject, Subject_date, Session, Cluster_qu
     VSpp_baseline = mean(VSpp[Period == &#39;Baseline&#39;], na.rm=T),
     VSpp_trial = mean(VSpp[Period == &#39;Trial&#39;], na.rm=T)
   )</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;Unit&#39;, &#39;Subject&#39;, &#39;Subject_date&#39;, &#39;Session&#39;, &#39;Cluster_quality_Allen&#39;,
-## &#39;Cluster_quality&#39;. You can override using the `.groups` argument.</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;Unit&#39;, &#39;Subject&#39;, &#39;Subject_date&#39;, &#39;Session&#39;,
+## &#39;Cluster_quality_Allen&#39;, &#39;Cluster_quality&#39;. You can override using the `.groups` argument.</code></pre>
 <pre class="r"><code>df_grouped$Session = factor(df_grouped$Session, levels=c(&#39;Pre&#39;, &#39;Active&#39;))
 levels(df_grouped$Session) = c(&#39;Passive&#39;, &#39;Task&#39;)
 
@@ -1245,23 +1285,24 @@ p =ggplot(data=graph_data, aes(x=Session, y=VSpp_trial, fill=Session.Treatment, 
   ylab(&#39;Firing rate variability (CV)&#39;) + 
   xlab(&#39;Trial type&#39;) +
   
-  scale_fill_manual(name = &quot;Treatment&quot;,
+  scale_fill_manual(name = &quot;&quot;,
                    values = session.treatment_colors) +
-  scale_color_manual(name = &quot;Treatment&quot;,
+  scale_color_manual(name = &quot;&quot;,
                    values = session.treatment_colors) +
   
   scale_y_continuous(breaks=y_axis, expand=c(0, 0)) +
   coord_cartesian(ylim = c(min(y_axis), max(y_axis))) +
   
-  theme(legend.position = &quot;none&quot;,
+  theme(legend.position = c(0.3, 0.2), 
       strip.text.x = element_blank(),
       axis.line.x = element_blank(),
       axis.ticks.x = element_blank(),
       axis.title.x = element_blank(),
       panel.spacing.x = unit(1.5, &quot;lines&quot;))
 p</code></pre>
-<p><img src="ACx_ephys_analyses_files/figure-html/unnamed-chunk-26-1.png" width="480" />
-### Stats</p>
+<p><img src="ACx_ephys_analyses_files/figure-html/unnamed-chunk-26-1.png" width="480" /></p>
+<div id="stats-11" class="section level3">
+<h3>Stats</h3>
 <pre class="r"><code>lme_data = graph_data[graph_data$Treatment == &#39;Saline&#39;,]
 lme_bin &lt;- glmmTMB(VSpp_trial*10~ Session +  (1|Subject/Unit/Session) , data=lme_data, family=gaussian)</code></pre>
 <pre><code>## Warning in finalizeTMB(TMBStruc, obj, fit, h, data.tmb.old): Model convergence
@@ -1286,6 +1327,7 @@ lme_bin &lt;- glmmTMB(VSpp_trial~ Session +  (1|Subject/Unit/Session) , data=lme
 ## Response: VSpp_trial
 ##          Chisq Df Pr(&gt;Chisq)
 ## Session 0.2388  1     0.6251</code></pre>
+</div>
 </div>
 </div>
 <div
@@ -1362,15 +1404,15 @@ class="section level2">
     Neural_dprime = d_prime(FR_Hz[Period == &#39;Trial&#39;], FR_Hz[Period == &#39;Baseline&#39;]),
     Behavioral_dprime = mean(AMdprime)
   )</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;Unit&#39;, &#39;Subject&#39;, &#39;Date&#39;, &#39;Subject_date&#39;. You can override using the
-## `.groups` argument.</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;Unit&#39;, &#39;Subject&#39;, &#39;Date&#39;, &#39;Subject_date&#39;. You can
+## override using the `.groups` argument.</code></pre>
 <pre class="r"><code>graph_data = df_grouped
 graph_means = graph_data %&gt;% group_by(Behavioral_dprime, Treatment_noDose) %&gt;%
   summarise(
     absNeural_dprime = mean(abs(Neural_dprime))
   )</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;Behavioral_dprime&#39;. You can override using
-## the `.groups` argument.</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;Behavioral_dprime&#39;. You can override using the `.groups`
+## argument.</code></pre>
 <pre class="r"><code>y_axis = seq(0, 3, 1)
 x_axis = seq(1, 3, 1)
 p =ggplot(data=graph_data, aes(x=Behavioral_dprime, y=abs(Neural_dprime), fill=Treatment_noDose)) + 
@@ -1398,8 +1440,9 @@ p =ggplot(data=graph_data, aes(x=Behavioral_dprime, y=abs(Neural_dprime), fill=T
    theme(legend.position = &quot;none&quot;,
          strip.text.x = element_blank())
 p</code></pre>
-<p><img src="ACx_ephys_analyses_files/figure-html/unnamed-chunk-29-1.png" width="576" />
-### Stats</p>
+<p><img src="ACx_ephys_analyses_files/figure-html/unnamed-chunk-29-1.png" width="576" /></p>
+<div id="stats-12" class="section level3">
+<h3>Stats</h3>
 <pre class="r"><code>lme_data = graph_data
 lme_bin &lt;- glmmTMB(sqrt(abs(Neural_dprime))*10~ Behavioral_dprime +  (1|Subject/Behavioral_dprime/Unit) , data=lme_data, family=gaussian)
 simulationOutput &lt;- simulateResiduals(fittedModel = lme_bin, plot = T, re.form=NULL)  # pass</code></pre>
@@ -1412,6 +1455,7 @@ simulationOutput &lt;- simulateResiduals(fittedModel = lme_bin, plot = T, re.for
 ## Behavioral_dprime 7.9799  1    0.00473 **
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+</div>
 </div>
 <div id="fig-6c-behavioral-performance-vs-neural-d"
 class="section level2">
@@ -1427,8 +1471,6 @@ df_grouped = df_grouped[df_grouped$Behavioral_performance %in% c(&#39;poor&#39;,
 
 df_grouped$Behavioral_performance = factor(df_grouped$Behavioral_performance, levels=c(&#39;poor&#39;, &#39;good&#39;))
 
-
-
 graph_data = df_grouped
 
 y_axis = seq(0, 2, 1)
@@ -1443,8 +1485,9 @@ p =ggplot(data=graph_data, aes(x=Behavioral_performance, y=abs(Neural_dprime))) 
     axis.ticks.x=element_blank()
     ) 
 p</code></pre>
-<p><img src="ACx_ephys_analyses_files/figure-html/unnamed-chunk-31-1.png" width="288" />
-### Stats</p>
+<p><img src="ACx_ephys_analyses_files/figure-html/unnamed-chunk-31-1.png" width="288" /></p>
+<div id="stats-13" class="section level3">
+<h3>Stats</h3>
 <pre class="r"><code>lme_data = graph_data
 lme_bin &lt;- glmmTMB(sqrt((abs(Neural_dprime)))~ Behavioral_performance +  (1|Subject/Behavioral_performance/Unit) , data=lme_data, family=gaussian)
 simulationOutput &lt;- simulateResiduals(fittedModel = lme_bin, plot = T, re.form=NULL)  # pass</code></pre>
@@ -1457,6 +1500,7 @@ simulationOutput &lt;- simulateResiduals(fittedModel = lme_bin, plot = T, re.for
 ## Behavioral_performance 11.526  1  0.0006863 ***
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+</div>
 </div>
 </div>
 

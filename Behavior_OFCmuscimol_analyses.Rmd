@@ -1,0 +1,383 @@
+---
+title: "OFC muscimol behavior (Figs 4, S4)"
+author: "Matheus Macedo-Lima"
+date: "2024-05-29"
+output: html_document
+---
+
+# Load libraries and data
+```{r echo=TRUE}
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+# install.packages(c('remotes', 'TMB'))
+# remotes::install_github("glmmTMB/glmmTMB/glmmTMB", build_vignettes=FALSE)
+library(glmmTMB)
+library(DHARMa)
+library(car)
+library(reshape2)
+library(emmeans)
+library(rcompanion)
+# Create the notin operator
+`%notin%` <- Negate(`%in%`)
+
+# Some global plot parameters if modification is needed.
+source('./r_theme.r', echo=F)
+theme_set(theme_mml(base_size = 20))
+LINE_THICKNESS = 1
+ERRORBAR_THICKNESS = LINE_THICKNESS/2
+INDIVIDUAL_DATAPOINT_LINE = LINE_THICKNESS/1.5
+SMALL_PLOTS_LINE_THICKNESS = LINE_THICKNESS/3
+
+cbPalette = c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7", "#d55e00")
+treatment_colors = c('#0072B2', '#B9519E')
+
+boxplot_whiskers <- function(x) {
+  r <- quantile(x, probs = c(0.10, 0.25, 0.5, 0.75, 0.90))
+  names(r) <- c("ymin", "lower", "middle", "upper", "ymax")
+  r
+}
+
+response_bias = function(Hit, Miss, Reject, False_alarm) {
+  hr = (Hit + 0.5) / (Hit + Miss + 1)
+  far = (False_alarm+0.5)/(False_alarm+Reject+1)
+  
+  return( -0.5 * (qnorm(hr) + qnorm(far)) )
+}
+
+
+get_dprime = function(hr, far) {
+  return( 
+      qnorm(hr) - qnorm(far)
+  )
+}
+
+boxplot_whiskers <- function(x) {
+  r <- quantile(x, probs = c(0.10, 0.25, 0.5, 0.75, 0.90))
+  names(r) <- c("ymin", "lower", "middle", "upper", "ymax")
+  r
+}
+
+# Create the notin operator
+`%notin%` <- Negate(`%in%`)
+
+### Load previously saved dataframe
+df = read.csv('./Data/Behavior_OFCmuscimol/Behavior_OFCmuscimol_df.csv')
+df$Treatment = factor(df$Treatment, levels=c('Saline', 'Muscimol'))
+```
+
+# Fig 4C-H: OFC inactivation impairs AM detection behavior
+## Fig 4C: d'
+```{r echo=TRUE, fig.height=6, fig.width=3, warning=FALSE}
+graph_data = df
+
+y_axis = seq(-1, 3, 1)
+p = ggplot(data=graph_data, aes(x=Treatment, y=D_prime, fill=Treatment, color=Treatment)) + 
+  stat_summary(fun.data=boxplot_whiskers, geom="boxplot", na.rm = T, alpha=0.1, lwd=LINE_THICKNESS/6, fatten=1)+
+  geom_line(aes(group = Subject, linetype=Hemisphere), color='black', alpha=0.1, size=LINE_THICKNESS/4) +
+  ylab('d\'') +
+  xlab('') +
+  scale_fill_manual(name = "Treatment",
+                   values = treatment_colors) +
+  scale_color_manual(name = "Treatment",
+                   values = treatment_colors) +
+    
+  scale_y_continuous(breaks=y_axis, expand=c(0, 0)) +
+  coord_cartesian(ylim = c(min(y_axis), max(y_axis))) +
+        
+  annotate("text", x=1.5, y=2.8, label='Saline', color=treatment_colors[1], size=5, hjust=0) + 
+  annotate("text", x=1.5, y=2.5, label='Muscimol', color=treatment_colors[2], size=5, hjust=0) + 
+    
+  theme(
+    legend.position = 'none',
+    axis.title.x=element_blank(),
+    axis.line.x = element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank())
+p
+```
+
+### Stats
+```{r echo=TRUE}
+lme_data = graph_data
+lme_bin <- glmmTMB(D_prime~Treatment + (1 | Subject) , data=lme_data, family=gaussian)
+simulationOutput <- simulateResiduals(fittedModel = lme_bin, plot = T, re.form=NULL)  # pass
+Anova(lme_bin)
+```
+
+## Fig 4D: Water consumption
+```{r echo=TRUE, fig.height=6, fig.width=3, warning=FALSE}
+graph_data = df
+
+y_axis = seq(0, 1.2, 0.4)
+p = ggplot(data=graph_data, aes(x=Treatment, y=WaterConsumed, fill=Treatment, color=Treatment)) + 
+  stat_summary(fun.data=boxplot_whiskers, geom="boxplot", na.rm = T, alpha=0.1, lwd=LINE_THICKNESS/6, fatten=1)+
+  geom_line(aes(group = Subject, linetype=Hemisphere), color='black', alpha=0.1, size=LINE_THICKNESS/4) +
+  ylab('Water consumed (mL)') +
+  xlab('') +
+  scale_fill_manual(name = "Treatment",
+                   values = treatment_colors) +
+  scale_color_manual(name = "Treatment",
+                   values = treatment_colors) +
+    
+  scale_y_continuous(breaks=y_axis, expand=c(0, 0)) +
+  coord_cartesian(ylim = c(min(y_axis), max(y_axis))) +
+      annotate("text", x=1.5, y=1.15, label='Saline', color=treatment_colors[1], size=5, hjust=0) + 
+  annotate("text", x=1.5, y=1.11, label='Muscimol', color=treatment_colors[2], size=5, hjust=0) + 
+    
+  theme(
+    legend.position = 'none',
+    axis.title.x=element_blank(),
+    axis.line.x = element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank())
+p
+```
+
+### Stats
+```{r echo=TRUE}
+lme_data = graph_data
+lme_bin <- glmmTMB(WaterConsumed~Treatment + (1 | Subject) , data=lme_data, family=gaussian)
+simulationOutput <- simulateResiduals(fittedModel = lme_bin, plot = T, re.form=NULL)  # pass
+Anova(lme_bin)
+```
+
+## Fig 4E: Number of AM trials
+```{r echo=TRUE, fig.height=6, fig.width=3, warning=FALSE}
+graph_data = df
+
+y_axis = seq(0, 60, 20)
+p = ggplot(data=graph_data, aes(x=Treatment, y=N_Trials, fill=Treatment, color=Treatment)) + 
+  stat_summary(fun.data=boxplot_whiskers, geom="boxplot", na.rm = T, alpha=0.1, lwd=LINE_THICKNESS/6, fatten=1)+
+  geom_line(aes(group = Subject, linetype=Hemisphere), color='black', alpha=0.1, size=LINE_THICKNESS/4) +
+  ylab('Num. AM trials') +
+  xlab('') +
+  scale_fill_manual(name = "Treatment",
+                   values = treatment_colors) +
+  scale_color_manual(name = "Treatment",
+                   values = treatment_colors) +
+    
+  scale_y_continuous(breaks=y_axis, expand=c(0, 0)) +
+  coord_cartesian(ylim = c(min(y_axis), max(y_axis))) +
+    
+  annotate("text", x=1.5, y=58, label='Saline', color=treatment_colors[1], size=5, hjust=0) + 
+  annotate("text", x=1.5, y=55, label='Muscimol', color=treatment_colors[2], size=5, hjust=0) + 
+    
+  theme(
+    legend.position = 'none',
+    axis.title.x=element_blank(),
+    axis.line.x = element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank())
+p
+```
+
+### Stats
+```{r echo=TRUE}
+lme_data = graph_data
+lme_bin <- glmmTMB(N_Trials~Treatment + (1 | Subject) , data=lme_data, family=gaussian)
+simulationOutput <- simulateResiduals(fittedModel = lme_bin, plot = T, re.form=NULL)  # pass
+Anova(lme_bin)
+```
+
+## Fig 4F:AM trials per minute
+```{r echo=TRUE, fig.height=6, fig.width=3, warning=FALSE}
+graph_data = df
+
+y_axis = seq(0, 10, 2)
+p = ggplot(data=graph_data, aes(x=Treatment, y=Trial_rate_per_min, fill=Treatment, color=Treatment)) + 
+  stat_summary(fun.data=boxplot_whiskers, geom="boxplot", na.rm = T, alpha=0.1, lwd=LINE_THICKNESS/6, fatten=1)+
+  geom_line(aes(group = Subject, linetype=Hemisphere), color='black', alpha=0.1, size=LINE_THICKNESS/4) +
+  ylab('AM trials / minute') +
+  xlab('') +
+  scale_fill_manual(name = "Treatment",
+                   values = treatment_colors) +
+  scale_color_manual(name = "Treatment",
+                   values = treatment_colors) +
+    
+  scale_y_continuous(breaks=y_axis, expand=c(0, 0)) +
+  coord_cartesian(ylim = c(min(y_axis), max(y_axis))) +
+    
+  annotate("text", x=1.5, y=9.8, label='Saline', color=treatment_colors[1], size=5, hjust=0) + 
+  annotate("text", x=1.5, y=9.4, label='Muscimol', color=treatment_colors[2], size=5, hjust=0) + 
+    
+  theme(
+    legend.position = 'none',
+    axis.title.x=element_blank(),
+    axis.line.x = element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank())
+p
+```
+
+### Stats
+```{r echo=TRUE}
+lme_data = graph_data
+lme_bin <- glmmTMB(Trial_rate_per_min~Treatment + (1 | Subject) , data=lme_data, family=gaussian)
+simulationOutput <- simulateResiduals(fittedModel = lme_bin, plot = T, re.form=NULL)  # pass
+Anova(lme_bin)
+```
+
+## Fig 4G: Hit rate
+```{r echo=TRUE, fig.height=6, fig.width=3, warning=FALSE}
+graph_data = df
+
+y_axis = seq(0, 100, 25)
+p = ggplot(data=graph_data, aes(x=Treatment, y=Hit_rate, fill=Treatment, color=Treatment)) + 
+  stat_summary(fun.data=boxplot_whiskers, geom="boxplot", na.rm = T, alpha=0.1, lwd=LINE_THICKNESS/6, fatten=1)+
+  geom_line(aes(group = Subject, linetype=Hemisphere), color='black', alpha=0.1, size=LINE_THICKNESS/4) +
+  ylab('Hit rate (%)') +
+  xlab('') +
+  scale_fill_manual(name = "Treatment",
+                   values = treatment_colors) +
+  scale_color_manual(name = "Treatment",
+                   values = treatment_colors) +
+    
+  scale_y_continuous(breaks=y_axis, expand=c(0, 0)) +
+  coord_cartesian(ylim = c(min(y_axis), max(y_axis))) +
+    
+  annotate("text", x=1.5, y=90, label='Saline', color=treatment_colors[1], size=5, hjust=0) + 
+  annotate("text", x=1.5, y=86, label='Muscimol', color=treatment_colors[2], size=5, hjust=0) + 
+    
+  theme(
+    legend.position = 'none',
+    axis.title.x=element_blank(),
+    axis.line.x = element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank())
+p
+```
+
+### Stats
+```{r echo=TRUE}
+lme_data = graph_data
+lme_bin <- glmmTMB(Hit_rate~Treatment + (1 | Subject) , data=lme_data, family=gaussian)
+simulationOutput <- simulateResiduals(fittedModel = lme_bin, plot = T, re.form=NULL)  # pass
+Anova(lme_bin)
+```
+
+## Fig 4H: False alarm rate
+```{r echo=TRUE, fig.height=6, fig.width=3, warning=FALSE}
+graph_data = df
+
+y_axis = seq(0, 100, 25)
+p = ggplot(data=graph_data, aes(x=Treatment, y=FA_rate, fill=Treatment, color=Treatment)) + 
+  stat_summary(fun.data=boxplot_whiskers, geom="boxplot", na.rm = T, alpha=0.1, lwd=LINE_THICKNESS/6, fatten=1)+
+  geom_line(aes(group = Subject, linetype=Hemisphere), color='black', alpha=0.1, size=LINE_THICKNESS/4) +
+  ylab('False alarm rate (%)') +
+  xlab('') +
+  scale_fill_manual(name = "Treatment",
+                   values = treatment_colors) +
+  scale_color_manual(name = "Treatment",
+                   values = treatment_colors) +
+    
+  scale_y_continuous(breaks=y_axis, expand=c(0, 0)) +
+  coord_cartesian(ylim = c(min(y_axis), max(y_axis))) +
+    
+  annotate("text", x=1.5, y=90, label='Saline', color=treatment_colors[1], size=5, hjust=0) + 
+  annotate("text", x=1.5, y=86, label='Muscimol', color=treatment_colors[2], size=5, hjust=0) + 
+    
+  theme(
+    legend.position = 'none',
+    axis.title.x=element_blank(),
+    axis.line.x = element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank())
+p
+```
+
+### Stats
+```{r echo=TRUE}
+lme_data = graph_data
+lme_bin <- glmmTMB(FA_rate~Treatment + (1 | Subject) , data=lme_data, family=gaussian)
+simulationOutput <- simulateResiduals(fittedModel = lme_bin, plot = T, re.form=NULL)  # pass
+Anova(lme_bin)
+```
+# Fig S4: Miss rates explain lower trial completion and higher false alarm rates under OFC inactivation
+## Fig S4A: Miss rates vs trial completion
+```{r echo=TRUE, fig.height=6, fig.width=3, warning=FALSE}
+graph_data = df
+graph_data$Miss_rate = 100 - graph_data$Hit_rate
+
+y_axis = seq(0, 10, 2)
+x_axis = seq(0, 100, 25)
+p =ggplot(data=graph_data, aes(x=Miss_rate, y=Trial_rate_per_min, fill=Treatment)) + 
+  geom_point(size=LINE_THICKNESS*3,
+             shape=21,
+             color='NA',
+             alpha=0.7) +
+  geom_line(size=LINE_THICKNESS,
+           color='black',
+           alpha=0.1,
+           aes(group=Subject, linetype=Hemisphere)) +
+  stat_smooth(method = "lm", se = T,  alpha=0.1, size=LINE_THICKNESS, formula=y~x, color='black', fill='black') +
+  # stat_cor(method = "spearman", r.digits = 2, p.accuracy = 0.001, size=LINE_THICKNESS*4, label.y=c(1, 1.5),
+  #          output.type = 'text', aes(color=Treatment)) +
+  scale_fill_manual(name = "Treatment", values = treatment_colors) +
+  scale_color_manual(name = "Treatment",
+                   values = treatment_colors) +
+  ylab('AM trials / minute') + xlab('Miss rate (%)') +
+  # coord_cartesian(ylim=c(-0.1, 3)) +
+  annotate("text", x=5, y=1.5, label='Saline', color=treatment_colors[1], size=5, hjust=0) + 
+  annotate("text", x=5, y=1.1, label='Muscimol', color=treatment_colors[2], size=5, hjust=0) + 
+    
+  scale_y_continuous(breaks=y_axis, expand=c(0, 0)) +
+  scale_x_continuous(breaks=x_axis, expand=c(0, 0)) +
+  coord_cartesian(ylim = c(min(y_axis), max(y_axis)),
+                  xlim = c(min(x_axis), max(x_axis))) +
+    
+   theme(legend.position = "none",
+         strip.text.x = element_blank())
+p
+```
+
+### Stats
+```{r echo=TRUE}
+lme_data = graph_data
+lme_bin <- glmmTMB(Trial_rate_per_min~Miss_rate + (1 | Subject) , data=lme_data, family=gaussian)
+simulationOutput <- simulateResiduals(fittedModel = lme_bin, plot = T, re.form=NULL)  # pass
+Anova(lme_bin)
+```
+
+## Fig S4B: Miss rates vs False alarm rates
+```{r echo=TRUE, fig.height=6, fig.width=3, warning=FALSE}
+graph_data = df
+graph_data$Miss_rate = 100 - graph_data$Hit_rate
+
+y_axis = seq(0, 20, 5)
+x_axis = seq(0, 100, 25)
+p =ggplot(data=graph_data, aes(x=Miss_rate, y=FA_rate, fill=Treatment)) + 
+  geom_point(size=LINE_THICKNESS*3,
+             shape=21,
+             color='NA',
+             alpha=0.7) +
+  geom_line(size=LINE_THICKNESS,
+           color='black',
+           alpha=0.1,
+           aes(group=Subject, linetype=Hemisphere)) +
+  stat_smooth(method = "lm", se = T,  alpha=0.1, size=LINE_THICKNESS, formula=y~x, color='black', fill='black') +
+  scale_fill_manual(name = "Treatment", values = treatment_colors) +
+  scale_color_manual(name = "Treatment",
+                   values = treatment_colors) +
+  ylab('False alarm rate (%)') + xlab('Miss rate (%)') +
+  # coord_cartesian(ylim=c(-0.1, 3)) +
+  annotate("text", x=5, y=18, label='Saline', color=treatment_colors[1], size=5, hjust=0) + 
+  annotate("text", x=5, y=17, label='Muscimol', color=treatment_colors[2], size=5, hjust=0) + 
+    
+  scale_y_continuous(breaks=y_axis, expand=c(0, 0)) +
+  scale_x_continuous(breaks=x_axis, expand=c(0, 0)) +
+  coord_cartesian(ylim = c(min(y_axis)-2.5, max(y_axis)),
+                  xlim = c(min(x_axis), max(x_axis))) +
+    
+   theme(legend.position = "none",
+         strip.text.x = element_blank())
+p
+```
+
+### Stats
+```{r echo=TRUE}
+lme_data = graph_data
+lme_bin <- glmmTMB(FA_rate~Miss_rate + (1 | Subject) , data=lme_data, family=gaussian)
+simulationOutput <- simulateResiduals(fittedModel = lme_bin, plot = T, re.form=NULL)  # pass
+Anova(lme_bin)
+```

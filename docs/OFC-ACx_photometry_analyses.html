@@ -9,9 +9,11 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
+<meta name="author" content="Matheus Macedo-Lima" />
 
+<meta name="date" content="2024-05-29" />
 
-<title>About This Website</title>
+<title>OFC-&gt;ACx photometry - Analyses (Fig S2)</title>
 
 <script src="site_libs/header-attrs-2.27/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
@@ -238,7 +240,7 @@ $(document).ready(function () {
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="index.html">My Website</a>
+      <a class="navbar-brand" href="index.html">Supporting code for Macedo-Lima et al., 2024 Current Biology</a>
     </div>
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
@@ -246,13 +248,22 @@ $(document).ready(function () {
   <a href="index.html">Home</a>
 </li>
 <li>
-  <a href="about.html">About</a>
+  <a href="contact.html">Contact</a>
+</li>
+<li>
+  <a href="Behavior_proceduralTraining_analyses.html">Behavior (Fig 1)</a>
 </li>
 <li>
   <a href="OFC_ephys_analyses.html">OFC ephys - Analyses (Figs 2, 3, S1-3)</a>
 </li>
 <li>
-  <a href="ACx_ephys_analyses.html">OFC muscimol + ACx ephys - Analyses (Figs 5, S5-6)</a>
+  <a href="OFC-ACx_photometry_analyses.html">OFC-&gt;ACx photometry - Analyses (Fig S2)</a>
+</li>
+<li>
+  <a href="Behavior_OFCmuscimol_analyses.html">OFC muscimol behavior (Figs 4, S4)</a>
+</li>
+<li>
+  <a href="ACx_ephys_analyses.html">OFC muscimol + ACx ephys - Analyses (Figs 5-6, S5-6)</a>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
@@ -266,12 +277,78 @@ $(document).ready(function () {
 
 
 
-<h1 class="title toc-ignore">About This Website</h1>
+<h1 class="title toc-ignore">OFC-&gt;ACx photometry - Analyses (Fig
+S2)</h1>
+<h4 class="author">Matheus Macedo-Lima</h4>
+<h4 class="date">2024-05-29</h4>
 
 </div>
 
 
-<p>More about this website.</p>
+<div
+id="fig-s1k-load-data-from-python-processing-pipeline-to-plot-average-z-scored-signals"
+class="section level1">
+<h1>Fig S1K: Load data from python processing pipeline to plot average
+z-scored signals</h1>
+<pre class="r"><code>library(ggplot2)
+library(dplyr)
+library(tidyr)
+# install.packages(c(&#39;remotes&#39;, &#39;TMB&#39;))
+# remotes::install_github(&quot;glmmTMB/glmmTMB/glmmTMB&quot;, build_vignettes=FALSE)
+library(glmmTMB)
+library(DHARMa)
+library(car)
+library(reshape2)
+library(emmeans)
+library(rcompanion)
+# Create the notin operator
+`%notin%` &lt;- Negate(`%in%`)
+
+# Some global plot parameters if modification is needed.
+source(&#39;./r_theme.r&#39;, echo=F)
+theme_set(theme_mml(base_size = 20))
+LINE_THICKNESS = 1
+ERRORBAR_THICKNESS = LINE_THICKNESS/2
+INDIVIDUAL_DATAPOINT_LINE = LINE_THICKNESS/1.5
+SMALL_PLOTS_LINE_THICKNESS = LINE_THICKNESS/3
+
+df_grouped = read.csv(&#39;./Data/Photometry/AAVrg_GCaMP8s-ACx_fiber-OFC_meanZscore.csv&#39;)
+df_grouped$Trial_type = factor(df_grouped$Trial_type, levels=c(&#39;Passive&#39;, &#39;Miss (shock)&#39;, &#39;Hit (shock)&#39;, &#39;False alarm&#39;))
+
+graph_data = df_grouped
+
+plot_colors = c(&#39;black&#39;, &#39;red&#39;, &#39;#64B2E3&#39;, &#39;#9F4871&#39;)
+y_axis = seq(-1, 5, 1)
+x_axis = seq(-2, 5, 2)
+p = ggplot(data=graph_data, aes(x=Time_s_round, y=Signal_mean, color=Trial_type, group=Trial_type, fill=Trial_type)) +
+  geom_vline(xintercept=0, linetype=&#39;dashed&#39;) +
+  stat_summary(fun.data = mean_se, geom = &quot;ribbon&quot;, na.rm = T, alpha=0.3, color=NA) +
+    # stat_summary(fun=&quot;mean&quot;, geom=&quot;bar&quot;, na.rm = T, alpha = 1, color=&#39;NA&#39;) +
+  stat_summary(fun=&quot;mean&quot;, geom=&quot;line&quot;, na.rm = T, alpha = 1, size=LINE_THICKNESS/2) +
+    scale_fill_manual(values=plot_colors, name=&#39;&#39;) +
+  scale_color_manual(values=plot_colors, name=&#39;&#39;) +
+    
+  annotate(&quot;text&quot;, x=-1.5, y=4.5, label=&#39;Miss&#39;, color=plot_colors[2], size=7, hjust=0) + 
+  annotate(&quot;text&quot;, x=-1.5, y=4, label=&#39;Hit&#39;, color=plot_colors[3], size=7, hjust=0) + 
+  annotate(&quot;text&quot;, x=-1.5, y=3.5, label=&#39;False alarm&#39;, color=plot_colors[4], size=7, hjust=0) + 
+  annotate(&quot;text&quot;, x=-1.5, y=3, label=&#39;Passive&#39;, color=plot_colors[1], size=7, hjust=0) + 
+        
+    theme(legend.position = &#39;none&#39;) +
+  scale_y_continuous(breaks=y_axis, expand=c(0, 0)) +
+  scale_x_continuous(breaks=x_axis, expand=c(0, 0)) +
+  coord_cartesian(ylim = c(min(y_axis), max(y_axis)),
+                  xlim = c(min(x_axis), max(x_axis))) +
+  ylab(&#39;dF/F (z)&#39;) +
+  xlab(&#39;Time re: trial onset (s)&#39;) 
+p</code></pre>
+<p><img src="OFC-ACx_photometry_analyses_files/figure-html/unnamed-chunk-1-1.png" width="576" /></p>
+</div>
+<div id="fig-s1l-heatmaps-were-generated-using-python"
+class="section level1">
+<h1>Fig S1L: Heatmaps were generated using Python</h1>
+<p>You can find this code here: <a href="https://"
+class="uri">https://</a></p>
+</div>
 
 
 

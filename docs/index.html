@@ -11,7 +11,7 @@
 
 
 
-<title>My Website</title>
+<title>Supporting code for Macedo-Lima et al., 2024 Current Biology</title>
 
 <script src="site_libs/header-attrs-2.27/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
@@ -238,7 +238,7 @@ $(document).ready(function () {
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="index.html">My Website</a>
+      <a class="navbar-brand" href="index.html">Supporting code for Macedo-Lima et al., 2024 Current Biology</a>
     </div>
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
@@ -246,13 +246,22 @@ $(document).ready(function () {
   <a href="index.html">Home</a>
 </li>
 <li>
-  <a href="about.html">About</a>
+  <a href="contact.html">Contact</a>
+</li>
+<li>
+  <a href="Behavior_proceduralTraining_analyses.html">Behavior (Fig 1)</a>
 </li>
 <li>
   <a href="OFC_ephys_analyses.html">OFC ephys - Analyses (Figs 2, 3, S1-3)</a>
 </li>
 <li>
-  <a href="ACx_ephys_analyses.html">OFC muscimol + ACx ephys - Analyses (Figs 5, S5-6)</a>
+  <a href="OFC-ACx_photometry_analyses.html">OFC-&gt;ACx photometry - Analyses (Fig S2)</a>
+</li>
+<li>
+  <a href="Behavior_OFCmuscimol_analyses.html">OFC muscimol behavior (Figs 4, S4)</a>
+</li>
+<li>
+  <a href="ACx_ephys_analyses.html">OFC muscimol + ACx ephys - Analyses (Figs 5-6, S5-6)</a>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
@@ -266,22 +275,24 @@ $(document).ready(function () {
 
 
 
-<h1 class="title toc-ignore">My Website</h1>
+<h1 class="title toc-ignore">Supporting code for Macedo-Lima et al.,
+2024 Current Biology</h1>
 
 </div>
 
 
-<p>Hello, Website!</p>
-<p>For more information about simple R Markdown websites, please read
-the documentation at <a
-href="https://bookdown.org/yihui/rmarkdown/rmarkdown-site.html"
-class="uri">https://bookdown.org/yihui/rmarkdown/rmarkdown-site.html</a>.</p>
-<p>Please also note that simple R Markdown sites are <em>not</em> based
-on <strong>blogdown</strong>. They are probably good for websites with
-only a few Rmd documents. For larger-scale and more sophisticated
-websites (such as blogs), you may want to use <strong>blogdown</strong>
-instead: <a href="https://github.com/rstudio/blogdown"
-class="uri">https://github.com/rstudio/blogdown</a>.</p>
+<p>The code illustrated in this website is read-only. For modifiable
+files, download .Rmd files</p>
+<p>More analyses can be found in associated python notebook and MatLab
+pipelines.</p>
+<p>The workflow for most datasets in this project was:</p>
+<ol style="list-style-type: decimal">
+<li><p>Raw data collection with MatLab or Intan/Synapse
+software</p></li>
+<li><p>Data preprocessing with MatLab pipeline</p></li>
+<li><p>Data preprocessing and plotting with Python pipeline</p></li>
+<li><p>Data analysis and plotting with R pipeline</p></li>
+</ol>
 
 
 

@@ -1,0 +1,555 @@
+---
+title: "ACx ephys recordings during auditory detection and OFC inactivation - Preprocessing"
+chunk_output_type: console
+---
+
+# Load data originated from the Python pipeline and get it ready
+```{r echo=TRUE, warning=FALSE, message=FALSE}
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(RJSONIO)
+
+# Create the notin operator
+`%notin%` <- Negate(`%in%`)
+
+# Some globals
+synapse_subjects = c('SUBJ-ID-174')
+
+df = read.csv('../Data/ACx_ephys/OFC-cannula_ACx-recording_AMsound_firing_rate.csv')
+df = separate(data = df, col = Key_file,  sep = "_", into=c("Subject", "temp1"), remove=F)
+
+df$Recording_format = ''
+df[df$Subject %notin% synapse_subjects,]$Recording_format = 'intan' 
+df[df$Subject %in% synapse_subjects,]$Recording_format = 'synapse' 
+
+intan_df = df[df$Recording_format == 'intan',]
+
+# Key file names in 448 and 575 have an extra SUBJ field in the beginning; deal with that here
+intan_df_temp1 = intan_df[intan_df$Subject %in% c('SUBJ-ID-448', 'SUBJ-ID-575'),]
+intan_df_temp1 = separate(data = intan_df_temp1, col = Key_file,  sep = "_", into=c("temp1", "temp2", "Date_fromSession", "Session_timestamp", "temp3", "temp4"), remove=F)
+intan_df_temp1$SessionID = paste(intan_df_temp1$Date_fromSession, intan_df_temp1$Session_timestamp, intan_df_temp1$temp3, sep="_")
+intan_df_temp1$Date = strptime(intan_df_temp1$Date_fromSession, format = '%Y-%m-%d')
+intan_df_temp1$Date = strftime(intan_df_temp1$Date, format='%y%m%d')
+
+intan_df = intan_df_temp1
+
+synapse_df = df[df$Recording_format == 'synapse',]
+synapse_df = separate(data = synapse_df, col = Key_file,  sep = "_", into=c("Subject", "SessionID", "temp1"), remove=F)
+
+# Remove eventual MML tag from experiment name
+synapse_df$SessionID = gsub("MML-", "", synapse_df$SessionID)
+
+synapse_df = separate(data = synapse_df, col = SessionID,  sep = "-", into=c("temp2", "temp3", "Date", "Session_timestamp"), remove=F)
+
+df = merge(intan_df, synapse_df, all=T)
+
+df = separate(data = df, col = Unit,  sep = "_", into=c("temp7", "temp8","temp9", "Cluster"), remove=F)
+
+# Remove temp columns
+df = df[, -grep("temp", colnames(df))]
+
+df$Subject_date = interaction(df$Subject, df$Date, sep="_")
+
+df$Session = ''
+df[(grepl('Aversive', df$Key_file)) | (grepl('Active', df$Key_file)),]$Session = 'Active'
+df[(grepl('Pre', df$Key_file)),]$Session = 'Pre'
+
+df$Session = factor(df$Session, levels=c('Pre', 'Active'))
+
+# Detail the trial outcomes
+df$Trial_type = 'Miss (no shock)'
+df[df$Hit == 1,]$Trial_type = 'Hit'
+df[df$Miss == 1 & df$ShockFlag == 1,]$Trial_type = 'Miss (shock)'
+df[df$FA == 1,]$Trial_type = 'False alarm'
+
+df$Trial_type = factor(df$Trial_type, levels=c('Miss (shock)', 'Hit', 'False alarm', 'Miss (no shock)'))
+
+df$Period = factor(df$Period, levels=c('Baseline', 'Trial', 'Aftertrial', 'previous_Baseline', 'previous_Trial', 'previous_Aftertrial'))
+
+# Add waveform measurements
+wf_measurement_files = Sys.glob(file.path("../Data/ACx_ephys/Waveform measurements/*waveform_measurements.csv"))
+# Add quality metrics
+wf_quality_files = Sys.glob(file.path("../Data/ACx_ephys/Quality metrics/*quality_metrics.csv"))
+
+# Sort by Unit then trialID for counting trials consecutively
+df = df[
+  with(df, order(Unit, TrialID)),
+]
+
+df$ISI_FPRate = NA
+df$Fraction_missing = NA
+df$Presence_ratio = NA
+df$PTP_duration = 0
+df$PTP_ratio = 0
+df$Repolarization = 0
+df$Best_channel = NA
+df$Shank = NA
+df$Cluster_quality_MML = ''
+all_start = Sys.time()
+for (cur_subject in unique(df$Subject)) {
+  for (cur_date in unique(df[df$Subject == cur_subject,]$Date)) {
+    
+    cur_date_df = df[df$Subject == cur_subject & df$Date == cur_date,]
+    
+    cur_file = wf_measurement_files[
+      intersect(grep(cur_subject, wf_measurement_files), grep(cur_date, wf_measurement_files))]
+    wf_measurements = read.csv(cur_file)
+    
+    cur_file = wf_quality_files[
+      intersect(grep(cur_subject, wf_quality_files), grep(cur_date, wf_quality_files))]
+    wf_quality = read.csv(cur_file)
+    
+    for (cluster in unique(cur_date_df$Cluster)) {
+      unit_start = Sys.time()
+      cluster_n = as.numeric(substr(cluster, 8, nchar(cluster)))
+      cur_unit_measurements_df = wf_measurements[wf_measurements$Cluster == cluster_n,]
+      cur_unit_quality_df = wf_quality[wf_quality$Cluster == cluster_n,]
+  
+      # Remove extra channels
+      # 5x12 Buzsaki
+      if (cur_unit_measurements_df$Shank > 5) { # shanks >5 are extra sites
+        df = df[!( (grepl(cluster, df$Unit))& (df$Subject == cur_subject) & (df$Date == cur_date) ), ]
+        next
+      }
+
+  
+      # Store best channel, shank and cluster quality
+      df[(grepl(cluster, df$Unit)) & (df$Subject == cur_subject) & (df$Date == cur_date), ]$Best_channel = cur_unit_measurements_df$Best_channel
+      df[(grepl(cluster, df$Unit)) & (df$Subject == cur_subject) & (df$Date == cur_date), ]$Shank = cur_unit_measurements_df$Shank
+      df[(grepl(cluster, df$Unit)) & (df$Subject == cur_subject) & (df$Date == cur_date), ]$Cluster_quality_MML = as.character(cur_unit_measurements_df$Cluster_quality)
+      
+      # Store unit measurements
+      df[(grepl(cluster, df$Unit)) & (df$Subject == cur_subject) & (df$Date == cur_date), ]$PTP_duration = cur_unit_measurements_df$PTP_duration_ms
+      df[(grepl(cluster, df$Unit)) & (df$Subject == cur_subject) & (df$Date == cur_date), ]$PTP_ratio = cur_unit_measurements_df$PTP_ratio
+      df[(grepl(cluster, df$Unit)) & (df$Subject == cur_subject) & (df$Date == cur_date), ]$Repolarization = cur_unit_measurements_df$Repolarization_duration_ms
+      
+      # Store unit quality metrics
+      df[(grepl(cluster, df$Unit)) & (df$Subject == cur_subject) & (df$Date == cur_date), ]$ISI_FPRate = cur_unit_quality_df$ISI_FPRate
+      df[(grepl(cluster, df$Unit)) & (df$Subject == cur_subject) & (df$Date == cur_date), ]$Fraction_missing = cur_unit_quality_df$Fraction_missing
+      df[(grepl(cluster, df$Unit)) & (df$Subject == cur_subject) & (df$Date == cur_date), ]$Presence_ratio = cur_unit_quality_df$Presence_ratio
+      
+      print(paste(paste(cur_subject, cur_date, cluster, sep="_"), " runtime: ", Sys.time() - unit_start, sep=""))
+    }
+  }
+}
+
+print("All units time: ")
+Sys.time() - all_start
+
+df$Cluster_quality_MML = factor(df$Cluster_quality_MML, levels=c('good', 'mua'))
+
+df$Cluster_quality_Allen = 'mua'
+df[(df$ISI_FPRate < 0.5) & (df$Fraction_missing < 0.1) & (df$Presence_ratio > 0.9),]$Cluster_quality_Allen = 'good'
+df$Cluster_quality_Allen = factor(df$Cluster_quality_Allen, levels=c('good', 'mua'))
+
+cur_temp_id = 1
+write.csv(df, paste('../Data/ACx_ephys/OFC-cannula_ACx-recording_allTrial_df_temp_', as.character(cur_temp_id), '.csv', sep=''), row.names=FALSE) # Save temp copy of dataframe because the above takes a while to run
+
+```
+
+# Calculate vector strength and VS cycle-by-cycle
+```{r echo=TRUE}
+test = read.csv(paste('../Data/ACx_ephys/OFC-cannula_ACx-recording_allTrial_df_temp_', as.character(cur_temp_id), '.csv', sep=''))
+
+get_vs = function(spike_time_trials, start_end) {
+  all_vs = c()
+  period = 1/5  # period in seconds
+  for(all_spike_times in spike_time_trials) {
+    cur_spikes = all_spike_times[(all_spike_times >= start_end[1]) & (all_spike_times < start_end[2])]
+    if(length(cur_spikes) == 0) { cur_vs = 0 }
+    else {
+      cur_th = 2*pi*( (cur_spikes%%period) / period)
+      cur_vs = sqrt(sum(cos(cur_th)^2) + sum(sin(cur_th)^2))/length(cur_th)
+    }
+    all_vs = c(all_vs, cur_vs)
+  }
+  return(all_vs)
+}
+
+get_phi = function(th) { atan2(sum(sin(th)), sum(cos(th))) }
+
+
+get_vspp = function(spike_time_trials, start_end) {
+  all_vspp = c()
+  period = 1/5  # period in seconds
+
+  # Calculate all-trial phi
+  all_spike_times = unlist(spike_time_trials)
+  cur_spikes = all_spike_times[(all_spike_times >= start_end[1]) & (all_spike_times < start_end[2])]
+  
+  # compute phase of each spike relative to the modulation period for all trials
+  cur_th = 2*pi*( (cur_spikes%%period) / period)
+  cur_phi_c = get_phi(cur_th)
+  
+  # Calculate trial-by-trial VSpp
+  for(all_spike_times in spike_time_trials) {
+    cur_spikes = all_spike_times[(all_spike_times >= start_end[1]) & (all_spike_times < start_end[2])]
+
+    if(length(cur_spikes) == 0) { 
+      cur_trial_cur_c_vspp = 0
+    } else {
+
+      # compute phase of each spike relative to the modulation period for each trial
+      cur_th = 2*pi*( (cur_spikes%%period) / period)
+
+      # compute the trial-by-trial phase angle phi
+      cur_phi_t = get_phi(cur_th)
+      
+      # Compute overall VS
+      cur_vs =  sqrt(sum(cos(cur_th)^2)+sum(sin(cur_th)^2))/length(cur_th)
+      
+      # Compute VS with phase projection
+      cur_trial_cur_c_vspp = cur_vs * cos(cur_phi_t - cur_phi_c)
+    }
+    
+    all_vspp = c(all_vspp, cur_trial_cur_c_vspp)
+  }
+  return(all_vspp)
+}
+
+
+
+get_vscc = function(spike_time_trials, start_end) {
+  all_vscc = c()
+  period = 1/5  # period in seconds
+  cvec = seq(start_end[1], start_end[1] + 0.8, period)  # time vector excluding last (incomplete) cycle in 5 Hz modulation
+  
+  # Calculate all-trial phi per cycle
+  all_phi_c = c()
+  for(c_ind in 1:(length(cvec)-1)) {
+    all_spike_times = unlist(spike_time_trials)
+    spike_times = all_spike_times[(all_spike_times >= start_end[1]) & (all_spike_times < start_end[2])]
+    cur_spikes = spike_times[spike_times >= cvec[c_ind] & spike_times < cvec[c_ind+1]]
+    # compute phase of each spike relative to the modulation period for all trials
+    cur_th = 2*pi*( (cur_spikes%%period) / period)
+    cur_phi_c = get_phi(cur_th)
+    all_phi_c = c(all_phi_c, cur_phi_c)
+  }
+  
+  for(all_spike_times in spike_time_trials) {
+    spike_times = all_spike_times[(all_spike_times >= start_end[1]) & (all_spike_times < start_end[2])]
+    
+    c_by_c_vspp = c()
+    for(c_ind in 1:(length(cvec)-1)) {
+      # current modulation period spikes
+      cur_spikes = spike_times[spike_times >= cvec[c_ind] & spike_times < cvec[c_ind+1]]
+      
+      if(length(cur_spikes) == 0) { 
+        cur_trial_cur_c_vspp = 0
+      } else {
+        # compute phase of each spike relative to the modulation period for each trial
+        cur_th = 2*pi*( (cur_spikes%%period) / period)
+  
+        # compute the trial-by-trial phase angle phi
+        cur_phi_t = get_phi(cur_th)
+        
+        # Compute overall VS
+        cur_vs =  sqrt(sum(cos(cur_th)^2)+sum(sin(cur_th)^2))/length(cur_th)
+        
+        # Compute VS with phase projection
+        cur_trial_cur_c_vspp = cur_vs * cos(cur_phi_t - cur_phi_c)
+      }
+      c_by_c_vspp = c(c_by_c_vspp, cur_trial_cur_c_vspp)
+    }
+    all_vscc = c(all_vscc, mean(c_by_c_vspp, na.rm =T))
+  }
+  return(all_vscc)
+}
+
+
+json_files = Sys.glob(file.path("../Data/ACx_ephys/JSON files/*json"))
+
+unit_list = c()
+session_list = c()
+period_list = c()
+vs_list = c()
+vspp_list = c()
+vscc_list  = c()
+all_start = Sys.time()
+for(cur_json in json_files) {
+  unit_start = Sys.time()
+  cur_json_df = RJSONIO::fromJSON(cur_json, nullValue=NA)
+  cur_unit = cur_json_df$Unit
+  if (cur_unit %notin% unique(df$Unit)) {next}  # Extra channel units are removed in processing
+
+  cur_key_names = names(cur_json_df$Session)
+  
+  for(key_file in cur_key_names) {
+    # trial-by-trial vector strength
+    temp_df = data.frame(TrialID=cur_json_df$Session[[key_file]]$TrialID, Trial_spikes=I(cur_json_df$Session[[key_file]]$Trial_spikes), FA=cur_json_df$Session[[key_file]]$FA)
+    # Exclude FA
+    temp_df = temp_df[temp_df$FA == 0,]
+    
+    for(period in c('Baseline', 'Trial', 'Aftertrial')) {
+      if(period == 'Baseline') { start_end = c(-1, 0) }
+      else if(period == 'Trial') { start_end = c(0, 0.95) }
+      else { start_end = c(1.3, 2.25) }
+
+      all_vs = get_vs(temp_df$Trial_spikes, start_end)
+      all_vspp = get_vspp(temp_df$Trial_spikes, start_end)
+      all_vscc = get_vscc(temp_df$Trial_spikes, start_end)
+      
+      n_trials = length(all_vs)
+      
+      unit_list = c(unit_list, rep(cur_unit, n_trials))
+      session_list = c(session_list, rep(key_file, n_trials))
+      period_list = c(period_list, rep(period, n_trials))
+      vs_list = c(vs_list, all_vs)
+      vspp_list = c(vspp_list, all_vspp)
+      vscc_list = c(vscc_list, all_vscc)
+    }
+
+  }
+  print(paste(cur_unit, " runtime: ", Sys.time() - unit_start, sep=""))
+}
+print("All units time: ")
+Sys.time() - all_start
+
+ret_df = data.frame(Unit=unit_list, SessionID=session_list, Period=period_list, VS = vs_list, VScc = vscc_list, VSpp = vspp_list)
+
+cur_temp_id = cur_temp_id + 1
+write.csv(df, paste('../Data/ACx_ephys/OFC-cannula_ACx-recording_allTrial_df_temp_', as.character(cur_temp_id), '.csv', sep=''), row.names=FALSE) # Save temp copy of dataframe because the above takes a while to run
+```
+
+# Add behavior info
+```{r}
+df = read.csv(paste('../Data/ACx_ephys/OFC-cannula_ACx-recording_allTrial_df_temp_', as.character(cur_temp_id), '.csv', sep=''))
+# df = read.csv('OFC-cannula_ACx-recording_allTrial_df.csv')
+
+# Combine with behavioral performance
+threshold_files = Sys.glob(file.path('../Data/ACx_ephys/Behavioral performance/shockTraining_active/*psychThreshold.csv'))
+dprime_files = Sys.glob(file.path('../Data/ACx_ephys/Behavioral performance/shockTraining_active/*dprimeMat.csv'))
+trial_files = Sys.glob(file.path('../Data/ACx_ephys/Behavioral performance/shockTraining_active/*trialMat.csv'))
+
+subj_list = c()
+session_list = c()
+threshold_list = c()
+threshold_linear_list = c()
+threshold_improvement_list = c()
+threshold_improvement_linear_list = c()
+day_list = c()
+dprimeSubj_list = c()
+dprimeAM_list = c()
+dprime_list = c()
+dprimeSession_list = c()
+dprimeDay_list = c()
+hr_list = c()
+far_list = c()
+trials_list = c()
+df$Threshold = 100  # arbitrarily large
+df$Threshold_linear = 100  # arbitrarily large
+df$Threshold_improvement = 100  # arbitrarily large
+df$Threshold_improvement_linear = 100  # arbitrarily large
+df$Day_of_training = 0
+df$AMdprime = NA
+df$FA_rate = NA
+# Convert percent to dB and round
+df$AMdepth_db = round(20*log(df$AMdepth, 10), 0)
+
+for (subject in unique(df$Subject)) {
+  cur_threshold_file = threshold_files[grep(subject, threshold_files)]
+  cur_dprime_file = dprime_files[grep(subject, dprime_files)]
+  cur_trial_file = trial_files[grep(subject, trial_files)]
+  if (length(cur_threshold_file) == 0) {next}
+
+  cur_threshold_df = read.csv(cur_threshold_file)
+  cur_dprime_df = read.csv(cur_dprime_file)
+  cur_trial_df = read.csv(cur_trial_file)
+
+  # Make sure values are ordered by date
+  date_list = c()
+  dprimeDate_list = c()
+  trialDate_list = c()
+  for (block_id in cur_threshold_df$Block_id) {
+    date = strsplit(block_id, '-')[[1]][1]
+    date_list = c(date_list, date)
+    dprimeDate_list = c(dprimeDate_list, rep(date, sum(grepl(date, cur_dprime_df$Block_id))))
+    trialDate_list = c(trialDate_list, rep(date, sum(grepl(date, cur_trial_df$Block_id))))
+  }
+  cur_threshold_df = cur_threshold_df[sort(as.numeric(date_list), index.return=TRUE)$ix,]
+  cur_dprime_df = cur_dprime_df[sort(as.numeric(dprimeDate_list), index.return=TRUE)$ix,]
+  cur_trial_df = cur_trial_df[sort(as.numeric(trialDate_list), index.return=TRUE)$ix,]
+  cur_dprime_df$Stimulus = round(cur_dprime_df$Stimulus, 0)  # Round dB values
+  cur_trial_df$Stimulus = round(cur_trial_df$Stimulus, 0)  # Round dB values
+
+
+  # Store all behavioral parameters
+  subj_list = c(subj_list, rep(subject, nrow(cur_threshold_df)))
+  session_list = c(session_list, as.character(cur_threshold_df$Block_id))
+  threshold_list = c(threshold_list, cur_threshold_df$Threshold)
+  day_list = c(day_list, 1:nrow(cur_threshold_df))
+
+  day1_t = cur_threshold_df$Threshold[1]
+  day1_t_linear = 10^(day1_t/20)*100
+  t_linear = 10^(cur_threshold_df$Threshold/20)*100
+  t_improvement = 100*(abs(cur_threshold_df$Threshold) - abs(day1_t)) / abs(day1_t)
+  t_improvement_linear = 100*(abs(10^(cur_threshold_df$Threshold/20)*100 - day1_t_linear)) / abs(day1_t_linear)
+  threshold_linear_list = c(threshold_linear_list, t_linear)
+  threshold_improvement_list = c(threshold_improvement_list, t_improvement)
+  threshold_improvement_linear_list = c(threshold_improvement_linear_list, t_improvement_linear)
+  cur_threshold_df$Threshold_linear = t_linear  # Easier to add it to data df below
+  cur_threshold_df$Threshold_improvement = t_improvement  # Easier to add it to data df below
+  cur_threshold_df$Threshold_improvement_linear = t_improvement_linear  # Easier to add it to data df below
+
+
+  dprimeSubj_list = c(dprimeSubj_list, rep(subject, nrow(cur_dprime_df)))
+  dprimeDay_list = c(dprimeDay_list, rep(1:length(unique(cur_dprime_df$Block_id)), table(cur_dprime_df$Block_id)))
+  dprimeAM_list = c(dprimeAM_list, cur_dprime_df$Stimulus)
+  dprime_list = c(dprime_list, cur_dprime_df$d_prime)
+  dprimeSession_list = c(dprimeSession_list, cur_dprime_df$Block_id)
+
+  cur_far_df = cur_trial_df[cur_trial_df$Block_id == block_id & cur_trial_df$Stimulus == -40,]
+
+
+  # Pair with data df
+  day_counter = 1
+  for (block_id in cur_threshold_df$Block_id) {
+    date = strsplit(block_id, '-')[[1]][1]
+    if(nrow(df[(grepl(date, df$Date)) & (grepl(subject, df$Subject)), ]) > 0) {
+      df[df$Date == date & df$Subject == subject, ]$Threshold = cur_threshold_df[cur_threshold_df$Block_id == block_id,]$Threshold
+      df[df$Date == date & df$Subject == subject, ]$Threshold_linear = cur_threshold_df[cur_threshold_df$Block_id == block_id,]$Threshold_linear
+      df[df$Date == date & df$Subject == subject, ]$Threshold_improvement = cur_threshold_df[cur_threshold_df$Block_id == block_id,]$Threshold_improvement
+      df[df$Date == date & df$Subject == subject, ]$Threshold_improvement_linear = cur_threshold_df[cur_threshold_df$Block_id == block_id,]$Threshold_improvement_linear
+      df[df$Date == date & df$Subject == subject, ]$Day_of_training = day_counter
+
+      # d_prime info
+      for (amdepth in unique(cur_dprime_df[cur_dprime_df$Block_id == block_id,]$Stimulus)) {
+        df[df$Date == date & df$Subject == subject & df$AMdepth_db == amdepth, ]$AMdprime = cur_dprime_df[cur_dprime_df$Block_id == block_id & cur_dprime_df$Stimulus == amdepth,]$d_prime
+      }
+
+      # FA rate info
+      cur_far_df = cur_trial_df[cur_trial_df$Block_id == block_id & cur_trial_df$Stimulus == -40,]
+      cur_far = cur_far_df$N_FA_or_Hit/cur_far_df$N_trials * 100
+      df[df$Date == date & df$Subject == subject, ]$FA_rate = cur_far
+    }
+    day_counter = day_counter + 1
+  }
+}
+
+dprime_df = data.frame(Subject=dprimeSubj_list, Session=dprimeSession_list, AMdepth_db=dprimeAM_list, d_prime=dprime_list, Day=dprimeDay_list)
+
+# Remove "orphan" units (without behavioral files)
+df = df[df$Threshold != 100,]
+
+# Remove sessions with less than 5 playback trials
+for (key_file in unique(df$Key_file)) {
+  for (stim in unique(df[df$Key_file == key_file,]$AMdepth)) {
+    # Checking the data for the first unit should be enough
+    first_unit_df = df[df$Key_file == key_file & df$AMdepth == stim,]
+    first_unit_df = first_unit_df[first_unit_df$Unit == first_unit_df$Unit[1] & first_unit_df$Period == 'Trial',]
+
+    if (nrow(first_unit_df) < 5) {
+      # print(key_file)
+      df = df[!(df$Key_file == key_file & df$AMdepth == stim),]
+    }
+
+  }
+}
+
+# Write final dfs
+write.csv(dprime_df, '../Data/ACx_ephys/OFC-cannula_ACx-recording_behavior_df.csv', row.names=FALSE)
+write.csv(df, '../Data/ACx_ephys/OFC-cannula_ACx-recording_allTrial_df.csv', row.names=FALSE)
+
+```
+
+# Behavior: trial-by-trial processing
+```{r}
+
+session_files = Sys.glob(file.path('../Data/ACx_ephys/Behavioral performance/shockTraining_active/*trialInfo.csv'))
+get_dprime = function(hr, far) {
+  return( 
+      qnorm(hr) - qnorm(far)
+  )
+}
+subj_list = c()
+session_list = c()
+subj_date_list = c()
+amdepth_list = c()
+ntrials_list = c()
+dprime_list = c()
+hr_list = c()
+far_list = c()
+task_duration = c()
+trial_rate = c()
+
+for (file_name in session_files) {
+  cur_df = read.csv(file_name)
+  cur_df = cur_df[cur_df$Reminder == 0,]  # remove reminders
+  cur_df$AMdepth = round(cur_df$AMdepth, 2)  # round amdepths
+  split_path = strsplit(file_name, '/')[[1]]
+  subject = strsplit(split_path[length(split_path)], '_')[[1]][1]
+  session_id = unique(cur_df$Session_id)
+  
+  # Convert session naming format from ePsych/Synapse to Intan format 
+  if (subject %in% synapse_subjects) {
+    split_session_id = strsplit(session_id, '-')[[1]]
+    # new_datetime = strftime(strptime(paste(split_session_id[3], '_', split_session_id[4], sep=''), format='%y%m%d_%H%M%S'), format='%Y-%m-%d_%H-%M-%S')
+    new_datetime = strftime(strptime(split_session_id[3], format='%y%m%d'), format='%y%m%d')
+  } else {
+    split_session_id = strsplit(session_id, '_')[[1]]
+    new_datetime = strftime(strptime(split_session_id[2], format='%Y-%m-%d'), format='%y%m%d')
+  }
+  
+  subj_date = paste(subject, '_', new_datetime, sep='')
+  
+  goTrial_filter = cur_df$TrialType == 0
+  goStim = cur_df[goTrial_filter,]$AMdepth
+  
+  
+  for(amdepth in sort(unique(goStim))) {
+    cur_amdepth_df = cur_df[cur_df$AMdepth == amdepth,]
+    
+    n_trials = nrow(cur_amdepth_df)
+
+    cur_go_trials = cur_amdepth_df
+    cur_go_trials = cur_go_trials[complete.cases(cur_go_trials),]
+
+    # Skip if less than 5 presentations
+    if(nrow(cur_go_trials) < 5) {next}
+    
+    # cur_trials = cur_df[cur_df$TrialID %in% min(cur_go_trials$TrialID):max(cur_go_trials$TrialID),]
+    nogoTrial_filter = cur_df$TrialType == 1
+    
+    n_fa = sum(cur_df$FA)
+    n_nogo = sum(nogoTrial_filter)
+    far = n_fa / n_nogo
+    # Adjust floor and ceiling
+    if (far < 0.05) { adjusted_far = 0.05 } else if (far > 0.95) { adjusted_far = 0.95 } else {adjusted_far = far}  
+    
+    adjusted_n_fa = adjusted_far * n_nogo
+    
+    # Hit rate
+    n_hit = sum(cur_amdepth_df$Hit)
+    n_go = sum(cur_amdepth_df$TrialType == 0)
+    hr = n_hit / n_go
+    
+    # Adjust floor and ceiling
+    if (hr < 0.05) { adjusted_hr = 0.05 } else if (hr > 0.95) { adjusted_hr = 0.95 } else {adjusted_hr = hr}
+    
+    adjusted_n_hit = adjusted_hr * n_go
+    
+    # Estimate task duration as the last timestamp
+    # cur_duration = max(cur_trials$TimestampSeconds)
+    cur_duration = max(cur_df$Trial_onset)
+    
+    # Store vars
+    subj_list = c(subj_list, subject)
+    session_list = c(session_list, session_id)
+    subj_date_list = c(subj_date_list, subj_date)
+    amdepth_list = c(amdepth_list, amdepth)
+    hr_list = c(hr_list, hr)
+    far_list = c(far_list, far)
+    dprime_list = c(dprime_list, get_dprime(adjusted_hr, adjusted_far))
+    task_duration = c(task_duration, cur_duration)
+    ntrials_list = c(ntrials_list, n_trials)
+    trial_rate = c(trial_rate, n_trials/(cur_duration/60))
+  }
+}
+
+dprime_df = data.frame(Subject=subj_list, Session=session_list, Subject_date=subj_date_list, AMdepth=amdepth_list, D_prime=dprime_list, FA_rate = far_list*100, Hit_rate=hr_list*100, N_Trials = ntrials_list, Task_duration = task_duration, Trial_rate_per_min = trial_rate)
+
+write.csv(dprime_df, '../Data/ACx_ephys/OFC-cannula_ACx-recording_dprime_df_trialInfo.csv', row.names=FALSE)
+
+```
+

@@ -5,6 +5,7 @@
 # Session Data files
 .RData
 .RDataTmp
+.Rproj
 
 # User-specific files
 .Ruserdata
@@ -41,7 +42,7 @@ vignettes/*.pdf
 
 # pkgdown site
 Data/
-docs/Data
+docs/Data/
 
 # translation temp files
 po/*~

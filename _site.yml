@@ -1,13 +1,19 @@
-name: "my-website"
+name: "Macedo-Lima_etal_2024_CurBiol"
 output_dir: "docs"
 navbar:
-  title: "My Website"
+  title: "Supporting code for Macedo-Lima et al., 2024 Current Biology"
   left:
     - text: "Home"
       href: index.html
-    - text: "About"
-      href: about.html
+    - text: "Contact"
+      href: contact.html
+    - text: "Behavior (Fig 1)"
+      href: Behavior_proceduralTraining_analyses.html
     - text: "OFC ephys - Analyses (Figs 2, 3, S1-3)"
       href: OFC_ephys_analyses.html
-    - text: "OFC muscimol + ACx ephys - Analyses (Figs 5, S5-6)"
+    - text: "OFC->ACx photometry - Analyses (Fig S2)"
+      href: OFC-ACx_photometry_analyses.html
+    - text: "OFC muscimol behavior (Figs 4, S4)"
+      href: Behavior_OFCmuscimol_analyses.html
+    - text: "OFC muscimol + ACx ephys - Analyses (Figs 5-6, S5-6)"
       href: ACx_ephys_analyses.html
