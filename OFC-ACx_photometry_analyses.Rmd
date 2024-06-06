@@ -60,5 +60,5 @@ p = ggplot(data=graph_data, aes(x=Time_s_round, y=Signal_mean, color=Trial_type,
 p
 ```
 
-# Fig S1L: Heatmaps were generated using Python
-You can find this code here: https://
+# Fig S1L: Heatmaps were generated using the Python preprocessing pipeline
+You can find this code [here](https://github.com/caraslab/Caraslab_FP_preprocessing_pipeline)

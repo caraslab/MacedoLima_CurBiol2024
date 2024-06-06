@@ -432,8 +432,8 @@ save.image(&#39;./Data/OFC_ephys/OFC_ephys_analyses_env.RData&#39;)
 # Some garbage collection
 gc()</code></pre>
 <pre><code>##            used  (Mb) gc trigger  (Mb)  max used  (Mb)
-## Ncells  3121726 166.8    9653627 515.6   9653627 515.6
-## Vcells 29010424 221.4   96068696 733.0 112541207 858.7</code></pre>
+## Ncells  3121848 166.8    9653605 515.6   9653605 515.6
+## Vcells 29013998 221.4   96073856 733.0 112541134 858.7</code></pre>
 </div>
 <div id="get-some-descriptives" class="section level1">
 <h1>Get some descriptives</h1>
@@ -455,8 +455,8 @@ df_info = df[df$AMdepth_db != -40 &amp; df$Period == &#39;Baseline&#39;,] %&gt;%
   summarise(
     Trial_count = length(unique(TrialID))
   )</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;Subject&#39;, &#39;Session&#39;. You can override using the `.groups`
-## argument.</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;Subject&#39;, &#39;Session&#39;. You can override
+## using the `.groups` argument.</code></pre>
 <pre class="r"><code>df_info %&gt;% group_by(Session) %&gt;%
   summarise(
     Trial_count_mean = mean(Trial_count),
@@ -477,8 +477,8 @@ df_info = df[df$AMdepth_db != -40 &amp; df$Period == &#39;Baseline&#39;,] %&gt;%
     ISI_ViolationRate = mean(ISI_ViolationRate),
     Fraction_missing = mean(Fraction_missing)
   )</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;Subject&#39;, &#39;Unit&#39;, &#39;Subject_date&#39;. You can override using
-## the `.groups` argument.</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;Subject&#39;, &#39;Unit&#39;, &#39;Subject_date&#39;. You can
+## override using the `.groups` argument.</code></pre>
 <pre class="r"><code>table(df_info$Cluster_quality)</code></pre>
 <pre><code>## 
 ## good  mua 
@@ -496,8 +496,8 @@ df_grouped = df[df$Trial_type != &#39;False alarm&#39; &amp; df$Period == &#39;B
     FR_Hz_baseline = mean(FR_Hz),
     Zscore_taskPassive = z_score(FR_Hz[Session==&#39;Active&#39;], FR_Hz[Session==&#39;Pre&#39;])
   )</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;Unit&#39;, &#39;Subject&#39;, &#39;Date&#39;, &#39;Day_of_training&#39;. You can
-## override using the `.groups` argument.</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;Unit&#39;, &#39;Subject&#39;, &#39;Date&#39;, &#39;Day_of_training&#39;. You can override using the `.groups`
+## argument.</code></pre>
 <pre class="r"><code>df_grouped$ActiveBaseline_modulation_direction = factor(df_grouped$ActiveBaseline_modulation_direction, levels=c(&#39;decrease&#39;, &#39;increase&#39;, &#39;none&#39;))
 
 # Plot
@@ -538,8 +538,8 @@ df_grouped = df[df$Trial_type != &#39;False alarm&#39; &amp; df$Period == &#39;B
     FR_Hz_baseline = mean(FR_Hz),
     Zscore_taskPassive = z_score(FR_Hz[Session==&#39;Active&#39;], FR_Hz[Session==&#39;Pre&#39;])
   )</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;Unit&#39;, &#39;Subject&#39;, &#39;Date&#39;, &#39;Day_of_training&#39;. You can
-## override using the `.groups` argument.</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;Unit&#39;, &#39;Subject&#39;, &#39;Date&#39;, &#39;Day_of_training&#39;. You can override using the `.groups`
+## argument.</code></pre>
 <pre class="r"><code>df_grouped$ActiveBaseline_modulation_direction = factor(df_grouped$ActiveBaseline_modulation_direction, levels=c(&#39;decrease&#39;, &#39;increase&#39;, &#39;none&#39;))
 
 # Plot
@@ -607,9 +607,8 @@ df_grouped = df[df$Trial_type != &#39;False alarm&#39;,] %&gt;% group_by(Unit, S
     Threshold_linear = mean(Threshold_linear, na.rm=T),
     Threshold = mean(Threshold, na.rm=T)
   )</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;Unit&#39;, &#39;Subject&#39;, &#39;Subject_date&#39;, &#39;Session&#39;, &#39;Period&#39;,
-## &#39;ActiveBaseline_modulated&#39;, &#39;ActiveBaseline_modulation_direction&#39;. You can override using the
-## `.groups` argument.</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;Unit&#39;, &#39;Subject&#39;, &#39;Subject_date&#39;, &#39;Session&#39;, &#39;Period&#39;, &#39;ActiveBaseline_modulated&#39;,
+## &#39;ActiveBaseline_modulation_direction&#39;. You can override using the `.groups` argument.</code></pre>
 <pre class="r"><code>df_grouped$ActiveBaseline_modulation_direction = factor(df_grouped$ActiveBaseline_modulation_direction, levels=c(&#39;decrease&#39;, &#39;increase&#39;, &#39;none&#39;))
 df_grouped$Session = factor(df_grouped$Session, levels=c(&#39;Pre&#39;, &#39;Active&#39;, &#39;Post&#39;))
 df_grouped = df_grouped[!is.na(df_grouped$Session),]
@@ -728,8 +727,8 @@ df_grouped = auroc_df[auroc_df$TrialType != &#39;SpoutOff_misses_auroc&#39;,] %&
     auroc_timeSlice_abs = mean(abs(auROC[(Time_s &gt;= time_slice[1]) &amp; (Time_s &lt; time_slice[2])] - 0.5), na.rm=T),
     auroc_timeSlice_all = all( abs(auROC[(Time_s &gt;= time_slice[1]) &amp; (Time_s &lt; time_slice[2])] - 0.5) &gt; 0.1)
   )</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;Unit&#39;, &#39;Subject&#39;, &#39;TrialType&#39;. You can override using the
-## `.groups` argument.</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;Unit&#39;, &#39;Subject&#39;, &#39;TrialType&#39;. You can
+## override using the `.groups` argument.</code></pre>
 <pre class="r"><code>df_grouped = df_grouped[!is.na(df_grouped$auroc_timeSlice_mean),]
 df_grouped$TrialType = factor(df_grouped$TrialType, levels=c(&#39;SpoutOff_hits_auroc&#39;, &#39;SpoutOff_FAs_auroc&#39;))
 levels(df_grouped$TrialType) = c(&#39;Hit&#39;, &#39;False alarm&#39;)
@@ -907,8 +906,8 @@ df_grouped = auroc_df[auroc_df$TrialType %in% c(&#39;SpoutOff_hits_auroc&#39;, &
     auroc_timeSlice_abs = mean(abs(auROC[(Time_s &gt;= time_slice[1]) &amp; (Time_s &lt; time_slice[2])] - 0.5), na.rm=T),
     auroc_timeSlice_all = all( abs(auROC[(Time_s &gt;= time_slice[1]) &amp; (Time_s &lt; time_slice[2])] - 0.5) &gt;= 0.1)
   )</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;Unit&#39;, &#39;Subject&#39;, &#39;TrialType&#39;. You can override using the
-## `.groups` argument.</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;Unit&#39;, &#39;Subject&#39;, &#39;TrialType&#39;. You can
+## override using the `.groups` argument.</code></pre>
 <pre class="r"><code>df_grouped = df_grouped[!is.na(df_grouped$auroc_timeSlice_mean),]
 df_grouped$TrialType = factor(df_grouped$TrialType, levels=c(&#39;SpoutOff_hits_auroc&#39;, &#39;SpoutOff_FAs_auroc&#39;, &#39;SpoutOff_misses_auroc&#39;))
 levels(df_grouped$TrialType) = c(&#39;Hit&#39;, &#39;False alarm&#39;, &#39;Miss&#39;)
@@ -1159,8 +1158,8 @@ df_grouped = auroc_df %&gt;% group_by(Unit, Subject, TrialType, ActiveBaseline_m
   summarise( 
     auroc_timeSlice_abs = mean(abs(auROC[(Time_s &gt;= time_slice[1]) &amp; (Time_s &lt; time_slice[2])] - 0.5), na.rm=T)
   )</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;Unit&#39;, &#39;Subject&#39;, &#39;TrialType&#39;. You can override using the
-## `.groups` argument.</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;Unit&#39;, &#39;Subject&#39;, &#39;TrialType&#39;. You can
+## override using the `.groups` argument.</code></pre>
 <pre class="r"><code>df_grouped$TrialType = factor(df_grouped$TrialType, levels=c(&#39;SpoutOff_hits_auroc&#39;, &#39;SpoutOff_FAs_auroc&#39;, &#39;SpoutOff_misses_auroc&#39;))
 levels(df_grouped$TrialType) = c(&#39;Hit&#39;, &#39;False alarm&#39;, &#39;Miss&#39;)
 df_grouped$ActiveBaseline_modulation_direction = factor(df_grouped$ActiveBaseline_modulation_direction, levels=c(&#39;decrease&#39;, &#39;increase&#39;, &#39;none&#39;))
@@ -1280,8 +1279,8 @@ df_grouped = auroc_df[auroc_df$TrialType %in% c(&#39;SpoutOff_hits_auroc&#39;, &
   summarise( 
     auroc_timeSlice_abs = mean(abs(auROC[(Time_s &gt;= time_slice[1]) &amp; (Time_s &lt; time_slice[2])] - 0.5), na.rm=T)
   )</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;Unit&#39;, &#39;Subject&#39;, &#39;TrialType&#39;. You can override using the
-## `.groups` argument.</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;Unit&#39;, &#39;Subject&#39;, &#39;TrialType&#39;. You can
+## override using the `.groups` argument.</code></pre>
 <pre class="r"><code>df_grouped$TrialType = factor(df_grouped$TrialType, levels=c(&#39;SpoutOff_hits_auroc&#39;, &#39;SpoutOff_FAs_auroc&#39;))
 levels(df_grouped$TrialType) = c(&#39;Hit&#39;, &#39;False alarm&#39;)
 df_grouped$ActiveBaseline_modulation_direction = factor(df_grouped$ActiveBaseline_modulation_direction, levels=c(&#39;decrease&#39;, &#39;increase&#39;, &#39;none&#39;))
@@ -1324,11 +1323,13 @@ simulationOutput &lt;- simulateResiduals(fittedModel = lme_bin, plot = T, re.for
 </div>
 </div>
 </div>
-<div id="fig-s1g-heatmaps-were-generated-using-python."
+<div
+id="fig-s1g-heatmaps-were-generated-using-our-python-preprocessing-pipeline."
 class="section level1">
-<h1>Fig S1G heatmaps were generated using Python.</h1>
-<p>You can find this code here: <a href="https://"
-class="uri">https://</a></p>
+<h1>Fig S1G heatmaps were generated using our Python preprocessing
+pipeline.</h1>
+<p>You can find this code <a
+href="https://github.com/biomath/Caraslab_EPhys_preprocessing_pipeline">here</a></p>
 </div>
 
 

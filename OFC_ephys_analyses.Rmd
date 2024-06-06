@@ -39,6 +39,7 @@ Uncomment chunk below if the second block of code has been run previously and do
 
 ```
 
+
 No need to run if chunk above has been run
 ```{r echo=TRUE}
 library(ggplot2)
@@ -826,5 +827,5 @@ simulationOutput <- simulateResiduals(fittedModel = lme_bin, plot = T, re.form=N
 Anova(lme_bin)
 ```
 
-# Fig S1G heatmaps were generated using Python.
-You can find this code here: https://
+# Fig S1G heatmaps were generated using our Python preprocessing pipeline.
+You can find this code [here](https://github.com/biomath/Caraslab_EPhys_preprocessing_pipeline)
