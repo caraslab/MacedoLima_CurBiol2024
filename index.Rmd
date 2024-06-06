@@ -16,7 +16,7 @@ The workflow for most datasets in this project was:
     - [Fiber photometry + behavior](https://github.com/caraslab/caraslab-fiberphotometry)
 
 3. Data processing and plotting with Python:
-    - [EPhys + behavior](https://github.com/biomath/Caraslab_EPhys_preprocessing_pipeline)
+    - [EPhys + behavior](https://github.com/caraslab/Caraslab_EPhys_preprocessing_pipeline)
     - [Fiber photometry + behavior](https://github.com/caraslab/Caraslab_FP_preprocessing_pipeline)
 
 4. Data analysis and plotting with R pipeline (current repository)
