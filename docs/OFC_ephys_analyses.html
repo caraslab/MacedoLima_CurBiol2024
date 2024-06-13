@@ -431,9 +431,9 @@ save.image(&#39;./Data/OFC_ephys/OFC_ephys_analyses_env.RData&#39;)
 
 # Some garbage collection
 gc()</code></pre>
-<pre><code>##            used  (Mb) gc trigger  (Mb)  max used  (Mb)
-## Ncells  3121848 166.8    9653605 515.6   9653605 515.6
-## Vcells 29013998 221.4   96073856 733.0 112541134 858.7</code></pre>
+<pre><code>##            used  (Mb) gc trigger  (Mb)  max used   (Mb)
+## Ncells  3198651 170.9    9810578 524.0   9810578  524.0
+## Vcells 58783320 448.5  125650396 958.7 151228459 1153.8</code></pre>
 </div>
 <div id="get-some-descriptives" class="section level1">
 <h1>Get some descriptives</h1>
@@ -477,8 +477,8 @@ df_info = df[df$AMdepth_db != -40 &amp; df$Period == &#39;Baseline&#39;,] %&gt;%
     ISI_ViolationRate = mean(ISI_ViolationRate),
     Fraction_missing = mean(Fraction_missing)
   )</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;Subject&#39;, &#39;Unit&#39;, &#39;Subject_date&#39;. You can
-## override using the `.groups` argument.</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;Subject&#39;, &#39;Unit&#39;, &#39;Subject_date&#39;. You
+## can override using the `.groups` argument.</code></pre>
 <pre class="r"><code>table(df_info$Cluster_quality)</code></pre>
 <pre><code>## 
 ## good  mua 
@@ -496,8 +496,8 @@ df_grouped = df[df$Trial_type != &#39;False alarm&#39; &amp; df$Period == &#39;B
     FR_Hz_baseline = mean(FR_Hz),
     Zscore_taskPassive = z_score(FR_Hz[Session==&#39;Active&#39;], FR_Hz[Session==&#39;Pre&#39;])
   )</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;Unit&#39;, &#39;Subject&#39;, &#39;Date&#39;, &#39;Day_of_training&#39;. You can override using the `.groups`
-## argument.</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;Unit&#39;, &#39;Subject&#39;, &#39;Date&#39;,
+## &#39;Day_of_training&#39;. You can override using the `.groups` argument.</code></pre>
 <pre class="r"><code>df_grouped$ActiveBaseline_modulation_direction = factor(df_grouped$ActiveBaseline_modulation_direction, levels=c(&#39;decrease&#39;, &#39;increase&#39;, &#39;none&#39;))
 
 # Plot
@@ -538,8 +538,8 @@ df_grouped = df[df$Trial_type != &#39;False alarm&#39; &amp; df$Period == &#39;B
     FR_Hz_baseline = mean(FR_Hz),
     Zscore_taskPassive = z_score(FR_Hz[Session==&#39;Active&#39;], FR_Hz[Session==&#39;Pre&#39;])
   )</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;Unit&#39;, &#39;Subject&#39;, &#39;Date&#39;, &#39;Day_of_training&#39;. You can override using the `.groups`
-## argument.</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;Unit&#39;, &#39;Subject&#39;, &#39;Date&#39;,
+## &#39;Day_of_training&#39;. You can override using the `.groups` argument.</code></pre>
 <pre class="r"><code>df_grouped$ActiveBaseline_modulation_direction = factor(df_grouped$ActiveBaseline_modulation_direction, levels=c(&#39;decrease&#39;, &#39;increase&#39;, &#39;none&#39;))
 
 # Plot
@@ -607,8 +607,10 @@ df_grouped = df[df$Trial_type != &#39;False alarm&#39;,] %&gt;% group_by(Unit, S
     Threshold_linear = mean(Threshold_linear, na.rm=T),
     Threshold = mean(Threshold, na.rm=T)
   )</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;Unit&#39;, &#39;Subject&#39;, &#39;Subject_date&#39;, &#39;Session&#39;, &#39;Period&#39;, &#39;ActiveBaseline_modulated&#39;,
-## &#39;ActiveBaseline_modulation_direction&#39;. You can override using the `.groups` argument.</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;Unit&#39;, &#39;Subject&#39;, &#39;Subject_date&#39;,
+## &#39;Session&#39;, &#39;Period&#39;, &#39;ActiveBaseline_modulated&#39;,
+## &#39;ActiveBaseline_modulation_direction&#39;. You can override using the
+## `.groups` argument.</code></pre>
 <pre class="r"><code>df_grouped$ActiveBaseline_modulation_direction = factor(df_grouped$ActiveBaseline_modulation_direction, levels=c(&#39;decrease&#39;, &#39;increase&#39;, &#39;none&#39;))
 df_grouped$Session = factor(df_grouped$Session, levels=c(&#39;Pre&#39;, &#39;Active&#39;, &#39;Post&#39;))
 df_grouped = df_grouped[!is.na(df_grouped$Session),]
@@ -719,22 +721,26 @@ auroc_df = auroc_df[, -grep(&quot;temp&quot;, colnames(auroc_df))]
 
 time_slice = c(-0.5, 0)  # 0-0.1 s is not included
 
-auroc_cutoffs = c(0.45, 0.55)
-
 df_grouped = auroc_df[auroc_df$TrialType != &#39;SpoutOff_misses_auroc&#39;,] %&gt;% group_by(Unit, Subject, TrialType, ActiveBaseline_modulation_direction) %&gt;%
   summarise( 
     auroc_timeSlice_mean = mean(auROC[(Time_s &gt;= time_slice[1]) &amp; (Time_s &lt; time_slice[2])], na.rm=T),
-    auroc_timeSlice_abs = mean(abs(auROC[(Time_s &gt;= time_slice[1]) &amp; (Time_s &lt; time_slice[2])] - 0.5), na.rm=T),
-    auroc_timeSlice_all = all( abs(auROC[(Time_s &gt;= time_slice[1]) &amp; (Time_s &lt; time_slice[2])] - 0.5) &gt; 0.1)
+    phasic_modulation = mean(abs(auROC[(Time_s &gt;= time_slice[1]) &amp; (Time_s &lt; time_slice[2])] - 0.5), na.rm=T)
   )</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;Unit&#39;, &#39;Subject&#39;, &#39;TrialType&#39;. You can
-## override using the `.groups` argument.</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;Unit&#39;, &#39;Subject&#39;, &#39;TrialType&#39;. You
+## can override using the `.groups` argument.</code></pre>
 <pre class="r"><code>df_grouped = df_grouped[!is.na(df_grouped$auroc_timeSlice_mean),]
 df_grouped$TrialType = factor(df_grouped$TrialType, levels=c(&#39;SpoutOff_hits_auroc&#39;, &#39;SpoutOff_FAs_auroc&#39;))
 levels(df_grouped$TrialType) = c(&#39;Hit&#39;, &#39;False alarm&#39;)
 
+# Calculate the confidence interval&#39;s upper bound
+l.model &lt;- lm(phasic_modulation ~ 1, df_grouped)
+abs_cutoff = confint(l.model, level=0.95)[2]
 
-# Cutoff based on auROC
+# Transform upper bound back to auROC metric space
+upper_cutoff = 0.5 + abs_cutoff
+lower_cutoff = 0.5 - abs_cutoff
+
+# Cutoff based on 95% CI upper bound of the absolute phasic modulation
 df_grouped$PreHit_modulated = &#39;unmodulated&#39;
 df_grouped$PreFA_modulated = &#39;unmodulated&#39;
 df_grouped$PreMiss_modulated = &#39;unmodulated&#39;
@@ -746,16 +752,16 @@ df_grouped$PreMiss_modulation_direction = &#39;none&#39;
 
 # Hit-modulated
 temp_df = df_grouped[df_grouped$TrialType == &#39;Hit&#39;,]
-temp_increase_units = temp_df[(temp_df$auroc_timeSlice_mean &gt; auroc_cutoffs[2]),]$Unit
-temp_decrease_units = temp_df[(temp_df$auroc_timeSlice_mean &lt; auroc_cutoffs[1]),]$Unit
+temp_increase_units = temp_df[(temp_df$auroc_timeSlice_mean &gt; upper_cutoff),]$Unit
+temp_decrease_units = temp_df[(temp_df$auroc_timeSlice_mean &lt;  lower_cutoff),]$Unit
 df_grouped[df_grouped$Unit %in% temp_increase_units,]$PreHit_modulation_direction = &#39;increase&#39;
 df_grouped[df_grouped$Unit %in% temp_decrease_units,]$PreHit_modulation_direction = &#39;decrease&#39;
 df_grouped[df_grouped$PreHit_modulation_direction != &#39;none&#39;,]$PreHit_modulated = &#39;modulated&#39;
 
 # FA-modulated
 temp_df = df_grouped[df_grouped$TrialType == &#39;False alarm&#39;,]
-temp_increase_units = temp_df[(temp_df$auroc_timeSlice_mean &gt; auroc_cutoffs[2]),]$Unit
-temp_decrease_units = temp_df[(temp_df$auroc_timeSlice_mean &lt; auroc_cutoffs[1]),]$Unit
+temp_increase_units = temp_df[(temp_df$auroc_timeSlice_mean &gt; upper_cutoff),]$Unit
+temp_decrease_units = temp_df[(temp_df$auroc_timeSlice_mean &lt;  lower_cutoff),]$Unit
 df_grouped[df_grouped$Unit %in% temp_increase_units,]$PreFA_modulation_direction = &#39;increase&#39;
 df_grouped[df_grouped$Unit %in% temp_decrease_units,]$PreFA_modulation_direction = &#39;decrease&#39;
 df_grouped[df_grouped$PreFA_modulation_direction != &#39;none&#39;,]$PreFA_modulated = &#39;modulated&#39;
@@ -770,45 +776,45 @@ cur_table = table(graph_data$PreHit_modulation_direction)
 cur_table</code></pre>
 <pre><code>## 
 ## decrease increase     none 
-##      103      192      238</code></pre>
+##       30      104      399</code></pre>
 <pre class="r"><code>cur_table/sum(cur_table)</code></pre>
 <pre><code>## 
-##  decrease  increase      none 
-## 0.1932458 0.3602251 0.4465291</code></pre>
-<pre class="r"><code>hit_values = cur_table[1:2]/sum(cur_table)*100
+##   decrease   increase       none 
+## 0.05628518 0.19512195 0.74859287</code></pre>
+<pre class="r"><code>hit_values = sum(cur_table[1:2]/sum(cur_table)*100)  # For labeling the plot
 
 cur_table = table(graph_data$PreFA_modulation_direction)
 cur_table</code></pre>
 <pre><code>## 
 ## decrease increase     none 
-##       77      172      284</code></pre>
+##       16       87      430</code></pre>
 <pre class="r"><code>cur_table/sum(cur_table)</code></pre>
 <pre><code>## 
-##  decrease  increase      none 
-## 0.1444653 0.3227017 0.5328330</code></pre>
-<pre class="r"><code>fa_values = cur_table[1:2]/sum(cur_table)*100
+##   decrease   increase       none 
+## 0.03001876 0.16322702 0.80675422</code></pre>
+<pre class="r"><code>fa_values = sum(cur_table[1:2]/sum(cur_table)*100)  # For labeling the plot
 
 cur_table = table(graph_data$PreHitOrFA_modulated)
 cur_table</code></pre>
 <pre><code>## 
 ##   modulated unmodulated 
-##         383         150</code></pre>
+##         180         353</code></pre>
 <pre class="r"><code>cur_table/sum(cur_table)</code></pre>
 <pre><code>## 
 ##   modulated unmodulated 
-##   0.7185741   0.2814259</code></pre>
+##   0.3377111   0.6622889</code></pre>
 <pre class="r"><code># Plot distributions
 graph_data = df_grouped
 
-y_axis = seq(0, 40, 20)
-x_axis = c(0, 0.45, 0.55, 1)
-p = ggplot(df_grouped, aes(x=auroc_timeSlice_mean, fill=TrialType)) + 
+y_axis = seq(0, 60, 20)
+x_axis = round(c(0, abs_cutoff, 0.5), 1)
+p = ggplot(df_grouped, aes(x=phasic_modulation, fill=TrialType)) + 
 
   geom_histogram(alpha=0.5, position=&quot;identity&quot;, binwidth=0.01, color=&#39;NA&#39;, boundary=0) +
   
-  geom_vline(xintercept=0.55, size=LINE_THICKNESS/4) +
-  
-  geom_vline(xintercept=0.45, size=LINE_THICKNESS/4) +
+  # geom_vline(xintercept=lower_cutoff, size=LINE_THICKNESS/4, linetype=&#39;dashed&#39;) +
+  geom_vline(xintercept=round(abs_cutoff, 1), size=LINE_THICKNESS/4, linetype=&#39;dashed&#39;) +
+
   
   scale_y_continuous(breaks=y_axis, expand=c(0, 0)) +
   
@@ -824,8 +830,8 @@ p = ggplot(df_grouped, aes(x=auroc_timeSlice_mean, fill=TrialType)) +
   xlab(&#39;Phasic modulation&#39;) +
   
   # Add percentage values
-  annotate(&quot;text&quot;, x=c(0.2, 0.8), y=c(20, 20), label=paste(round(hit_values, 0), &#39;%&#39;, sep=&#39;&#39;), color=TRIALTYPE_MODULATION_COLORS[1], size=7) + 
-  annotate(&quot;text&quot;, x=c(0.2, 0.8), y=c(18, 18), label=paste(round(fa_values, 0), &#39;%&#39;, sep=&#39;&#39;), color=TRIALTYPE_MODULATION_COLORS[2], size=7) + 
+  annotate(&quot;text&quot;, x=c(0.3), y=c(25), label=paste(round(hit_values, 0), &#39;%&#39;, sep=&#39;&#39;), color=TRIALTYPE_MODULATION_COLORS[1], size=LINE_THICKNESS*10) + 
+  annotate(&quot;text&quot;, x=c(0.3), y=c(20), label=paste(round(fa_values, 0), &#39;%&#39;, sep=&#39;&#39;), color=TRIALTYPE_MODULATION_COLORS[2], size=LINE_THICKNESS*10) + 
   
   theme(
     legend.position=c(0.85, 0.85)
@@ -873,13 +879,13 @@ p</code></pre>
 <div id="stats-2" class="section level3">
 <h3>Stats</h3>
 <pre class="r"><code>lme_data = df_grouped
-lme_bin &lt;- glmmTMB((blom(auroc_timeSlice_abs, method=&#39;rankit&#39;))~ TrialType + (1 | Subject/Unit/TrialType),  data=lme_data, family=gaussian)
+lme_bin &lt;- glmmTMB((blom(phasic_modulation, method=&#39;rankit&#39;))~ TrialType + (1 | Subject/Unit/TrialType),  data=lme_data, family=gaussian)
 simulationOutput &lt;- simulateResiduals(fittedModel = lme_bin, plot = T, re.form=NULL)  # pass</code></pre>
 <p><img src="OFC_ephys_analyses_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
 <pre class="r"><code>Anova(lme_bin)</code></pre>
 <pre><code>## Analysis of Deviance Table (Type II Wald chisquare tests)
 ## 
-## Response: (blom(auroc_timeSlice_abs, method = &quot;rankit&quot;))
+## Response: (blom(phasic_modulation, method = &quot;rankit&quot;))
 ##            Chisq Df Pr(&gt;Chisq)    
 ## TrialType 49.281  1  2.218e-12 ***
 ## ---
@@ -898,20 +904,25 @@ auroc_df = auroc_df[, -grep(&quot;temp&quot;, colnames(auroc_df))]  # Remove tem
 
 time_slice = c(0.3, 0.8) # 0.8-0.9 s is not included
 
-auroc_cutoffs = c(0.45, 0.55)
-
 df_grouped = auroc_df[auroc_df$TrialType %in% c(&#39;SpoutOff_hits_auroc&#39;, &#39;SpoutOff_FAs_auroc&#39;, &#39;SpoutOff_misses_auroc&#39;),] %&gt;% group_by(Unit, Subject, TrialType, ActiveBaseline_modulation_direction) %&gt;%
   summarise( 
     auroc_timeSlice_mean = mean(auROC[(Time_s &gt;= time_slice[1]) &amp; (Time_s &lt; time_slice[2])], na.rm=T),
-    auroc_timeSlice_abs = mean(abs(auROC[(Time_s &gt;= time_slice[1]) &amp; (Time_s &lt; time_slice[2])] - 0.5), na.rm=T),
-    auroc_timeSlice_all = all( abs(auROC[(Time_s &gt;= time_slice[1]) &amp; (Time_s &lt; time_slice[2])] - 0.5) &gt;= 0.1)
+    phasic_modulation = mean(abs(auROC[(Time_s &gt;= time_slice[1]) &amp; (Time_s &lt; time_slice[2])] - 0.5), na.rm=T)
   )</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;Unit&#39;, &#39;Subject&#39;, &#39;TrialType&#39;. You can
-## override using the `.groups` argument.</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;Unit&#39;, &#39;Subject&#39;, &#39;TrialType&#39;. You
+## can override using the `.groups` argument.</code></pre>
 <pre class="r"><code>df_grouped = df_grouped[!is.na(df_grouped$auroc_timeSlice_mean),]
 df_grouped$TrialType = factor(df_grouped$TrialType, levels=c(&#39;SpoutOff_hits_auroc&#39;, &#39;SpoutOff_FAs_auroc&#39;, &#39;SpoutOff_misses_auroc&#39;))
 levels(df_grouped$TrialType) = c(&#39;Hit&#39;, &#39;False alarm&#39;, &#39;Miss&#39;)
 
+
+# Calculate the confidence interval&#39;s upper bound from the phasic modulation distribution
+l.model &lt;- lm(phasic_modulation ~ 1, df_grouped)
+abs_cutoff = confint(l.model, level=0.95)[2]
+
+# Transform upper bound back to auROC metric space
+upper_cutoff = 0.5 + abs_cutoff
+lower_cutoff = 0.5 - abs_cutoff
 
 # Cutoff based on auROC
 df_grouped$PostHit_modulated = &#39;unmodulated&#39;
@@ -925,24 +936,24 @@ df_grouped$PostMiss_modulation_direction = &#39;none&#39;
 
 # Hit modulation
 temp_df = df_grouped[df_grouped$TrialType == &#39;Hit&#39;,]
-temp_increase_units = temp_df[(temp_df$auroc_timeSlice_mean &gt; auroc_cutoffs[2]),]$Unit
-temp_decrease_units = temp_df[(temp_df$auroc_timeSlice_mean &lt; auroc_cutoffs[1]),]$Unit
+temp_increase_units = temp_df[(temp_df$auroc_timeSlice_mean &gt; upper_cutoff),]$Unit
+temp_decrease_units = temp_df[(temp_df$auroc_timeSlice_mean &lt;  lower_cutoff),]$Unit
 df_grouped[df_grouped$Unit %in% temp_increase_units,]$PostHit_modulation_direction = &#39;increase&#39;
 df_grouped[df_grouped$Unit %in% temp_decrease_units,]$PostHit_modulation_direction = &#39;decrease&#39;
 df_grouped[df_grouped$PostHit_modulation_direction != &#39;none&#39;,]$PostHit_modulated = &#39;modulated&#39;
 
 # FA modulation
 temp_df = df_grouped[df_grouped$TrialType == &#39;False alarm&#39;,]
-temp_increase_units = temp_df[(temp_df$auroc_timeSlice_mean &gt; auroc_cutoffs[2]),]$Unit
-temp_decrease_units = temp_df[(temp_df$auroc_timeSlice_mean &lt; auroc_cutoffs[1]),]$Unit
+temp_increase_units = temp_df[(temp_df$auroc_timeSlice_mean &gt; upper_cutoff),]$Unit
+temp_decrease_units = temp_df[(temp_df$auroc_timeSlice_mean &lt;  lower_cutoff),]$Unit
 df_grouped[df_grouped$Unit %in% temp_increase_units,]$PostFA_modulation_direction = &#39;increase&#39;
 df_grouped[df_grouped$Unit %in% temp_decrease_units,]$PostFA_modulation_direction = &#39;decrease&#39;
 df_grouped[df_grouped$PostFA_modulation_direction != &#39;none&#39;,]$PostFA_modulated = &#39;modulated&#39;
 
 # Miss modulation
 temp_df = df_grouped[df_grouped$TrialType == &#39;Miss&#39;,]
-temp_increase_units = temp_df[(temp_df$auroc_timeSlice_mean &gt; auroc_cutoffs[2]),]$Unit
-temp_decrease_units = temp_df[(temp_df$auroc_timeSlice_mean &lt; auroc_cutoffs[1]),]$Unit
+temp_increase_units = temp_df[(temp_df$auroc_timeSlice_mean &gt; upper_cutoff),]$Unit
+temp_decrease_units = temp_df[(temp_df$auroc_timeSlice_mean &lt;  lower_cutoff),]$Unit
 df_grouped[df_grouped$Unit %in% temp_increase_units,]$PostMiss_modulation_direction = &#39;increase&#39;
 df_grouped[df_grouped$Unit %in% temp_decrease_units,]$PostMiss_modulation_direction = &#39;decrease&#39;
 df_grouped[df_grouped$PostMiss_modulation_direction != &#39;none&#39;,]$PostMiss_modulated = &#39;modulated&#39;
@@ -958,60 +969,56 @@ cur_table = table(graph_data$PostHit_modulation_direction)
 cur_table</code></pre>
 <pre><code>## 
 ## decrease increase     none 
-##      113      331       89</code></pre>
+##       55      201      277</code></pre>
 <pre class="r"><code>cur_table/sum(cur_table)</code></pre>
 <pre><code>## 
 ##  decrease  increase      none 
-## 0.2120075 0.6210131 0.1669794</code></pre>
-<pre class="r"><code>hit_values = cur_table[1:2]/sum(cur_table)*100
+## 0.1031895 0.3771107 0.5196998</code></pre>
+<pre class="r"><code>hit_values = sum(cur_table[1:2]/sum(cur_table)*100)
 
 cur_table = table(graph_data$PostFA_modulation_direction)
 cur_table</code></pre>
 <pre><code>## 
 ## decrease increase     none 
-##       85      297      151</code></pre>
+##       25      133      375</code></pre>
 <pre class="r"><code>cur_table/sum(cur_table)</code></pre>
 <pre><code>## 
-##  decrease  increase      none 
-## 0.1594747 0.5572233 0.2833021</code></pre>
-<pre class="r"><code>fa_values = cur_table[1:2]/sum(cur_table)*100
+##   decrease   increase       none 
+## 0.04690432 0.24953096 0.70356473</code></pre>
+<pre class="r"><code>fa_values = sum(cur_table[1:2]/sum(cur_table)*100)
 
 cur_table = table(graph_data$PostMiss_modulation_direction)
 cur_table</code></pre>
 <pre><code>## 
 ## decrease increase     none 
-##      112      273      148</code></pre>
+##       36      118      379</code></pre>
 <pre class="r"><code>cur_table/sum(cur_table)</code></pre>
 <pre><code>## 
-##  decrease  increase      none 
-## 0.2101313 0.5121951 0.2776735</code></pre>
-<pre class="r"><code>miss_values = cur_table[1:2]/sum(cur_table)*100
+##   decrease   increase       none 
+## 0.06754221 0.22138837 0.71106942</code></pre>
+<pre class="r"><code>miss_values = sum(cur_table[1:2]/sum(cur_table)*100)
 
 cur_table = table(graph_data$PostHitOrFAOrMiss_modulated)
 cur_table</code></pre>
 <pre><code>## 
 ##   modulated unmodulated 
-##         481          52</code></pre>
+##         278         255</code></pre>
 <pre class="r"><code>cur_table/sum(cur_table)</code></pre>
 <pre><code>## 
 ##   modulated unmodulated 
-##  0.90243902  0.09756098</code></pre>
+##    0.521576    0.478424</code></pre>
 <pre class="r"><code># Plot distributions
 graph_data = df_grouped
 
-y_axis = seq(0, 40, 20)
-x_axis = c(0, 0.45, 0.55, 1)
-p = ggplot(df_grouped, aes(x=auroc_timeSlice_mean, fill=TrialType)) + 
-  # facet_grid(.~TrialType) +
-    # geom_density(alpha=0.2, fill=&#39;NA&#39;, adjust=1, size=LINE_THICKNESS/2) +
-
-  
+y_axis = seq(0, 60, 20)
+x_axis = round(c(0, abs_cutoff, 0.5), 1)
+p = ggplot(df_grouped, aes(x=phasic_modulation, fill=TrialType)) + 
 
   geom_histogram(alpha=0.5, position=&quot;identity&quot;, binwidth=0.01, color=&#39;NA&#39;, boundary=0) +
   
-  geom_vline(xintercept=0.55, size=LINE_THICKNESS/4) +
-  
-  geom_vline(xintercept=0.45, size=LINE_THICKNESS/4) +
+  # geom_vline(xintercept=lower_cutoff, size=LINE_THICKNESS/4, linetype=&#39;dashed&#39;) +
+  geom_vline(xintercept=round(abs_cutoff, 1), size=LINE_THICKNESS/4, linetype=&#39;dashed&#39;) +
+
   
   scale_y_continuous(breaks=y_axis, expand=c(0, 0)) +
   
@@ -1019,21 +1026,20 @@ p = ggplot(df_grouped, aes(x=auroc_timeSlice_mean, fill=TrialType)) +
   
   coord_cartesian(ylim = c(min(y_axis), max(y_axis)), 
                   xlim = c(min(x_axis), max(x_axis))) +
-
-  # scale_linetype_manual(values = plot_linetypes) +
+  
   scale_color_manual(values = TRIALTYPE_MODULATION_COLORS, name=&#39;&#39;) +
   scale_fill_manual(values = TRIALTYPE_MODULATION_COLORS, name=&#39;&#39;) +
   
   ylab(&#39;Number of units&#39;) +
-  xlab(&#39;Phasic modulation&#39;) +
+  xlab(&#39;Mean phasic modulation&#39;) +
   
   # Add percentage values
-  annotate(&quot;text&quot;, x=c(0.2, 0.8), y=c(20, 20), label=paste(round(hit_values, 0), &#39;%&#39;, sep=&#39;&#39;), color=TRIALTYPE_MODULATION_COLORS[1], size=7) + 
-  annotate(&quot;text&quot;, x=c(0.2, 0.8), y=c(18, 18), label=paste(round(fa_values, 0), &#39;%&#39;, sep=&#39;&#39;), color=TRIALTYPE_MODULATION_COLORS[2], size=7) + 
-  annotate(&quot;text&quot;, x=c(0.2, 0.8), y=c(16, 16), label=paste(round(miss_values, 0), &#39;%&#39;, sep=&#39;&#39;), color=TRIALTYPE_MODULATION_COLORS[3], size=7) + 
+  annotate(&quot;text&quot;, x=c(0.3), y=c(30), label=paste(round(hit_values, 0), &#39;%&#39;, sep=&#39;&#39;), color=TRIALTYPE_MODULATION_COLORS[1], size=LINE_THICKNESS*10) + 
+  annotate(&quot;text&quot;, x=c(0.3), y=c(25), label=paste(round(fa_values, 0), &#39;%&#39;, sep=&#39;&#39;), color=TRIALTYPE_MODULATION_COLORS[2], size=LINE_THICKNESS*10) + 
+  annotate(&quot;text&quot;, x=c(0.3), y=c(20), label=paste(round(miss_values, 0), &#39;%&#39;, sep=&#39;&#39;), color=TRIALTYPE_MODULATION_COLORS[3], size=LINE_THICKNESS*10) + 
   
   theme(
-    legend.position = c(0.85, 0.85)
+    legend.position=c(0.85, 0.85)
   )
 p</code></pre>
 <p><img src="OFC_ephys_analyses_files/figure-html/unnamed-chunk-12-1.png" width="576" /></p>
@@ -1081,13 +1087,13 @@ p</code></pre>
 <div id="stats-3" class="section level3">
 <h3>Stats</h3>
 <pre class="r"><code>lme_data = df_grouped
-lme_bin &lt;- glmmTMB(blom(auroc_timeSlice_abs, method=&#39;rankit&#39;)*10~ TrialType + (1 | Subject/Unit/TrialType),  data=lme_data, family=gaussian)
+lme_bin &lt;- glmmTMB(blom(phasic_modulation, method=&#39;rankit&#39;)*10~ TrialType + (1 | Subject/Unit/TrialType),  data=lme_data, family=gaussian)
 simulationOutput &lt;- simulateResiduals(fittedModel = lme_bin, plot = T, re.form=NULL)  # pass</code></pre>
 <p><img src="OFC_ephys_analyses_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
 <pre class="r"><code>Anova(lme_bin)</code></pre>
 <pre><code>## Analysis of Deviance Table (Type II Wald chisquare tests)
 ## 
-## Response: blom(auroc_timeSlice_abs, method = &quot;rankit&quot;) * 10
+## Response: blom(phasic_modulation, method = &quot;rankit&quot;) * 10
 ##            Chisq Df Pr(&gt;Chisq)    
 ## TrialType 203.98  2  &lt; 2.2e-16 ***
 ## ---
@@ -1156,23 +1162,23 @@ p</code></pre>
 <pre class="r"><code>time_slice = c(0.3, 0.8)
 df_grouped = auroc_df %&gt;% group_by(Unit, Subject, TrialType, ActiveBaseline_modulation_direction) %&gt;%
   summarise( 
-    auroc_timeSlice_abs = mean(abs(auROC[(Time_s &gt;= time_slice[1]) &amp; (Time_s &lt; time_slice[2])] - 0.5), na.rm=T)
+    phasic_modulation = mean(abs(auROC[(Time_s &gt;= time_slice[1]) &amp; (Time_s &lt; time_slice[2])] - 0.5), na.rm=T)
   )</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;Unit&#39;, &#39;Subject&#39;, &#39;TrialType&#39;. You can
-## override using the `.groups` argument.</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;Unit&#39;, &#39;Subject&#39;, &#39;TrialType&#39;. You
+## can override using the `.groups` argument.</code></pre>
 <pre class="r"><code>df_grouped$TrialType = factor(df_grouped$TrialType, levels=c(&#39;SpoutOff_hits_auroc&#39;, &#39;SpoutOff_FAs_auroc&#39;, &#39;SpoutOff_misses_auroc&#39;))
 levels(df_grouped$TrialType) = c(&#39;Hit&#39;, &#39;False alarm&#39;, &#39;Miss&#39;)
 df_grouped$ActiveBaseline_modulation_direction = factor(df_grouped$ActiveBaseline_modulation_direction, levels=c(&#39;decrease&#39;, &#39;increase&#39;, &#39;none&#39;))
 levels(df_grouped$ActiveBaseline_modulation_direction) = c(&#39;Task-suppressed&#39;, &#39;Task-enhanced&#39;, &#39;Task-unchanged&#39;)
 
 lme_data = df_grouped[df_grouped$ActiveBaseline_modulation_direction==&#39;Task-suppressed&#39;,]
-lme_bin &lt;- glmmTMB((sqrt(auroc_timeSlice_abs))~ TrialType + (1 | Subject/Unit/TrialType),  data=lme_data, family=gaussian)
+lme_bin &lt;- glmmTMB((sqrt(phasic_modulation))~ TrialType + (1 | Subject/Unit/TrialType),  data=lme_data, family=gaussian)
 simulationOutput &lt;- simulateResiduals(fittedModel = lme_bin, plot = T, re.form=NULL)  # pass</code></pre>
 <p><img src="OFC_ephys_analyses_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
 <pre class="r"><code>Anova(lme_bin)</code></pre>
 <pre><code>## Analysis of Deviance Table (Type II Wald chisquare tests)
 ## 
-## Response: (sqrt(auroc_timeSlice_abs))
+## Response: (sqrt(phasic_modulation))
 ##            Chisq Df Pr(&gt;Chisq)    
 ## TrialType 89.686  2  &lt; 2.2e-16 ***
 ## ---
@@ -1187,7 +1193,7 @@ simulationOutput &lt;- simulateResiduals(fittedModel = lme_bin, plot = T, re.for
 ## 
 ## P value adjustment: bonferroni method for 3 tests</code></pre>
 <pre class="r"><code>lme_data = df_grouped[df_grouped$ActiveBaseline_modulation_direction==&#39;Task-enhanced&#39;,]
-lme_bin &lt;- glmmTMB((sqrt(auroc_timeSlice_abs))~ TrialType + (1 | Subject/Unit/TrialType),  data=lme_data, family=gaussian)</code></pre>
+lme_bin &lt;- glmmTMB((sqrt(phasic_modulation))~ TrialType + (1 | Subject/Unit/TrialType),  data=lme_data, family=gaussian)</code></pre>
 <pre><code>## Warning in finalizeTMB(TMBStruc, obj, fit, h, data.tmb.old): Model convergence
 ## problem; non-positive-definite Hessian matrix. See vignette(&#39;troubleshooting&#39;)</code></pre>
 <pre class="r"><code>simulationOutput &lt;- simulateResiduals(fittedModel = lme_bin, plot = T, re.form=NULL)  # pass</code></pre>
@@ -1195,7 +1201,7 @@ lme_bin &lt;- glmmTMB((sqrt(auroc_timeSlice_abs))~ TrialType + (1 | Subject/Unit
 <pre class="r"><code>Anova(lme_bin)</code></pre>
 <pre><code>## Analysis of Deviance Table (Type II Wald chisquare tests)
 ## 
-## Response: (sqrt(auroc_timeSlice_abs))
+## Response: (sqrt(phasic_modulation))
 ##            Chisq Df Pr(&gt;Chisq)    
 ## TrialType 104.72  2  &lt; 2.2e-16 ***
 ## ---
@@ -1210,13 +1216,13 @@ lme_bin &lt;- glmmTMB((sqrt(auroc_timeSlice_abs))~ TrialType + (1 | Subject/Unit
 ## 
 ## P value adjustment: bonferroni method for 3 tests</code></pre>
 <pre class="r"><code>lme_data = df_grouped[df_grouped$ActiveBaseline_modulation_direction==&#39;Task-unchanged&#39;,]
-lme_bin &lt;- glmmTMB((log(auroc_timeSlice_abs+0.1))*100~ TrialType + (1 | Subject/Unit/TrialType),  data=lme_data, family=gaussian)
+lme_bin &lt;- glmmTMB((log(phasic_modulation+0.1))*100~ TrialType + (1 | Subject/Unit/TrialType),  data=lme_data, family=gaussian)
 simulationOutput &lt;- simulateResiduals(fittedModel = lme_bin, plot = T, re.form=NULL)  # pass</code></pre>
 <p><img src="OFC_ephys_analyses_files/figure-html/unnamed-chunk-16-3.png" width="672" /></p>
 <pre class="r"><code>Anova(lme_bin)</code></pre>
 <pre><code>## Analysis of Deviance Table (Type II Wald chisquare tests)
 ## 
-## Response: (log(auroc_timeSlice_abs + 0.1)) * 100
+## Response: (log(phasic_modulation + 0.1)) * 100
 ##            Chisq Df Pr(&gt;Chisq)    
 ## TrialType 21.378  2  2.279e-05 ***
 ## ---
@@ -1277,47 +1283,47 @@ p</code></pre>
 <pre class="r"><code>time_slice = c(-0.5, 0)
 df_grouped = auroc_df[auroc_df$TrialType %in% c(&#39;SpoutOff_hits_auroc&#39;, &#39;SpoutOff_FAs_auroc&#39;),] %&gt;% group_by(Unit, Subject, TrialType, ActiveBaseline_modulation_direction) %&gt;%
   summarise( 
-    auroc_timeSlice_abs = mean(abs(auROC[(Time_s &gt;= time_slice[1]) &amp; (Time_s &lt; time_slice[2])] - 0.5), na.rm=T)
+    phasic_modulation = mean(abs(auROC[(Time_s &gt;= time_slice[1]) &amp; (Time_s &lt; time_slice[2])] - 0.5), na.rm=T)
   )</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;Unit&#39;, &#39;Subject&#39;, &#39;TrialType&#39;. You can
-## override using the `.groups` argument.</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;Unit&#39;, &#39;Subject&#39;, &#39;TrialType&#39;. You
+## can override using the `.groups` argument.</code></pre>
 <pre class="r"><code>df_grouped$TrialType = factor(df_grouped$TrialType, levels=c(&#39;SpoutOff_hits_auroc&#39;, &#39;SpoutOff_FAs_auroc&#39;))
 levels(df_grouped$TrialType) = c(&#39;Hit&#39;, &#39;False alarm&#39;)
 df_grouped$ActiveBaseline_modulation_direction = factor(df_grouped$ActiveBaseline_modulation_direction, levels=c(&#39;decrease&#39;, &#39;increase&#39;, &#39;none&#39;))
 levels(df_grouped$ActiveBaseline_modulation_direction) = c(&#39;Task-suppressed&#39;, &#39;Task-enhanced&#39;, &#39;Task-unchanged&#39;)
 
 lme_data = df_grouped[df_grouped$ActiveBaseline_modulation_direction==&#39;Task-suppressed&#39;,]
-lme_bin &lt;- glmmTMB((log(auroc_timeSlice_abs+0.1))~ TrialType + (1 | Subject/Unit/TrialType),  data=lme_data, family=gaussian)
+lme_bin &lt;- glmmTMB((log(phasic_modulation+0.1))~ TrialType + (1 | Subject/Unit/TrialType),  data=lme_data, family=gaussian)
 simulationOutput &lt;- simulateResiduals(fittedModel = lme_bin, plot = T, re.form=NULL)  # pass</code></pre>
 <p><img src="OFC_ephys_analyses_files/figure-html/unnamed-chunk-18-1.png" width="672" /></p>
 <pre class="r"><code>Anova(lme_bin)</code></pre>
 <pre><code>## Analysis of Deviance Table (Type II Wald chisquare tests)
 ## 
-## Response: (log(auroc_timeSlice_abs + 0.1))
+## Response: (log(phasic_modulation + 0.1))
 ##            Chisq Df Pr(&gt;Chisq)    
 ## TrialType 20.842  1  4.989e-06 ***
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 <pre class="r"><code>lme_data = df_grouped[df_grouped$ActiveBaseline_modulation_direction==&#39;Task-enhanced&#39;,]
-lme_bin &lt;- glmmTMB((log(auroc_timeSlice_abs+0.1))~ TrialType + (1 | Subject/Unit/TrialType),  data=lme_data, family=gaussian)
+lme_bin &lt;- glmmTMB((log(phasic_modulation+0.1))~ TrialType + (1 | Subject/Unit/TrialType),  data=lme_data, family=gaussian)
 simulationOutput &lt;- simulateResiduals(fittedModel = lme_bin, plot = T, re.form=NULL)  # pass</code></pre>
 <p><img src="OFC_ephys_analyses_files/figure-html/unnamed-chunk-18-2.png" width="672" /></p>
 <pre class="r"><code>Anova(lme_bin)</code></pre>
 <pre><code>## Analysis of Deviance Table (Type II Wald chisquare tests)
 ## 
-## Response: (log(auroc_timeSlice_abs + 0.1))
+## Response: (log(phasic_modulation + 0.1))
 ##            Chisq Df Pr(&gt;Chisq)    
 ## TrialType 31.561  1  1.933e-08 ***
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 <pre class="r"><code>lme_data = df_grouped[df_grouped$ActiveBaseline_modulation_direction==&#39;Task-unchanged&#39;,]
-lme_bin &lt;- glmmTMB((log(auroc_timeSlice_abs+0.1))~ TrialType + (1 | Subject/Unit/TrialType),  data=lme_data, family=gaussian)
+lme_bin &lt;- glmmTMB((log(phasic_modulation+0.1))~ TrialType + (1 | Subject/Unit/TrialType),  data=lme_data, family=gaussian)
 simulationOutput &lt;- simulateResiduals(fittedModel = lme_bin, plot = T, re.form=NULL)  # pass</code></pre>
 <p><img src="OFC_ephys_analyses_files/figure-html/unnamed-chunk-18-3.png" width="672" /></p>
 <pre class="r"><code>Anova(lme_bin)</code></pre>
 <pre><code>## Analysis of Deviance Table (Type II Wald chisquare tests)
 ## 
-## Response: (log(auroc_timeSlice_abs + 0.1))
+## Response: (log(phasic_modulation + 0.1))
 ##            Chisq Df Pr(&gt;Chisq)
 ## TrialType 2.4882  1     0.1147</code></pre>
 </div>

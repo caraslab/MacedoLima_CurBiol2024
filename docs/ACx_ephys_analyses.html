@@ -499,9 +499,9 @@ save.image(&#39;./Data/ACx_ephys/ACx_ephys_analyses_env.RData&#39;)
 
 # Some garbage collection
 gc()</code></pre>
-<pre><code>##            used  (Mb) gc trigger  (Mb) max used  (Mb)
-## Ncells  2440517 130.4    4888777 261.1  3024336 161.6
-## Vcells 10469437  79.9   24184045 184.6 24184045 184.6</code></pre>
+<pre><code>##            used  (Mb) gc trigger  (Mb)  max used  (Mb)
+## Ncells  2602389 139.0    4596315 245.5   3668195 196.0
+## Vcells 40952356 312.5  130819162 998.1 130816779 998.1</code></pre>
 </div>
 <div id="get-some-descriptives" class="section level1">
 <h1>Get some descriptives</h1>
@@ -541,8 +541,8 @@ df_info = df[df$AMdepth_db != -40 &amp; df$Period == &#39;Baseline&#39;,] %&gt;%
     ISI_ViolationRate = mean(ISI_ViolationRate),
     Fraction_missing = mean(Fraction_missing)
   )</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;Subject&#39;, &#39;Unit&#39;, &#39;Subject_date&#39;. You can
-## override using the `.groups` argument.</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;Subject&#39;, &#39;Unit&#39;, &#39;Subject_date&#39;. You
+## can override using the `.groups` argument.</code></pre>
 <pre class="r"><code>table(df_info$Cluster_quality)</code></pre>
 <pre><code>## 
 ## good  mua 
@@ -555,8 +555,8 @@ df_info = df[df$AMdepth_db != -40 &amp; df$Period == &#39;Baseline&#39;,] %&gt;%
     ISI_ViolationRate = mean(ISI_ViolationRate),
     Fraction_missing = mean(Fraction_missing)
   )</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;Subject&#39;, &#39;Unit&#39;, &#39;Subject_date&#39;, &#39;Cluster_quality&#39;. You can override using the
-## `.groups` argument.</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;Subject&#39;, &#39;Unit&#39;, &#39;Subject_date&#39;,
+## &#39;Cluster_quality&#39;. You can override using the `.groups` argument.</code></pre>
 <pre class="r"><code>table(df_info$Cluster_quality, df_info$Treatment)</code></pre>
 <pre><code>##       
 ##        Saline Muscimol
@@ -794,8 +794,8 @@ recordings</h1>
     FR_Hz_trial = mean(FR_Hz[Period == &#39;Trial&#39;]),
     absNeural_d_trial = abs(d_prime(FR_Hz[Period == &#39;Trial&#39;], FR_Hz[Period == &#39;Baseline&#39;])),
   )</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;Unit&#39;, &#39;Subject&#39;, &#39;Subject_date&#39;, &#39;Session&#39;, &#39;Treatment&#39;. You can override using the
-## `.groups` argument.</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;Unit&#39;, &#39;Subject&#39;, &#39;Subject_date&#39;,
+## &#39;Session&#39;, &#39;Treatment&#39;. You can override using the `.groups` argument.</code></pre>
 <pre class="r"><code>df_grouped$Session = factor(df_grouped$Session, levels=c(&#39;Pre&#39;, &#39;Active&#39;))
 levels(df_grouped$Session) = c(&#39;Passive&#39;, &#39;Task&#39;)
 
@@ -866,8 +866,9 @@ simulationOutput &lt;- simulateResiduals(fittedModel = lme_bin, plot = T, re.for
   summarise( 
     FR_Hz = mean(FR_Hz)
   )</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;Unit&#39;, &#39;Subject&#39;, &#39;Session&#39;, &#39;Subject_date&#39;, &#39;Period&#39;, &#39;Cluster_quality&#39;. You can
-## override using the `.groups` argument.</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;Unit&#39;, &#39;Subject&#39;, &#39;Session&#39;,
+## &#39;Subject_date&#39;, &#39;Period&#39;, &#39;Cluster_quality&#39;. You can override using the
+## `.groups` argument.</code></pre>
 <pre class="r"><code>df_grouped$Period = factor(df_grouped$Period, levels=c(&#39;Baseline&#39;,&#39;Trial&#39;))
 df_grouped$Period = droplevels(df_grouped$Period)
 levels(df_grouped$Period) = c(&#39;non-AM&#39;, &#39;AM&#39;)
@@ -989,16 +990,18 @@ simulationOutput &lt;- simulateResiduals(fittedModel = lme_bin, plot = T, re.for
   summarise( 
     FR_Hz_Pre_AM_delta = (FR_Hz[Period==&#39;Trial&#39;] - FR_Hz[Period==&#39;Baseline&#39;])
   )</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;Unit&#39;, &#39;Subject&#39;, &#39;Session&#39;, &#39;Subject_date&#39;, &#39;Cluster_quality_Allen&#39;, &#39;Cluster_quality&#39;,
-## &#39;Treatment&#39;. You can override using the `.groups` argument.</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;Unit&#39;, &#39;Subject&#39;, &#39;Session&#39;,
+## &#39;Subject_date&#39;, &#39;Cluster_quality_Allen&#39;, &#39;Cluster_quality&#39;, &#39;Treatment&#39;.
+## You can override using the `.groups` argument.</code></pre>
 <pre class="r"><code>levels(df_grouped$Session) = c(&#39;Passive&#39;, &#39;Task&#39;)
 
 graph_data = df_grouped %&gt;% group_by(Unit, Subject, Session, Subject_date, Cluster_quality_Allen, Cluster_quality, Treatment) %&gt;%
   summarise(
     FR_Hz_Pre_AM_delta = mean(FR_Hz_Pre_AM_delta, na.rm=T)
   )</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;Unit&#39;, &#39;Subject&#39;, &#39;Session&#39;, &#39;Subject_date&#39;, &#39;Cluster_quality_Allen&#39;, &#39;Cluster_quality&#39;.
-## You can override using the `.groups` argument.</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;Unit&#39;, &#39;Subject&#39;, &#39;Session&#39;,
+## &#39;Subject_date&#39;, &#39;Cluster_quality_Allen&#39;, &#39;Cluster_quality&#39;. You can
+## override using the `.groups` argument.</code></pre>
 <pre class="r"><code>graph_data$Session.Treatment = as.character(interaction(graph_data$Session, graph_data$Treatment))
 graph_data[grepl(&#39;Passive&#39;, graph_data$Session.Treatment),]$Session.Treatment = &#39;Passive&#39;
 graph_data$Session.Treatment = factor(graph_data$Session.Treatment, levels=c(&#39;Passive&#39;, &#39;Task.Saline&#39;, &#39;Task.Muscimol&#39;))
@@ -1063,8 +1066,9 @@ class="section level2">
     FR_cv_trial = cv(FR_Hz[Period == &#39;Trial&#39;]),
     FR_cv_sum = FR_cv_baseline+FR_cv_trial,
   )</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;Unit&#39;, &#39;Subject&#39;, &#39;Subject_date&#39;, &#39;Session&#39;, &#39;Cluster_quality&#39;. You can override using
-## the `.groups` argument.</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;Unit&#39;, &#39;Subject&#39;, &#39;Subject_date&#39;,
+## &#39;Session&#39;, &#39;Cluster_quality&#39;. You can override using the `.groups`
+## argument.</code></pre>
 <pre class="r"><code>levels(df_grouped$Session) = c(&#39;Passive&#39;, &#39;Task&#39;)
 
 # Exclude units with NaN values in either session
@@ -1261,8 +1265,9 @@ df_grouped = df %&gt;% group_by(Unit, Subject, Subject_date, Session, Cluster_qu
     VSpp_baseline = mean(VSpp[Period == &#39;Baseline&#39;], na.rm=T),
     VSpp_trial = mean(VSpp[Period == &#39;Trial&#39;], na.rm=T)
   )</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;Unit&#39;, &#39;Subject&#39;, &#39;Subject_date&#39;, &#39;Session&#39;, &#39;Cluster_quality_Allen&#39;, &#39;Cluster_quality&#39;.
-## You can override using the `.groups` argument.</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;Unit&#39;, &#39;Subject&#39;, &#39;Subject_date&#39;,
+## &#39;Session&#39;, &#39;Cluster_quality_Allen&#39;, &#39;Cluster_quality&#39;. You can override
+## using the `.groups` argument.</code></pre>
 <pre class="r"><code>df_grouped$Session = factor(df_grouped$Session, levels=c(&#39;Pre&#39;, &#39;Active&#39;))
 levels(df_grouped$Session) = c(&#39;Passive&#39;, &#39;Task&#39;)
 
@@ -1403,15 +1408,15 @@ class="section level2">
     Neural_dprime = d_prime(FR_Hz[Period == &#39;Trial&#39;], FR_Hz[Period == &#39;Baseline&#39;]),
     Behavioral_dprime = mean(AMdprime)
   )</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;Unit&#39;, &#39;Subject&#39;, &#39;Date&#39;, &#39;Subject_date&#39;.
-## You can override using the `.groups` argument.</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;Unit&#39;, &#39;Subject&#39;, &#39;Date&#39;,
+## &#39;Subject_date&#39;. You can override using the `.groups` argument.</code></pre>
 <pre class="r"><code>graph_data = df_grouped
 graph_means = graph_data %&gt;% group_by(Behavioral_dprime, Treatment_noDose) %&gt;%
   summarise(
     absNeural_dprime = mean(abs(Neural_dprime))
   )</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;Behavioral_dprime&#39;. You can override using
-## the `.groups` argument.</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;Behavioral_dprime&#39;. You can override
+## using the `.groups` argument.</code></pre>
 <pre class="r"><code>y_axis = seq(0, 3, 1)
 x_axis = seq(1, 3, 1)
 p =ggplot(data=graph_data, aes(x=Behavioral_dprime, y=abs(Neural_dprime), fill=Treatment_noDose)) + 

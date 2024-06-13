@@ -364,20 +364,24 @@ auroc_df = auroc_df[, -grep("temp", colnames(auroc_df))]
 
 time_slice = c(-0.5, 0)  # 0-0.1 s is not included
 
-auroc_cutoffs = c(0.45, 0.55)
-
 df_grouped = auroc_df[auroc_df$TrialType != 'SpoutOff_misses_auroc',] %>% group_by(Unit, Subject, TrialType, ActiveBaseline_modulation_direction) %>%
   summarise( 
     auroc_timeSlice_mean = mean(auROC[(Time_s >= time_slice[1]) & (Time_s < time_slice[2])], na.rm=T),
-    auroc_timeSlice_abs = mean(abs(auROC[(Time_s >= time_slice[1]) & (Time_s < time_slice[2])] - 0.5), na.rm=T),
-    auroc_timeSlice_all = all( abs(auROC[(Time_s >= time_slice[1]) & (Time_s < time_slice[2])] - 0.5) > 0.1)
+    phasic_modulation = mean(abs(auROC[(Time_s >= time_slice[1]) & (Time_s < time_slice[2])] - 0.5), na.rm=T)
   )
 df_grouped = df_grouped[!is.na(df_grouped$auroc_timeSlice_mean),]
 df_grouped$TrialType = factor(df_grouped$TrialType, levels=c('SpoutOff_hits_auroc', 'SpoutOff_FAs_auroc'))
 levels(df_grouped$TrialType) = c('Hit', 'False alarm')
 
+# Calculate the confidence interval's upper bound
+l.model <- lm(phasic_modulation ~ 1, df_grouped)
+abs_cutoff = confint(l.model, level=0.95)[2]
 
-# Cutoff based on auROC
+# Transform upper bound back to auROC metric space
+upper_cutoff = 0.5 + abs_cutoff
+lower_cutoff = 0.5 - abs_cutoff
+
+# Cutoff based on 95% CI upper bound of the absolute phasic modulation
 df_grouped$PreHit_modulated = 'unmodulated'
 df_grouped$PreFA_modulated = 'unmodulated'
 df_grouped$PreMiss_modulated = 'unmodulated'
@@ -389,16 +393,16 @@ df_grouped$PreMiss_modulation_direction = 'none'
 
 # Hit-modulated
 temp_df = df_grouped[df_grouped$TrialType == 'Hit',]
-temp_increase_units = temp_df[(temp_df$auroc_timeSlice_mean > auroc_cutoffs[2]),]$Unit
-temp_decrease_units = temp_df[(temp_df$auroc_timeSlice_mean < auroc_cutoffs[1]),]$Unit
+temp_increase_units = temp_df[(temp_df$auroc_timeSlice_mean > upper_cutoff),]$Unit
+temp_decrease_units = temp_df[(temp_df$auroc_timeSlice_mean <  lower_cutoff),]$Unit
 df_grouped[df_grouped$Unit %in% temp_increase_units,]$PreHit_modulation_direction = 'increase'
 df_grouped[df_grouped$Unit %in% temp_decrease_units,]$PreHit_modulation_direction = 'decrease'
 df_grouped[df_grouped$PreHit_modulation_direction != 'none',]$PreHit_modulated = 'modulated'
 
 # FA-modulated
 temp_df = df_grouped[df_grouped$TrialType == 'False alarm',]
-temp_increase_units = temp_df[(temp_df$auroc_timeSlice_mean > auroc_cutoffs[2]),]$Unit
-temp_decrease_units = temp_df[(temp_df$auroc_timeSlice_mean < auroc_cutoffs[1]),]$Unit
+temp_increase_units = temp_df[(temp_df$auroc_timeSlice_mean > upper_cutoff),]$Unit
+temp_decrease_units = temp_df[(temp_df$auroc_timeSlice_mean <  lower_cutoff),]$Unit
 df_grouped[df_grouped$Unit %in% temp_increase_units,]$PreFA_modulation_direction = 'increase'
 df_grouped[df_grouped$Unit %in% temp_decrease_units,]$PreFA_modulation_direction = 'decrease'
 df_grouped[df_grouped$PreFA_modulation_direction != 'none',]$PreFA_modulated = 'modulated'
@@ -412,12 +416,12 @@ graph_data =  df_grouped[df_grouped$TrialType=='Hit',]
 cur_table = table(graph_data$PreHit_modulation_direction)
 cur_table
 cur_table/sum(cur_table)
-hit_values = cur_table[1:2]/sum(cur_table)*100
+hit_values = sum(cur_table[1:2]/sum(cur_table)*100)  # For labeling the plot
 
 cur_table = table(graph_data$PreFA_modulation_direction)
 cur_table
 cur_table/sum(cur_table)
-fa_values = cur_table[1:2]/sum(cur_table)*100
+fa_values = sum(cur_table[1:2]/sum(cur_table)*100)  # For labeling the plot
 
 cur_table = table(graph_data$PreHitOrFA_modulated)
 cur_table
@@ -426,15 +430,15 @@ cur_table/sum(cur_table)
 # Plot distributions
 graph_data = df_grouped
 
-y_axis = seq(0, 40, 20)
-x_axis = c(0, 0.45, 0.55, 1)
-p = ggplot(df_grouped, aes(x=auroc_timeSlice_mean, fill=TrialType)) + 
+y_axis = seq(0, 60, 20)
+x_axis = round(c(0, abs_cutoff, 0.5), 1)
+p = ggplot(df_grouped, aes(x=phasic_modulation, fill=TrialType)) + 
 
   geom_histogram(alpha=0.5, position="identity", binwidth=0.01, color='NA', boundary=0) +
   
-  geom_vline(xintercept=0.55, size=LINE_THICKNESS/4) +
-  
-  geom_vline(xintercept=0.45, size=LINE_THICKNESS/4) +
+  # geom_vline(xintercept=lower_cutoff, size=LINE_THICKNESS/4, linetype='dashed') +
+  geom_vline(xintercept=round(abs_cutoff, 1), size=LINE_THICKNESS/4, linetype='dashed') +
+
   
   scale_y_continuous(breaks=y_axis, expand=c(0, 0)) +
   
@@ -450,8 +454,8 @@ p = ggplot(df_grouped, aes(x=auroc_timeSlice_mean, fill=TrialType)) +
   xlab('Phasic modulation') +
   
   # Add percentage values
-  annotate("text", x=c(0.2, 0.8), y=c(20, 20), label=paste(round(hit_values, 0), '%', sep=''), color=TRIALTYPE_MODULATION_COLORS[1], size=7) + 
-  annotate("text", x=c(0.2, 0.8), y=c(18, 18), label=paste(round(fa_values, 0), '%', sep=''), color=TRIALTYPE_MODULATION_COLORS[2], size=7) + 
+  annotate("text", x=c(0.3), y=c(25), label=paste(round(hit_values, 0), '%', sep=''), color=TRIALTYPE_MODULATION_COLORS[1], size=LINE_THICKNESS*10) + 
+  annotate("text", x=c(0.3), y=c(20), label=paste(round(fa_values, 0), '%', sep=''), color=TRIALTYPE_MODULATION_COLORS[2], size=LINE_THICKNESS*10) + 
   
   theme(
     legend.position=c(0.85, 0.85)
@@ -500,7 +504,7 @@ p
 ### Stats
 ```{r echo=TRUE}
 lme_data = df_grouped
-lme_bin <- glmmTMB((blom(auroc_timeSlice_abs, method='rankit'))~ TrialType + (1 | Subject/Unit/TrialType),  data=lme_data, family=gaussian)
+lme_bin <- glmmTMB((blom(phasic_modulation, method='rankit'))~ TrialType + (1 | Subject/Unit/TrialType),  data=lme_data, family=gaussian)
 simulationOutput <- simulateResiduals(fittedModel = lme_bin, plot = T, re.form=NULL)  # pass
 Anova(lme_bin)
 ```
@@ -514,18 +518,23 @@ auroc_df = auroc_df[, -grep("temp", colnames(auroc_df))]  # Remove temp columns
 
 time_slice = c(0.3, 0.8) # 0.8-0.9 s is not included
 
-auroc_cutoffs = c(0.45, 0.55)
-
 df_grouped = auroc_df[auroc_df$TrialType %in% c('SpoutOff_hits_auroc', 'SpoutOff_FAs_auroc', 'SpoutOff_misses_auroc'),] %>% group_by(Unit, Subject, TrialType, ActiveBaseline_modulation_direction) %>%
   summarise( 
     auroc_timeSlice_mean = mean(auROC[(Time_s >= time_slice[1]) & (Time_s < time_slice[2])], na.rm=T),
-    auroc_timeSlice_abs = mean(abs(auROC[(Time_s >= time_slice[1]) & (Time_s < time_slice[2])] - 0.5), na.rm=T),
-    auroc_timeSlice_all = all( abs(auROC[(Time_s >= time_slice[1]) & (Time_s < time_slice[2])] - 0.5) >= 0.1)
+    phasic_modulation = mean(abs(auROC[(Time_s >= time_slice[1]) & (Time_s < time_slice[2])] - 0.5), na.rm=T)
   )
 df_grouped = df_grouped[!is.na(df_grouped$auroc_timeSlice_mean),]
 df_grouped$TrialType = factor(df_grouped$TrialType, levels=c('SpoutOff_hits_auroc', 'SpoutOff_FAs_auroc', 'SpoutOff_misses_auroc'))
 levels(df_grouped$TrialType) = c('Hit', 'False alarm', 'Miss')
 
+
+# Calculate the confidence interval's upper bound from the phasic modulation distribution
+l.model <- lm(phasic_modulation ~ 1, df_grouped)
+abs_cutoff = confint(l.model, level=0.95)[2]
+
+# Transform upper bound back to auROC metric space
+upper_cutoff = 0.5 + abs_cutoff
+lower_cutoff = 0.5 - abs_cutoff
 
 # Cutoff based on auROC
 df_grouped$PostHit_modulated = 'unmodulated'
@@ -539,24 +548,24 @@ df_grouped$PostMiss_modulation_direction = 'none'
 
 # Hit modulation
 temp_df = df_grouped[df_grouped$TrialType == 'Hit',]
-temp_increase_units = temp_df[(temp_df$auroc_timeSlice_mean > auroc_cutoffs[2]),]$Unit
-temp_decrease_units = temp_df[(temp_df$auroc_timeSlice_mean < auroc_cutoffs[1]),]$Unit
+temp_increase_units = temp_df[(temp_df$auroc_timeSlice_mean > upper_cutoff),]$Unit
+temp_decrease_units = temp_df[(temp_df$auroc_timeSlice_mean <  lower_cutoff),]$Unit
 df_grouped[df_grouped$Unit %in% temp_increase_units,]$PostHit_modulation_direction = 'increase'
 df_grouped[df_grouped$Unit %in% temp_decrease_units,]$PostHit_modulation_direction = 'decrease'
 df_grouped[df_grouped$PostHit_modulation_direction != 'none',]$PostHit_modulated = 'modulated'
 
 # FA modulation
 temp_df = df_grouped[df_grouped$TrialType == 'False alarm',]
-temp_increase_units = temp_df[(temp_df$auroc_timeSlice_mean > auroc_cutoffs[2]),]$Unit
-temp_decrease_units = temp_df[(temp_df$auroc_timeSlice_mean < auroc_cutoffs[1]),]$Unit
+temp_increase_units = temp_df[(temp_df$auroc_timeSlice_mean > upper_cutoff),]$Unit
+temp_decrease_units = temp_df[(temp_df$auroc_timeSlice_mean <  lower_cutoff),]$Unit
 df_grouped[df_grouped$Unit %in% temp_increase_units,]$PostFA_modulation_direction = 'increase'
 df_grouped[df_grouped$Unit %in% temp_decrease_units,]$PostFA_modulation_direction = 'decrease'
 df_grouped[df_grouped$PostFA_modulation_direction != 'none',]$PostFA_modulated = 'modulated'
 
 # Miss modulation
 temp_df = df_grouped[df_grouped$TrialType == 'Miss',]
-temp_increase_units = temp_df[(temp_df$auroc_timeSlice_mean > auroc_cutoffs[2]),]$Unit
-temp_decrease_units = temp_df[(temp_df$auroc_timeSlice_mean < auroc_cutoffs[1]),]$Unit
+temp_increase_units = temp_df[(temp_df$auroc_timeSlice_mean > upper_cutoff),]$Unit
+temp_decrease_units = temp_df[(temp_df$auroc_timeSlice_mean <  lower_cutoff),]$Unit
 df_grouped[df_grouped$Unit %in% temp_increase_units,]$PostMiss_modulation_direction = 'increase'
 df_grouped[df_grouped$Unit %in% temp_decrease_units,]$PostMiss_modulation_direction = 'decrease'
 df_grouped[df_grouped$PostMiss_modulation_direction != 'none',]$PostMiss_modulated = 'modulated'
@@ -571,17 +580,17 @@ graph_data =  df_grouped[df_grouped$TrialType=='Hit',]
 cur_table = table(graph_data$PostHit_modulation_direction)
 cur_table
 cur_table/sum(cur_table)
-hit_values = cur_table[1:2]/sum(cur_table)*100
+hit_values = sum(cur_table[1:2]/sum(cur_table)*100)
 
 cur_table = table(graph_data$PostFA_modulation_direction)
 cur_table
 cur_table/sum(cur_table)
-fa_values = cur_table[1:2]/sum(cur_table)*100
+fa_values = sum(cur_table[1:2]/sum(cur_table)*100)
 
 cur_table = table(graph_data$PostMiss_modulation_direction)
 cur_table
 cur_table/sum(cur_table)
-miss_values = cur_table[1:2]/sum(cur_table)*100
+miss_values = sum(cur_table[1:2]/sum(cur_table)*100)
 
 cur_table = table(graph_data$PostHitOrFAOrMiss_modulated)
 cur_table
@@ -590,19 +599,15 @@ cur_table/sum(cur_table)
 # Plot distributions
 graph_data = df_grouped
 
-y_axis = seq(0, 40, 20)
-x_axis = c(0, 0.45, 0.55, 1)
-p = ggplot(df_grouped, aes(x=auroc_timeSlice_mean, fill=TrialType)) + 
-  # facet_grid(.~TrialType) +
-    # geom_density(alpha=0.2, fill='NA', adjust=1, size=LINE_THICKNESS/2) +
-
-  
+y_axis = seq(0, 60, 20)
+x_axis = round(c(0, abs_cutoff, 0.5), 1)
+p = ggplot(df_grouped, aes(x=phasic_modulation, fill=TrialType)) + 
 
   geom_histogram(alpha=0.5, position="identity", binwidth=0.01, color='NA', boundary=0) +
   
-  geom_vline(xintercept=0.55, size=LINE_THICKNESS/4) +
-  
-  geom_vline(xintercept=0.45, size=LINE_THICKNESS/4) +
+  # geom_vline(xintercept=lower_cutoff, size=LINE_THICKNESS/4, linetype='dashed') +
+  geom_vline(xintercept=round(abs_cutoff, 1), size=LINE_THICKNESS/4, linetype='dashed') +
+
   
   scale_y_continuous(breaks=y_axis, expand=c(0, 0)) +
   
@@ -610,21 +615,20 @@ p = ggplot(df_grouped, aes(x=auroc_timeSlice_mean, fill=TrialType)) +
   
   coord_cartesian(ylim = c(min(y_axis), max(y_axis)), 
                   xlim = c(min(x_axis), max(x_axis))) +
-
-  # scale_linetype_manual(values = plot_linetypes) +
+  
   scale_color_manual(values = TRIALTYPE_MODULATION_COLORS, name='') +
   scale_fill_manual(values = TRIALTYPE_MODULATION_COLORS, name='') +
   
   ylab('Number of units') +
-  xlab('Phasic modulation') +
+  xlab('Mean phasic modulation') +
   
   # Add percentage values
-  annotate("text", x=c(0.2, 0.8), y=c(20, 20), label=paste(round(hit_values, 0), '%', sep=''), color=TRIALTYPE_MODULATION_COLORS[1], size=7) + 
-  annotate("text", x=c(0.2, 0.8), y=c(18, 18), label=paste(round(fa_values, 0), '%', sep=''), color=TRIALTYPE_MODULATION_COLORS[2], size=7) + 
-  annotate("text", x=c(0.2, 0.8), y=c(16, 16), label=paste(round(miss_values, 0), '%', sep=''), color=TRIALTYPE_MODULATION_COLORS[3], size=7) + 
+  annotate("text", x=c(0.3), y=c(30), label=paste(round(hit_values, 0), '%', sep=''), color=TRIALTYPE_MODULATION_COLORS[1], size=LINE_THICKNESS*10) + 
+  annotate("text", x=c(0.3), y=c(25), label=paste(round(fa_values, 0), '%', sep=''), color=TRIALTYPE_MODULATION_COLORS[2], size=LINE_THICKNESS*10) + 
+  annotate("text", x=c(0.3), y=c(20), label=paste(round(miss_values, 0), '%', sep=''), color=TRIALTYPE_MODULATION_COLORS[3], size=LINE_THICKNESS*10) + 
   
   theme(
-    legend.position = c(0.85, 0.85)
+    legend.position=c(0.85, 0.85)
   )
 p
 ```
@@ -673,7 +677,7 @@ p
 ```{r echo=TRUE}
 
 lme_data = df_grouped
-lme_bin <- glmmTMB(blom(auroc_timeSlice_abs, method='rankit')*10~ TrialType + (1 | Subject/Unit/TrialType),  data=lme_data, family=gaussian)
+lme_bin <- glmmTMB(blom(phasic_modulation, method='rankit')*10~ TrialType + (1 | Subject/Unit/TrialType),  data=lme_data, family=gaussian)
 simulationOutput <- simulateResiduals(fittedModel = lme_bin, plot = T, re.form=NULL)  # pass
 Anova(lme_bin)
 pairs(regrid(emmeans(lme_bin,  ~TrialType)),  adjust='Bonferroni')
@@ -731,7 +735,7 @@ p
 time_slice = c(0.3, 0.8)
 df_grouped = auroc_df %>% group_by(Unit, Subject, TrialType, ActiveBaseline_modulation_direction) %>%
   summarise( 
-    auroc_timeSlice_abs = mean(abs(auROC[(Time_s >= time_slice[1]) & (Time_s < time_slice[2])] - 0.5), na.rm=T)
+    phasic_modulation = mean(abs(auROC[(Time_s >= time_slice[1]) & (Time_s < time_slice[2])] - 0.5), na.rm=T)
   )
 df_grouped$TrialType = factor(df_grouped$TrialType, levels=c('SpoutOff_hits_auroc', 'SpoutOff_FAs_auroc', 'SpoutOff_misses_auroc'))
 levels(df_grouped$TrialType) = c('Hit', 'False alarm', 'Miss')
@@ -739,19 +743,19 @@ df_grouped$ActiveBaseline_modulation_direction = factor(df_grouped$ActiveBaselin
 levels(df_grouped$ActiveBaseline_modulation_direction) = c('Task-suppressed', 'Task-enhanced', 'Task-unchanged')
 
 lme_data = df_grouped[df_grouped$ActiveBaseline_modulation_direction=='Task-suppressed',]
-lme_bin <- glmmTMB((sqrt(auroc_timeSlice_abs))~ TrialType + (1 | Subject/Unit/TrialType),  data=lme_data, family=gaussian)
+lme_bin <- glmmTMB((sqrt(phasic_modulation))~ TrialType + (1 | Subject/Unit/TrialType),  data=lme_data, family=gaussian)
 simulationOutput <- simulateResiduals(fittedModel = lme_bin, plot = T, re.form=NULL)  # pass
 Anova(lme_bin)
 pairs(regrid(emmeans(lme_bin,  ~TrialType)),  adjust='Bonferroni')
 
 lme_data = df_grouped[df_grouped$ActiveBaseline_modulation_direction=='Task-enhanced',]
-lme_bin <- glmmTMB((sqrt(auroc_timeSlice_abs))~ TrialType + (1 | Subject/Unit/TrialType),  data=lme_data, family=gaussian)
+lme_bin <- glmmTMB((sqrt(phasic_modulation))~ TrialType + (1 | Subject/Unit/TrialType),  data=lme_data, family=gaussian)
 simulationOutput <- simulateResiduals(fittedModel = lme_bin, plot = T, re.form=NULL)  # pass
 Anova(lme_bin)
 pairs(regrid(emmeans(lme_bin,  ~TrialType)),  adjust='Bonferroni')
 
 lme_data = df_grouped[df_grouped$ActiveBaseline_modulation_direction=='Task-unchanged',]
-lme_bin <- glmmTMB((log(auroc_timeSlice_abs+0.1))*100~ TrialType + (1 | Subject/Unit/TrialType),  data=lme_data, family=gaussian)
+lme_bin <- glmmTMB((log(phasic_modulation+0.1))*100~ TrialType + (1 | Subject/Unit/TrialType),  data=lme_data, family=gaussian)
 simulationOutput <- simulateResiduals(fittedModel = lme_bin, plot = T, re.form=NULL)  # pass
 Anova(lme_bin)
 pairs(regrid(emmeans(lme_bin,  ~TrialType)),  adjust='Bonferroni')
@@ -804,7 +808,7 @@ p
 time_slice = c(-0.5, 0)
 df_grouped = auroc_df[auroc_df$TrialType %in% c('SpoutOff_hits_auroc', 'SpoutOff_FAs_auroc'),] %>% group_by(Unit, Subject, TrialType, ActiveBaseline_modulation_direction) %>%
   summarise( 
-    auroc_timeSlice_abs = mean(abs(auROC[(Time_s >= time_slice[1]) & (Time_s < time_slice[2])] - 0.5), na.rm=T)
+    phasic_modulation = mean(abs(auROC[(Time_s >= time_slice[1]) & (Time_s < time_slice[2])] - 0.5), na.rm=T)
   )
 df_grouped$TrialType = factor(df_grouped$TrialType, levels=c('SpoutOff_hits_auroc', 'SpoutOff_FAs_auroc'))
 levels(df_grouped$TrialType) = c('Hit', 'False alarm')
@@ -812,17 +816,17 @@ df_grouped$ActiveBaseline_modulation_direction = factor(df_grouped$ActiveBaselin
 levels(df_grouped$ActiveBaseline_modulation_direction) = c('Task-suppressed', 'Task-enhanced', 'Task-unchanged')
 
 lme_data = df_grouped[df_grouped$ActiveBaseline_modulation_direction=='Task-suppressed',]
-lme_bin <- glmmTMB((log(auroc_timeSlice_abs+0.1))~ TrialType + (1 | Subject/Unit/TrialType),  data=lme_data, family=gaussian)
+lme_bin <- glmmTMB((log(phasic_modulation+0.1))~ TrialType + (1 | Subject/Unit/TrialType),  data=lme_data, family=gaussian)
 simulationOutput <- simulateResiduals(fittedModel = lme_bin, plot = T, re.form=NULL)  # pass
 Anova(lme_bin)
 
 lme_data = df_grouped[df_grouped$ActiveBaseline_modulation_direction=='Task-enhanced',]
-lme_bin <- glmmTMB((log(auroc_timeSlice_abs+0.1))~ TrialType + (1 | Subject/Unit/TrialType),  data=lme_data, family=gaussian)
+lme_bin <- glmmTMB((log(phasic_modulation+0.1))~ TrialType + (1 | Subject/Unit/TrialType),  data=lme_data, family=gaussian)
 simulationOutput <- simulateResiduals(fittedModel = lme_bin, plot = T, re.form=NULL)  # pass
 Anova(lme_bin)
 
 lme_data = df_grouped[df_grouped$ActiveBaseline_modulation_direction=='Task-unchanged',]
-lme_bin <- glmmTMB((log(auroc_timeSlice_abs+0.1))~ TrialType + (1 | Subject/Unit/TrialType),  data=lme_data, family=gaussian)
+lme_bin <- glmmTMB((log(phasic_modulation+0.1))~ TrialType + (1 | Subject/Unit/TrialType),  data=lme_data, family=gaussian)
 simulationOutput <- simulateResiduals(fittedModel = lme_bin, plot = T, re.form=NULL)  # pass
 Anova(lme_bin)
 ```
