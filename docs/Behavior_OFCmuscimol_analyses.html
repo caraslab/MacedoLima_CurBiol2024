@@ -746,6 +746,9 @@ p</code></pre>
 <pre class="r"><code>lme_data = graph_data
 lme_bin &lt;- glmmTMB(FA_rate~Miss_rate + (1 | Subject) , data=lme_data, family=gaussian)
 simulationOutput &lt;- simulateResiduals(fittedModel = lme_bin, plot = T, re.form=NULL)  # pass</code></pre>
+<pre><code>## qu = 0.75, log(sigma) = -3.560721 : outer Newton did not converge fully.</code></pre>
+<pre><code>## Warning in newton(lsp = lsp, X = G$X, y = G$y, Eb = G$Eb, UrS = G$UrS, L = G$L,
+## : Fitting terminated with step failure - check results carefully</code></pre>
 <p><img src="Behavior_OFCmuscimol_analyses_files/figure-html/unnamed-chunk-17-1.png" width="672" /></p>
 <pre class="r"><code>Anova(lme_bin)</code></pre>
 <pre><code>## Analysis of Deviance Table (Type II Wald chisquare tests)
